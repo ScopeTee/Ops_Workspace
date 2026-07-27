@@ -110,12 +110,17 @@ input,select,textarea{font-family:var(--font-body)}
 .view{display:none}
 .view.active{display:block}
 
+.back-link{display:inline-flex;align-items:center;gap:7px;font-size:13px;font-weight:600;color:var(--silver-light);text-decoration:none;margin-bottom:14px;transition:.12s}
+.back-link:hover{color:var(--green-dark)}
+.back-link svg{flex-shrink:0}
+
 /* ==========================================================================
    Reusable components
    ========================================================================== */
 .card{background:var(--white);border:1px solid var(--border-tint);border-radius:var(--radius-xl);box-shadow:var(--shadow-e1)}
 .card-pad{padding:22px 24px}
-.section-title{font-family:var(--font-display);font-weight:600;font-size:17px;color:var(--green-dark);margin:0 0 4px}
+.section-title{font-family:var(--font-display);font-weight:600;font-size:17px;color:var(--green-dark);margin:0 0 4px;display:flex;align-items:center;gap:8px}
+.section-title svg{color:var(--green-accent-hover);flex-shrink:0}
 .section-sub{font-size:13px;color:var(--silver-light);margin:0 0 18px}
 .powered-by{font-size:11px;color:var(--silver-light);margin:2px 0 18px}
 .powered-by b{color:var(--silver-dark)}
@@ -139,23 +144,25 @@ input,select,textarea{font-family:var(--font-body)}
 .btn-icon{width:36px;height:36px;padding:0;border-radius:var(--radius-md)}
 
 .chip{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;font-weight:700;padding:4px 10px;border-radius:var(--radius-sm);white-space:nowrap}
-.chip-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
 .chip-neutral{background:var(--green-chip-bg);color:#4a5a3f}
 .chip-success{background:var(--success-bg);color:var(--success-text)}
 .chip-warning{background:var(--gold-bg);color:var(--gold-text)}
 .chip-error{background:var(--error-bg);color:var(--error-text)}
 
-.status-chip{display:inline-flex;align-items:center;gap:7px;font-size:12px;font-weight:700;padding:5px 12px;border-radius:999px}
+.status-chip{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;padding:5px 12px;border-radius:999px}
 .status-chip .status-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.status-chip .status-icon{display:inline-flex;flex-shrink:0}
 .status-active{background:var(--green-light-surface);color:var(--green-dark)}
 .status-active .status-dot{background:var(--green-accent);animation:status-pulse 2s infinite}
 .status-completed{background:var(--success-bg);color:var(--success-text)}
-.status-completed .status-dot{background:var(--success)}
 .status-cancelled{background:var(--green-chip-bg);color:#5c5c5c}
-.status-cancelled .status-dot{background:#9a9a9a}
 @keyframes status-pulse{0%{box-shadow:0 0 0 0 rgba(191,251,79,.5)}70%{box-shadow:0 0 0 6px rgba(191,251,79,0)}100%{box-shadow:0 0 0 0 rgba(191,251,79,0)}}
 
-.badge-sla{display:inline-flex;align-items:center;gap:7px;font-size:12.5px;font-weight:700;padding:6px 13px;border-radius:999px}
+.badge-sla{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:700;padding:6px 13px;border-radius:999px}
+.badge-sla .sla-icon{display:inline-flex;flex-shrink:0}
+.badge-sla.sm{padding:3px 9px;font-size:10.5px;gap:5px}
+
+.status-stack{display:flex;flex-direction:column;gap:4px;align-items:flex-start}
 
 .avatar{display:grid;place-items:center;border-radius:10px;font-family:var(--font-display);font-weight:600;flex-shrink:0}
 .avatar-sm{width:32px;height:32px;font-size:11.5px;border-radius:8px}
@@ -164,7 +171,7 @@ input,select,textarea{font-family:var(--font-body)}
 
 .tabs{display:flex;gap:8px;border-bottom:1px solid var(--border-tint);margin-bottom:24px}
 .tab-btn{
-  background:transparent;border:none;padding:12px 4px;margin-right:22px;font-family:var(--font-display);
+  display:inline-flex;align-items:center;gap:7px;background:transparent;border:none;padding:12px 4px;margin-right:22px;font-family:var(--font-display);
   font-weight:600;font-size:14.5px;color:var(--silver-light);cursor:pointer;position:relative;top:1px;
   border-bottom:2.5px solid transparent;
 }
@@ -182,6 +189,19 @@ table{width:100%;border-collapse:collapse}
 .data-table tbody tr.clickable{cursor:pointer;transition:.12s}
 .data-table tbody tr.clickable:hover{background:var(--green-light-surface)}
 .table-wrap{overflow:auto;max-height:65vh}
+
+.data-table tbody tr.sla-at-risk td:first-child{border-left:3px solid var(--gold)}
+.data-table tbody tr.sla-at-risk .task-name{color:var(--gold-text)}
+.data-table tbody tr.sla-breached td:first-child{border-left:3px solid var(--error)}
+.data-table tbody tr.sla-breached .task-name{color:var(--error-text)}
+.task-name{color:var(--green-dark);font-weight:700}
+.sla-history-note{font-size:10.5px;margin-top:4px;font-weight:700}
+.sla-history-note.breach{color:var(--error-text)}
+.sla-history-note.at-risk{color:var(--gold-text)}
+
+.task-owner-btn{display:inline-flex;align-items:center;gap:7px;background:transparent;border:1px solid transparent;border-radius:6px;padding:4px 8px 4px 4px;font-size:12.5px;font-weight:600;color:var(--silver-dark);cursor:pointer;transition:.12s}
+.task-owner-btn:hover{background:var(--green-light-surface);border-color:var(--border-tint)}
+.task-owner-btn .chevron-sm{color:var(--silver-light);flex-shrink:0}
 
 .form-field{position:relative;margin-bottom:18px}
 .form-field label.field-label{
@@ -235,7 +255,7 @@ textarea.field-control{resize:vertical;min-height:70px}
 /* Dropdown menu (Actions button + row overflow menus) */
 .dropdown{position:relative;display:inline-block}
 .dropdown-menu{position:absolute;right:0;top:calc(100% + 6px);background:var(--white);border:1px solid var(--border-tint);border-radius:var(--radius-md);box-shadow:var(--shadow-e3);min-width:220px;padding:6px;display:none;z-index:50}
-.dropdown-menu-sm{min-width:160px}
+.dropdown-menu-sm{min-width:170px}
 .dropdown.open .dropdown-menu{display:block}
 .dropdown-toggle .chevron{transition:transform .15s}
 .dropdown.open .dropdown-toggle .chevron{transform:rotate(180deg)}
@@ -243,6 +263,7 @@ textarea.field-control{resize:vertical;min-height:70px}
 .dropdown-item:hover{background:var(--green-light-surface)}
 .dropdown-item-danger{color:var(--error)}
 .dropdown-item-danger:hover{background:var(--error-bg)}
+.task-owner-dropdown .dropdown-menu{max-height:280px;overflow:auto}
 
 /* Toast */
 #toast-wrap{position:fixed;bottom:24px;right:24px;z-index:2000;display:flex;flex-direction:column;gap:10px}
@@ -262,6 +283,8 @@ textarea.field-control{resize:vertical;min-height:70px}
 .ship-header-id h1{font-size:28px;letter-spacing:-.01em}
 .ship-header-strip{display:flex;align-items:stretch;gap:26px;padding-top:18px;border-top:1px solid var(--border-tint-soft);flex-wrap:wrap}
 .strip-cell{display:flex;flex-direction:column;justify-content:center;gap:6px;min-width:0}
+.strip-cell .k-row{display:flex;align-items:center;gap:5px}
+.strip-cell .k-row svg{color:var(--silver-light);flex-shrink:0}
 .strip-cell .k{font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--silver-light);font-weight:700}
 .strip-cell .v{font-size:14.5px;font-weight:600;color:var(--green-dark)}
 .strip-divider{width:1px;background:var(--border-tint);align-self:stretch}
@@ -274,6 +297,8 @@ textarea.field-control{resize:vertical;min-height:70px}
 
 /* Details grid */
 .detail-fields-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px 24px}
+.detail-field .k-row{display:flex;align-items:center;gap:5px;margin-bottom:6px}
+.detail-field .k-row svg{color:var(--silver-light);flex-shrink:0}
 .detail-field .k{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--silver-light);font-weight:700;margin-bottom:6px}
 .detail-field .v{font-size:14.5px;font-weight:600;color:var(--green-dark)}
 .quote-link{color:var(--green-dark);font-weight:700;text-decoration:underline;text-decoration-color:rgba(2,56,25,.35);text-underline-offset:2px;cursor:pointer}
@@ -294,15 +319,19 @@ textarea.field-control{resize:vertical;min-height:70px}
 .primary-toggle:hover{border-color:var(--green-dark)}
 .primary-toggle.active{background:var(--green-accent);border-color:var(--green-accent);color:var(--green-dark)}
 
+/* Progress tab layout */
+.progress-layout{display:grid;grid-template-columns:1.9fr 1fr;gap:22px;align-items:start}
+@media (max-width:1100px){.progress-layout{grid-template-columns:1fr}}
+
 /* Timeline (shipment tracking) */
-.timeline{position:relative;padding-left:6px}
-.timeline-item{display:flex;gap:16px;position:relative;padding-bottom:26px}
+.timeline{position:relative;padding-left:2px}
+.timeline-item{display:flex;gap:14px;position:relative;padding-bottom:24px}
 .timeline-item:last-child{padding-bottom:0}
 .timeline-item .rail{position:relative;display:flex;flex-direction:column;align-items:center;flex-shrink:0}
-.timeline-dot{width:14px;height:14px;border-radius:50%;background:var(--green-dark);border:3px solid var(--green-accent);z-index:1;flex-shrink:0;margin-top:2px}
-.timeline-item.pending .timeline-dot{background:var(--white);border-color:var(--border-tint);border-width:2px}
+.timeline-dot{width:26px;height:26px;border-radius:50%;background:var(--green-dark);color:var(--green-accent);display:grid;place-items:center;z-index:1;flex-shrink:0}
+.timeline-item.pending .timeline-dot{background:var(--white);border:2px solid var(--border-tint);color:var(--silver-light)}
 .timeline-line{width:2px;flex:1;background:var(--border-tint);margin-top:2px}
-.timeline-content{flex:1;padding-bottom:2px}
+.timeline-content{flex:1;padding-bottom:2px;padding-top:2px}
 .track-top{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:3px}
 .track-source-tag{display:inline-flex;align-items:center;font-size:10px;font-weight:700;padding:3px 8px;border-radius:5px;text-transform:uppercase;letter-spacing:.04em;flex-shrink:0}
 .tag-terminal{background:var(--green-chip-bg);color:#4a5a3f}
@@ -311,9 +340,6 @@ textarea.field-control{resize:vertical;min-height:70px}
 .timeline-content .ttitle{font-weight:700;color:var(--green-dark);font-size:13.5px}
 .timeline-item.pending .timeline-content .ttitle{color:var(--silver-light);font-weight:600}
 .timeline-content .tmeta{font-size:12px;color:var(--silver-light);margin-top:3px}
-
-/* Service delivery */
-.sla-breach-note{font-size:10.5px;color:var(--error-text);margin-top:4px;font-weight:700}
 
 /* Documents */
 .doc-header-stats{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:14px}
@@ -334,9 +360,6 @@ textarea.field-control{resize:vertical;min-height:70px}
 .file-pill .fsize{color:var(--silver-light);flex-shrink:0}
 .file-pill .frm{background:transparent;border:none;color:var(--silver-light);flex-shrink:0}
 .file-pill .frm:hover{color:var(--error)}
-
-.info-callout{display:flex;gap:14px;align-items:flex-start;background:var(--white);border:1px solid var(--border-tint);border-left:4px solid var(--green-accent);border-radius:var(--radius-lg);padding:16px 18px}
-.info-callout p{margin:0;font-size:13px;color:var(--silver-dark);line-height:1.6}
 
 .page-head{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:18px;flex-wrap:wrap;gap:12px}
 .page-head h1{font-size:24px;margin-bottom:4px}
@@ -437,11 +460,28 @@ textarea.field-control{resize:vertical;min-height:70px}
             <h1>Shipments</h1>
             <div class="sub" id="shipments-count-label">Loading shipments…</div>
           </div>
+          <div class="dropdown">
+            <button class="btn btn-accent dropdown-toggle" type="button">
+              <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" stroke-linecap="round"></path></svg>
+              Add Shipment
+              <svg class="chevron" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.4" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+            </button>
+            <div class="dropdown-menu">
+              <button class="dropdown-item" data-add-shipment="quote">
+                <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 3h6a2 2 0 012 2v14l-5-3-5 3V5a2 2 0 012-2z"></path></svg>
+                Create from Quote
+              </button>
+              <button class="dropdown-item" data-add-shipment="manual">
+                <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"></path><path d="M18.5 2.5a2.1 2.1 0 013 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                Create Manually
+              </button>
+            </div>
+          </div>
         </div>
 
         <div class="list-search">
           <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="M21 21l-4-4" stroke-linecap="round"></path></svg>
-          <input type="text" id="shipment-search" placeholder="Search by Job Number or Shipment Owner...">
+          <input type="text" id="shipment-search" placeholder="Search by Shipment Reference or Shipment Owner...">
         </div>
 
         <div class="card">
@@ -449,13 +489,12 @@ textarea.field-control{resize:vertical;min-height:70px}
             <table class="data-table">
               <thead>
                 <tr>
-                  <th>Job Reference</th>
+                  <th>Shipment Reference</th>
                   <th>Customer</th>
                   <th>Route</th>
-                  <th>Mode</th>
+                  <th>Shipment Type</th>
+                  <th>Transport Mode</th>
                   <th>Status</th>
-                  <th>SLA</th>
-                  <th>ETA</th>
                   <th>Owner</th>
                 </tr>
               </thead>
@@ -468,14 +507,28 @@ textarea.field-control{resize:vertical;min-height:70px}
       <!-- ===================== SHIPMENT DETAIL ===================== -->
       <section class="view" id="view-shipment-detail">
 
+        <a href="#" class="back-link">
+          <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M19 12H5M11 18l-6-6 6-6" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+          Back to Shipments
+        </a>
+
         <!-- Header -->
         <div class="card ship-header-card" id="ship-header"></div>
 
         <!-- Tabs -->
         <div class="tabs">
-          <button class="tab-btn active" data-tab="overview">Overview</button>
-          <button class="tab-btn" data-tab="progress">Progress</button>
-          <button class="tab-btn" data-tab="documents">Documents</button>
+          <button class="tab-btn active" data-tab="overview">
+            <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"></rect><rect x="14" y="3" width="7" height="7" rx="1.5"></rect><rect x="14" y="14" width="7" height="7" rx="1.5"></rect><rect x="3" y="14" width="7" height="7" rx="1.5"></rect></svg>
+            Overview
+          </button>
+          <button class="tab-btn" data-tab="progress">
+            <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 17l6-6 4 4 8-8M21 7v6M15 7h6" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+            Progress
+          </button>
+          <button class="tab-btn" data-tab="documents">
+            <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 7a2 2 0 012-2h4l2 2h8a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V7z"></path></svg>
+            Documents
+          </button>
         </div>
 
         <!-- Tab: Overview -->
@@ -493,7 +546,10 @@ textarea.field-control{resize:vertical;min-height:70px}
           <div class="card card-pad">
             <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:18px;flex-wrap:wrap;gap:12px">
               <div>
-                <h3 class="section-title">Containers</h3>
+                <h3 class="section-title">
+                  <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 8l-9-5-9 5 9 5 9-5zM3 8v8l9 5 9-5V8M12 13v8"></path></svg>
+                  Containers
+                </h3>
                 <p class="section-sub" style="margin:0">Equipment assigned to this shipment.</p>
               </div>
               <button class="btn btn-accent btn-sm" id="btn-add-container">
@@ -514,22 +570,24 @@ textarea.field-control{resize:vertical;min-height:70px}
 
         <!-- Tab: Progress -->
         <div class="tab-pane" id="tab-progress" style="display:none">
-          <div class="card card-pad" style="margin-bottom:22px">
-            <h3 class="section-title">Service Delivery</h3>
-            <p class="section-sub">Milestones for this shipment. Completion is logged manually.</p>
-            <div class="table-wrap">
-              <table class="data-table">
-                <thead>
-                  <tr><th>Task</th><th>Owner</th><th>Status</th><th>SLA Health</th><th>Due Date</th><th style="text-align:right">Actions</th></tr>
-                </thead>
-                <tbody id="service-delivery-tbody"></tbody>
-              </table>
+          <div class="progress-layout">
+            <div class="card card-pad">
+              <h3 class="section-title">Service Delivery</h3>
+              <p class="section-sub">Milestones for this shipment. Completion is logged manually.</p>
+              <div class="table-wrap">
+                <table class="data-table">
+                  <thead>
+                    <tr><th>Task</th><th>Owner</th><th>Due Date &amp; Time</th><th>Status</th><th style="text-align:right">Actions</th></tr>
+                  </thead>
+                  <tbody id="service-delivery-tbody"></tbody>
+                </table>
+              </div>
             </div>
-          </div>
-          <div class="card card-pad">
-            <h3 class="section-title">Shipment Tracking</h3>
-            <div class="powered-by">Powered by <b>OneTrack365</b></div>
-            <div class="timeline" id="physical-timeline"></div>
+            <div class="card card-pad">
+              <h3 class="section-title">Shipment Tracking</h3>
+              <div class="powered-by">Powered by <b>OneTrack365</b></div>
+              <div class="timeline" id="physical-timeline"></div>
+            </div>
           </div>
         </div>
 
@@ -805,6 +863,21 @@ textarea.field-control{resize:vertical;min-height:70px}
 
 <script>
 /* ==========================================================================
+   Icon helpers (used sparingly across the interface)
+   ========================================================================== */
+const ICON_CHECK = `<svg width="10" height="10" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5" stroke-linecap="round" stroke-linejoin="round"></path></svg>`;
+const ICON_X = `<svg width="10" height="10" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18" stroke-linecap="round"></path></svg>`;
+const ICON_WARN = `<svg width="10" height="10" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path d="M12 9v4M12 16h.01" stroke-linecap="round"></path><circle cx="12" cy="12" r="9"></circle></svg>`;
+const ICON_BUILDING = `<svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 21h18M5 21V7l6-4 6 4v14M9 9h1M9 13h1M14 9h1M14 13h1"></path></svg>`;
+const ICON_PERSON = `<svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"></circle><path d="M4 21v-1a8 8 0 0116 0v1"></path></svg>`;
+const ICON_ROUTE = `<svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="6" cy="19" r="2"></circle><circle cx="18" cy="5" r="2"></circle><path d="M6 17V13a4 4 0 014-4h4a4 4 0 004-4"></path></svg>`;
+const SOURCE_ICON = {
+  Terminal: `<svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 21h18M5 21V9l7-6 7 6v12M9 21v-6h6v6"></path></svg>`,
+  Vessel: `<svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 17l1.2-5h13.6L20 17M6 12V7h3V5h6v2h3v5M3 21c1.3 0 1.3-1.3 2.6-1.3S7.9 21 9.2 21s1.3-1.3 2.6-1.3S14.1 21 15.4 21s1.3-1.3 2.6-1.3S20.3 21 21.6 21" stroke-linecap="round" stroke-linejoin="round"></path></svg>`,
+  Haulage: `<svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 16V6a1 1 0 011-1h9v11M3 16h10m0-11h3l4 4v7h-2M3 16a2 2 0 104 0 2 2 0 00-4 0zm10 0a2 2 0 104 0 2 2 0 00-4 0z" stroke-linecap="round" stroke-linejoin="round"></path></svg>`,
+};
+
+/* ==========================================================================
    Mock data
    ========================================================================== */
 const CURRENT_USER = 'Nkechi M.';
@@ -829,11 +902,15 @@ const SLA_CONFIG = {
   'At-Risk': {chip:'chip-warning', dot:'var(--gold)'},
   'Breached': {chip:'chip-error', dot:'var(--error)'},
 };
+function slaIcon(health){ return health==='Healthy' ? ICON_CHECK : ICON_WARN; }
 
 const STATUS_CLASS = { Active:'status-active', Completed:'status-completed', Cancelled:'status-cancelled' };
 function renderStatusChip(status){
   const cls = STATUS_CLASS[status] || 'status-active';
-  return `<span class="status-chip ${cls}"><span class="status-dot"></span>${status}</span>`;
+  let icon = `<span class="status-dot"></span>`;
+  if(status==='Completed') icon = `<span class="status-icon">${ICON_CHECK}</span>`;
+  else if(status==='Cancelled') icon = `<span class="status-icon">${ICON_X}</span>`;
+  return `<span class="status-chip ${cls}">${icon}${status}</span>`;
 }
 
 function shipmentTypeOf(s){ return s.mode.includes('Import') ? 'Import' : s.mode.includes('Export') ? 'Export' : 'Cross-trade'; }
@@ -846,6 +923,16 @@ function parseDisplayDate(str){
 }
 function formatDate(date){
   return date.toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'});
+}
+function formatDueDateTime(date){
+  if(!date) return '—';
+  const now = new Date();
+  const startOfDay = d => new Date(d.getFullYear(), d.getMonth(), d.getDate());
+  const diffDays = Math.round((startOfDay(date) - startOfDay(now)) / 86400000);
+  const timeStr = date.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit',hour12:false});
+  if(diffDays === 0) return `Today • ${timeStr}`;
+  if(diffDays === 1) return `Tomorrow • ${timeStr}`;
+  return `${formatDate(date)} • ${timeStr}`;
 }
 function daysBetween(a,b){ return Math.round((b.getTime()-a.getTime())/86400000); }
 function computeLiveSlaHealth(dueDate){
@@ -900,11 +987,15 @@ function buildShipmentDetail(base, seed){
   const milestones = template.map((name,i)=>{
     const frac = template.length>1 ? i/(template.length-1) : 0;
     let dueDate = new Date(etdDate.getTime() + span*frac);
+    dueDate.setHours(9 + ((i*3)%8), (i%2)*30, 0, 0);
     if(i === template.length-1 && seed % 3 === 0) dueDate = null;
+    // Demo overrides so "Today" / "Tomorrow" relative labels are always visible regardless of viewing date
+    if(seed===3 && i===4){ dueDate = new Date(); dueDate.setHours(14,30,0,0); }
+    if(seed===4 && i===6){ dueDate = new Date(); dueDate.setDate(dueDate.getDate()+1); dueDate.setHours(10,0,0,0); }
     const isDone = i < completedCount;
     let completedSlaHealth = null, completedBy = '', completedAt = null, comment = '';
     if(isDone){
-      completedSlaHealth = ((i+seed) % 5 === 0) ? 'Breached' : 'Healthy';
+      completedSlaHealth = ((i+seed) % 5 === 0) ? 'Breached' : ((i+seed) % 7 === 0) ? 'At-Risk' : 'Healthy';
       completedBy = teamMember(shipTeamIds[(i+seed+1)%shipTeamIds.length]).name;
       completedAt = new Date(Date.now() - (template.length-i)*86400000);
       comment = (i%3===0) ? 'Cleared without exceptions.' : '';
@@ -964,12 +1055,12 @@ function buildShipmentDetail(base, seed){
 }
 
 const SHIPMENT_LIST_BASE = [
-  {jobRef:'OP-SHP-10231', customer:'Dangote Industries', route:'Shanghai → Lagos', mode:'Ocean Import', status:'Active', slaHealth:'Healthy', eta:'02 Aug 2026', ownerId:'u1', supportingOwnerIds:['u5','u6'], completedMilestones:4, quoteRef:'OP-QT-8821', incoterm:'CIF', origin:'Shanghai, China', destination:'Lagos, Nigeria', pol:'Shanghai Yangshan Port', pod:'Apapa Port, Lagos', etd:'12 Jul 2026', serviceType:'Full Container Load'},
-  {jobRef:'OP-SHP-10228', customer:'Nestlé West Africa', route:'Rotterdam → Tema', mode:'Ocean Import', status:'Active', slaHealth:'At-Risk', eta:'29 Jul 2026', ownerId:'u2', supportingOwnerIds:['u4'], completedMilestones:6, quoteRef:'OP-QT-8790', incoterm:'FOB', origin:'Rotterdam, Netherlands', destination:'Tema, Ghana', pol:'Port of Rotterdam', pod:'Tema Port', etd:'05 Jul 2026', serviceType:'Full Container Load'},
-  {jobRef:'OP-SHP-10219', customer:'Julius Berger Nigeria', route:'Hamburg → Lagos', mode:'Ocean Import', status:'Active', slaHealth:'Breached', eta:'20 Jul 2026', ownerId:'u3', supportingOwnerIds:[], completedMilestones:1, quoteRef:'OP-QT-8744', incoterm:'CFR', origin:'Hamburg, Germany', destination:'Lagos, Nigeria', pol:'Port of Hamburg', pod:'Apapa Port, Lagos', etd:'01 Jul 2026', serviceType:'Break Bulk'},
-  {jobRef:'OP-SHP-10214', customer:'MTN Nigeria', route:'Shenzhen → Lagos', mode:'Air Import', status:'Cancelled', slaHealth:'Healthy', eta:'31 Jul 2026', ownerId:'u4', supportingOwnerIds:['u1'], completedMilestones:2, quoteRef:'OP-QT-8701', incoterm:'FCA', origin:'Shenzhen, China', destination:'Lagos, Nigeria', pol:'Shenzhen Bao\'an Airport', pod:'Murtala Muhammed Airport', etd:'27 Jul 2026', serviceType:'Air Freight'},
-  {jobRef:'OP-SHP-10201', customer:'Dufil Prima Foods', route:'Lagos → Douala', mode:'Ocean Export', status:'Active', slaHealth:'Healthy', eta:'26 Jul 2026', ownerId:'u5', supportingOwnerIds:['u2','u3'], completedMilestones:7, quoteRef:'OP-QT-8650', incoterm:'CIF', origin:'Lagos, Nigeria', destination:'Douala, Cameroon', pol:'Apapa Port, Lagos', pod:'Port of Douala', etd:'14 Jul 2026', serviceType:'Full Container Load'},
-  {jobRef:'OP-SHP-10188', customer:'Nigerian Breweries', route:'Antwerp → Lagos', mode:'Ocean Import', status:'Completed', slaHealth:'Healthy', eta:'10 Jul 2026', ownerId:'u6', supportingOwnerIds:[], completedMilestones:10, quoteRef:'OP-QT-8590', incoterm:'CIF', origin:'Antwerp, Belgium', destination:'Lagos, Nigeria', pol:'Port of Antwerp', pod:'Apapa Port, Lagos', etd:'20 Jun 2026', serviceType:'Full Container Load'},
+  {jobRef:'ZELO000001', customer:'Dangote Industries', route:'Shanghai → Lagos', mode:'Ocean Import', status:'Active', slaHealth:'Healthy', eta:'02 Aug 2026', ownerId:'u1', supportingOwnerIds:['u5','u6'], completedMilestones:4, quoteRef:'OP-QT-8821', incoterm:'CIF', origin:'Shanghai, China', destination:'Lagos, Nigeria', pol:'Shanghai Yangshan Port', pod:'Apapa Port, Lagos', etd:'12 Jul 2026', serviceType:'Full Container Load'},
+  {jobRef:'ZELO000002', customer:'Nestlé West Africa', route:'Rotterdam → Tema', mode:'Ocean Import', status:'Active', slaHealth:'At-Risk', eta:'29 Jul 2026', ownerId:'u2', supportingOwnerIds:['u4'], completedMilestones:6, quoteRef:'OP-QT-8790', incoterm:'FOB', origin:'Rotterdam, Netherlands', destination:'Tema, Ghana', pol:'Port of Rotterdam', pod:'Tema Port', etd:'05 Jul 2026', serviceType:'Full Container Load'},
+  {jobRef:'ZELO000003', customer:'Julius Berger Nigeria', route:'Hamburg → Lagos', mode:'Ocean Import', status:'Active', slaHealth:'Breached', eta:'20 Jul 2026', ownerId:'u3', supportingOwnerIds:[], completedMilestones:1, quoteRef:'OP-QT-8744', incoterm:'CFR', origin:'Hamburg, Germany', destination:'Lagos, Nigeria', pol:'Port of Hamburg', pod:'Apapa Port, Lagos', etd:'01 Jul 2026', serviceType:'Break Bulk'},
+  {jobRef:'ZELO000004', customer:'MTN Nigeria', route:'Shenzhen → Lagos', mode:'Air Import', status:'Cancelled', slaHealth:'Healthy', eta:'31 Jul 2026', ownerId:'u4', supportingOwnerIds:['u1'], completedMilestones:2, quoteRef:'OP-QT-8701', incoterm:'FCA', origin:'Shenzhen, China', destination:'Lagos, Nigeria', pol:'Shenzhen Bao\'an Airport', pod:'Murtala Muhammed Airport', etd:'27 Jul 2026', serviceType:'Air Freight'},
+  {jobRef:'ZELO000005', customer:'Dufil Prima Foods', route:'Lagos → Douala', mode:'Ocean Export', status:'Active', slaHealth:'Healthy', eta:'26 Jul 2026', ownerId:'u5', supportingOwnerIds:['u2','u3'], completedMilestones:7, quoteRef:'OP-QT-8650', incoterm:'CIF', origin:'Lagos, Nigeria', destination:'Douala, Cameroon', pol:'Apapa Port, Lagos', pod:'Port of Douala', etd:'14 Jul 2026', serviceType:'Full Container Load'},
+  {jobRef:'ZELO000006', customer:'Nigerian Breweries', route:'Antwerp → Lagos', mode:'Ocean Import', status:'Completed', slaHealth:'Healthy', eta:'10 Jul 2026', ownerId:'u6', supportingOwnerIds:[], completedMilestones:10, quoteRef:'OP-QT-8590', incoterm:'CIF', origin:'Antwerp, Belgium', destination:'Lagos, Nigeria', pol:'Port of Antwerp', pod:'Apapa Port, Lagos', etd:'20 Jun 2026', serviceType:'Full Container Load'},
 ];
 
 const SHIPMENTS = {};
@@ -1064,10 +1155,14 @@ function renderShipmentsList(){
       <td><b style="color:var(--green-dark);font-family:var(--font-display);font-weight:600">${s.jobRef}</b></td>
       <td>${s.customer}</td>
       <td>${s.route}</td>
-      <td><span class="chip chip-neutral">${s.mode}</span></td>
-      <td>${renderStatusChip(s.status)}</td>
-      <td><span class="badge-sla ${sla.chip}"><span class="chip-dot" style="background:${sla.dot}"></span>${s.slaHealth}</span></td>
-      <td>${s.eta}</td>
+      <td><span class="chip chip-neutral">${shipmentTypeOf(s)}</span></td>
+      <td><span class="chip chip-neutral">${transportLabelOf(s)}</span></td>
+      <td>
+        <div class="status-stack">
+          ${renderStatusChip(s.status)}
+          <span class="badge-sla sm ${sla.chip}"><span class="sla-icon">${slaIcon(s.slaHealth)}</span>${s.slaHealth}</span>
+        </div>
+      </td>
       <td>
         <div style="display:flex;align-items:center;gap:8px">
           <div class="avatar avatar-sm" style="${avatarFillStyle(primary.fill)}">${primary.initials}</div>
@@ -1076,7 +1171,7 @@ function renderShipmentsList(){
         </div>
       </td>
     </tr>`;
-  }).join('') || `<tr><td colspan="8" style="text-align:center;color:var(--silver-light);padding:40px">No shipments match your search.</td></tr>`;
+  }).join('') || `<tr><td colspan="7" style="text-align:center;color:var(--silver-light);padding:40px">No shipments match your search.</td></tr>`;
 }
 
 /* ==========================================================================
@@ -1103,7 +1198,7 @@ function renderShipHeader(){
       <div class="ship-header-id">
         <h1>${s.jobRef}</h1>
         ${renderStatusChip(s.status)}
-        <span class="badge-sla ${sla.chip}"><span class="chip-dot" style="background:${sla.dot}"></span>${s.slaHealth}</span>
+        <span class="badge-sla ${sla.chip}"><span class="sla-icon">${slaIcon(s.slaHealth)}</span>${s.slaHealth}</span>
       </div>
       <div class="dropdown">
         <button class="btn btn-solid dropdown-toggle" type="button">
@@ -1127,11 +1222,17 @@ function renderShipHeader(){
       </div>
     </div>
     <div class="ship-header-strip">
-      <div class="strip-cell"><div class="k">Customer</div><div class="v">${s.customer}</div></div>
+      <div class="strip-cell">
+        <div class="k-row">${ICON_BUILDING}<span class="k">Customer</span></div>
+        <div class="v">${s.customer}</div>
+      </div>
       <span class="strip-divider"></span>
       <div class="strip-cell"><div class="k">Shipment Type</div><div class="v">${shipmentTypeOf(s)}</div></div>
       <span class="strip-divider"></span>
-      <div class="strip-cell"><div class="k">Route</div><div class="v">${transportLabelOf(s)} · ${s.route}</div></div>
+      <div class="strip-cell">
+        <div class="k-row">${ICON_ROUTE}<span class="k">Route</span></div>
+        <div class="v">${transportLabelOf(s)} · ${s.route}</div>
+      </div>
       <span class="strip-divider"></span>
       <div class="strip-cell strip-cell-grow">
         <div class="k">Service Delivery Progress</div>
@@ -1148,10 +1249,10 @@ function renderShipDetailFields(){
   const s = currentShipment();
   const primary = s.owners.primary, supporting = s.owners.supporting;
   const fields = [
-    ['Customer', s.customer],
+    [`${ICON_BUILDING}<span>Customer</span>`, s.customer],
     ['Quote Reference', `<a href="#" class="quote-link" data-quote-link>${s.quoteRef}</a>`],
-    ['Primary Owner', `<div style="display:flex;align-items:center;gap:8px"><div class="avatar avatar-sm" style="${avatarFillStyle(primary.fill)}">${primary.initials}</div>${primary.name}</div>`],
-    ['Supporting Team', supporting.length ? supporting.map(o=>o.name).join(', ') : '—'],
+    [`${ICON_PERSON}<span>Primary Owner</span>`, `<div style="display:flex;align-items:center;gap:8px"><div class="avatar avatar-sm" style="${avatarFillStyle(primary.fill)}">${primary.initials}</div>${primary.name}</div>`],
+    [`${ICON_PERSON}<span>Supporting Team</span>`, supporting.length ? supporting.map(o=>o.name).join(', ') : '—'],
     ['Transport Mode', s.mode],
     ['Shipment Type', shipmentTypeOf(s)],
     ['Service Type', s.serviceType],
@@ -1163,9 +1264,10 @@ function renderShipDetailFields(){
     ['ETD', s.etd],
     ['ETA', s.eta],
   ];
-  el('ship-detail-fields').innerHTML = fields.map(([k,v])=>`
-    <div class="detail-field"><div class="k">${k}</div><div class="v">${v}</div></div>
-  `).join('');
+  el('ship-detail-fields').innerHTML = fields.map(([k,v])=>{
+    const label = k.includes('<svg') ? `<div class="k-row">${k}</div>` : `<div class="k">${k}</div>`;
+    return `<div class="detail-field">${label}<div class="v">${v}</div></div>`;
+  }).join('');
 }
 
 function renderContainers(){
@@ -1186,20 +1288,34 @@ function renderServiceDelivery(){
   const s = currentShipment();
   el('service-delivery-tbody').innerHTML = s.milestones.map(m=>{
     const owner = teamMember(m.ownerId);
-    const health = m.status==='Completed' ? m.completedSlaHealth : computeLiveSlaHealth(m.dueDate);
-    const slaCfg = SLA_CONFIG[health];
-    const dueLabel = m.dueDate ? formatDate(m.dueDate) : '—';
+    const isDone = m.status==='Completed';
+    const liveHealth = isDone ? null : computeLiveSlaHealth(m.dueDate);
+    const rowClass = !isDone && liveHealth==='Breached' ? 'sla-breached' : !isDone && liveHealth==='At-Risk' ? 'sla-at-risk' : '';
+    const dueLabel = formatDueDateTime(m.dueDate);
+    let historyNote = '';
+    if(isDone && m.completedSlaHealth==='Breached') historyNote = '<div class="sla-history-note breach">⚠ After Breach</div>';
+    else if(isDone && m.completedSlaHealth==='At-Risk') historyNote = '<div class="sla-history-note at-risk">⚠ Completed While At-Risk</div>';
     return `
-    <tr>
-      <td><b style="color:var(--green-dark)">${m.name}</b></td>
-      <td><div style="display:flex;align-items:center;gap:8px"><div class="avatar avatar-sm" style="${avatarFillStyle(owner.fill)}">${owner.initials}</div>${owner.name.split(' ')[0]}</div></td>
+    <tr class="${rowClass}">
+      <td><b class="task-name">${m.name}</b></td>
       <td>
-        <span class="chip ${m.status==='Completed'?'chip-success':'chip-neutral'}">${m.status}</span>
-        ${m.status==='Completed' && m.completedSlaHealth==='Breached' ? '<div class="sla-breach-note">⚠ Completed After SLA Breach</div>' : ''}
+        <div class="dropdown task-owner-dropdown">
+          <button type="button" class="task-owner-btn dropdown-toggle">
+            <div class="avatar avatar-sm" style="${avatarFillStyle(owner.fill)}">${owner.initials}</div>
+            <span>${owner.name.split(' ')[0]}</span>
+            <svg class="chevron-sm" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.4" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+          </button>
+          <div class="dropdown-menu dropdown-menu-sm">
+            ${TEAM.map(t=>`<button class="dropdown-item" data-reassign-task="${m.id}" data-new-owner="${t.id}"><div class="avatar avatar-sm" style="${avatarFillStyle(t.fill)}">${t.initials}</div>${t.name}</button>`).join('')}
+          </div>
+        </div>
       </td>
-      <td><span class="badge-sla ${slaCfg.chip}"><span class="chip-dot" style="background:${slaCfg.dot}"></span>${health}</span></td>
-      <td>${dueLabel}</td>
-      <td style="text-align:right">${m.status!=='Completed' ? `<button class="btn btn-outline btn-sm" data-complete-ms="${m.id}">Mark Complete</button>` : `<svg width="18" height="18" fill="none" stroke="#1F8A5B" stroke-width="2.4" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5" stroke-linecap="round" stroke-linejoin="round"></path></svg>`}</td>
+      <td class="due-cell">${dueLabel}</td>
+      <td>
+        <span class="chip ${isDone?'chip-success':'chip-neutral'}">${m.status}</span>
+        ${historyNote}
+      </td>
+      <td style="text-align:right">${!isDone ? `<button class="btn btn-outline btn-sm" data-complete-ms="${m.id}">Mark Complete</button>` : `<svg width="18" height="18" fill="none" stroke="#1F8A5B" stroke-width="2.4" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5" stroke-linecap="round" stroke-linejoin="round"></path></svg>`}</td>
     </tr>`;
   }).join('');
 }
@@ -1209,7 +1325,7 @@ function renderShipmentTracking(){
   el('physical-timeline').innerHTML = s.physicalTracking.map((ev,i)=>`
     <div class="timeline-item ${ev.done?'':'pending'}">
       <div class="rail">
-        <span class="timeline-dot"></span>
+        <span class="timeline-dot">${SOURCE_ICON[ev.source]}</span>
         ${i < s.physicalTracking.length-1 ? '<span class="timeline-line"></span>' : ''}
       </div>
       <div class="timeline-content">
@@ -1546,7 +1662,7 @@ el('confirm-delete-doc').addEventListener('click', ()=>{
 document.body.addEventListener('click', (e)=>{
   const t = e.target;
 
-  // dropdown toggle (Actions button, row overflow menus)
+  // dropdown toggle (Actions button, row overflow menus, task owner selector)
   const toggle = t.closest('.dropdown-toggle');
   if(toggle){
     const wrapper = toggle.closest('.dropdown');
@@ -1562,6 +1678,9 @@ document.body.addEventListener('click', (e)=>{
     document.querySelectorAll('.dropdown.open').forEach(w=>w.classList.remove('open'));
   }
 
+  const backLink = t.closest('.back-link');
+  if(backLink){ e.preventDefault(); navTo('shipments'); return; }
+
   const navItem = t.closest('.nav-item');
   if(navItem){ e.preventDefault(); navTo(navItem.dataset.nav); return; }
 
@@ -1576,12 +1695,25 @@ document.body.addEventListener('click', (e)=>{
 
   if(t.classList && t.classList.contains('modal-overlay')){ closeModal(t.id); return; }
 
+  const addShipment = t.closest('[data-add-shipment]');
+  if(addShipment){ showToast('Shipment creation isn\'t wired up in this prototype yet'); return; }
+
   if(t.closest('#btn-add-container')){ openContainerModal(null); return; }
   const cEdit = t.closest('[data-cid]');
   if(cEdit){ openContainerModal(cEdit.dataset.cid); return; }
 
   const msBtn = t.closest('[data-complete-ms]');
   if(msBtn){ openMilestoneModal(msBtn.dataset.completeMs); return; }
+
+  const reassignBtn = t.closest('[data-reassign-task]');
+  if(reassignBtn){
+    const s = currentShipment();
+    const m = s.milestones.find(x=>x.id===reassignBtn.dataset.reassignTask);
+    m.ownerId = reassignBtn.dataset.newOwner;
+    renderServiceDelivery();
+    showToast('Task reassigned to ' + teamMember(reassignBtn.dataset.newOwner).name);
+    return;
+  }
 
   const shipAction = t.closest('[data-ship-action]');
   if(shipAction){
