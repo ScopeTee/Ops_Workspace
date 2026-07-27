@@ -98,21 +98,13 @@ input,select,textarea{font-family:var(--font-body)}
 /* --- Main --- */
 .main{flex:1;min-width:0;display:flex;flex-direction:column}
 .topbar{
-  display:flex;align-items:center;justify-content:space-between;padding:18px 32px;
-  background:var(--white);border-bottom:1px solid var(--border-tint);position:sticky;top:0;z-index:20;
+  display:flex;align-items:center;padding:18px 32px;min-height:60px;
+  background:var(--white);border-bottom:1px solid var(--border-tint);position:sticky;top:0;z-index:30;
 }
 .breadcrumbs{display:flex;align-items:center;gap:8px;font-size:13.5px;font-family:var(--font-body)}
 .breadcrumbs .crumb{color:var(--silver-light)}
-.breadcrumbs .crumb.link{color:var(--green-dark);font-weight:600;cursor:pointer}
-.breadcrumbs .crumb.link:hover{text-decoration:underline}
+.breadcrumbs .crumb-current{color:var(--green-dark);font-weight:700}
 .breadcrumbs .sep{color:var(--silver-light)}
-.topbar-right{display:flex;align-items:center;gap:14px}
-.topbar-search{
-  display:flex;align-items:center;gap:8px;background:var(--green-light-surface);border-radius:var(--radius-md);
-  padding:8px 12px;width:240px;border:1px solid transparent;
-}
-.topbar-search input{border:none;outline:none;background:transparent;font-size:13px;width:100%;color:var(--silver-dark)}
-.topbar-search svg{flex-shrink:0;color:var(--silver-light)}
 
 .content{padding:28px 32px 64px;flex:1}
 .view{display:none}
@@ -125,7 +117,8 @@ input,select,textarea{font-family:var(--font-body)}
 .card-pad{padding:22px 24px}
 .section-title{font-family:var(--font-display);font-weight:600;font-size:17px;color:var(--green-dark);margin:0 0 4px}
 .section-sub{font-size:13px;color:var(--silver-light);margin:0 0 18px}
-.eyebrow{font-family:var(--font-body);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--silver-light);font-weight:700}
+.powered-by{font-size:11px;color:var(--silver-light);margin:2px 0 18px}
+.powered-by b{color:var(--silver-dark)}
 
 .btn{
   display:inline-flex;align-items:center;justify-content:center;gap:8px;border:none;cursor:pointer;
@@ -141,8 +134,6 @@ input,select,textarea{font-family:var(--font-body)}
 .btn-outline:hover{background:var(--green-dark);color:var(--green-accent)}
 .btn-ghost{background:transparent;color:var(--green-dark);padding:8px 10px}
 .btn-ghost:hover{background:var(--green-light-surface)}
-.btn-danger-ghost{background:transparent;color:var(--error);padding:8px 10px;font-weight:600}
-.btn-danger-ghost:hover{background:var(--error-bg)}
 .btn-sm{padding:8px 13px;font-size:12.5px}
 .btn:disabled{background:#8FA08C;color:var(--cream);cursor:not-allowed}
 .btn-icon{width:36px;height:36px;padding:0;border-radius:var(--radius-md)}
@@ -153,9 +144,16 @@ input,select,textarea{font-family:var(--font-body)}
 .chip-success{background:var(--success-bg);color:var(--success-text)}
 .chip-warning{background:var(--gold-bg);color:var(--gold-text)}
 .chip-error{background:var(--error-bg);color:var(--error-text)}
-.chip-dark{background:var(--green-dark);color:var(--green-accent)}
-.chip-accent{background:var(--green-accent);color:var(--green-dark)}
-.chip-pill{border-radius:999px}
+
+.status-chip{display:inline-flex;align-items:center;gap:7px;font-size:12px;font-weight:700;padding:5px 12px;border-radius:999px}
+.status-chip .status-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.status-active{background:var(--green-light-surface);color:var(--green-dark)}
+.status-active .status-dot{background:var(--green-accent);animation:status-pulse 2s infinite}
+.status-completed{background:var(--success-bg);color:var(--success-text)}
+.status-completed .status-dot{background:var(--success)}
+.status-cancelled{background:var(--green-chip-bg);color:#5c5c5c}
+.status-cancelled .status-dot{background:#9a9a9a}
+@keyframes status-pulse{0%{box-shadow:0 0 0 0 rgba(191,251,79,.5)}70%{box-shadow:0 0 0 6px rgba(191,251,79,0)}100%{box-shadow:0 0 0 0 rgba(191,251,79,0)}}
 
 .badge-sla{display:inline-flex;align-items:center;gap:7px;font-size:12.5px;font-weight:700;padding:6px 13px;border-radius:999px}
 
@@ -163,10 +161,6 @@ input,select,textarea{font-family:var(--font-body)}
 .avatar-sm{width:32px;height:32px;font-size:11.5px;border-radius:8px}
 .avatar-md{width:40px;height:40px;font-size:13.5px}
 .avatar-lg{width:52px;height:52px;font-size:17px;border-radius:13px}
-
-.owner-chip{display:flex;align-items:center;gap:10px;background:var(--green-light-surface);border:1px solid var(--border-tint);border-radius:var(--radius-lg);padding:9px 12px}
-.owner-chip .who .nm{font-family:var(--font-body);font-weight:700;font-size:13.5px;color:var(--green-dark)}
-.owner-chip .who .rl{font-size:11.5px;color:var(--silver-light)}
 
 .tabs{display:flex;gap:8px;border-bottom:1px solid var(--border-tint);margin-bottom:24px}
 .tab-btn{
@@ -180,13 +174,14 @@ input,select,textarea{font-family:var(--font-body)}
 table{width:100%;border-collapse:collapse}
 .data-table thead th{
   text-align:left;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--silver-light);
-  font-weight:700;padding:0 14px 12px;border-bottom:1px solid var(--border-tint);white-space:nowrap;
+  font-weight:700;padding:12px 16px;white-space:nowrap;position:sticky;top:0;z-index:2;
+  background:var(--green-light-surface);box-shadow:inset 0 -1px 0 var(--border-tint);
 }
-.data-table tbody td{padding:14px;border-bottom:1px solid var(--border-tint-soft);font-size:13.5px;vertical-align:middle}
+.data-table tbody td{padding:14px 16px;border-bottom:1px solid var(--border-tint-soft);font-size:13.5px;vertical-align:middle}
 .data-table tbody tr:last-child td{border-bottom:none}
 .data-table tbody tr.clickable{cursor:pointer;transition:.12s}
 .data-table tbody tr.clickable:hover{background:var(--green-light-surface)}
-.table-wrap{overflow-x:auto}
+.table-wrap{overflow:auto;max-height:65vh}
 
 .form-field{position:relative;margin-bottom:18px}
 .form-field label.field-label{
@@ -201,8 +196,7 @@ table{width:100%;border-collapse:collapse}
 }
 .field-control:focus{border-color:var(--green-dark);border-width:2px;padding:13px 13px}
 .form-field.err .field-control{border-color:var(--error);border-width:2px;color:var(--error)}
-.field-error-msg{font-size:11.5px;color:var(--error);margin-top:6px}
-.field-hint{font-size:11.5px;color:var(--silver-light);margin-top:6px}
+.field-hint{font-size:11.5px;color:var(--silver-light);margin-top:2px}
 select.field-control{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='none' stroke='%23808080' stroke-width='2' viewBox='0 0 24 24'%3E%3Cpath d='M6 9l6 6 6-6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center;padding-right:38px}
 textarea.field-control{resize:vertical;min-height:70px}
 .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:0 16px}
@@ -238,6 +232,18 @@ textarea.field-control{resize:vertical;min-height:70px}
 .modal-body{padding:24px 26px;overflow-y:auto}
 .modal-foot{display:flex;justify-content:flex-end;gap:10px;padding:18px 26px;border-top:1px solid var(--border-tint)}
 
+/* Dropdown menu (Actions button + row overflow menus) */
+.dropdown{position:relative;display:inline-block}
+.dropdown-menu{position:absolute;right:0;top:calc(100% + 6px);background:var(--white);border:1px solid var(--border-tint);border-radius:var(--radius-md);box-shadow:var(--shadow-e3);min-width:220px;padding:6px;display:none;z-index:50}
+.dropdown-menu-sm{min-width:160px}
+.dropdown.open .dropdown-menu{display:block}
+.dropdown-toggle .chevron{transition:transform .15s}
+.dropdown.open .dropdown-toggle .chevron{transform:rotate(180deg)}
+.dropdown-item{display:flex;align-items:center;gap:10px;width:100%;text-align:left;background:transparent;border:none;padding:10px 12px;border-radius:6px;font-size:13.5px;font-weight:600;color:var(--green-dark);cursor:pointer}
+.dropdown-item:hover{background:var(--green-light-surface)}
+.dropdown-item-danger{color:var(--error)}
+.dropdown-item-danger:hover{background:var(--error-bg)}
+
 /* Toast */
 #toast-wrap{position:fixed;bottom:24px;right:24px;z-index:2000;display:flex;flex-direction:column;gap:10px}
 .toast{
@@ -250,33 +256,45 @@ textarea.field-control{resize:vertical;min-height:70px}
 @keyframes toast-in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
 
 /* Header block on Shipment Detail */
-.ship-header-card{padding:26px 28px 24px;margin-bottom:24px}
-.ship-header-top{display:flex;justify-content:space-between;align-items:flex-start;gap:20px;flex-wrap:wrap;margin-bottom:18px}
+.ship-header-card{padding:24px 28px 22px;margin-bottom:24px}
+.ship-header-row1{display:flex;justify-content:space-between;align-items:flex-start;gap:20px;flex-wrap:wrap;margin-bottom:20px}
 .ship-header-id{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
-.ship-header-id h1{font-size:26px}
-.ship-header-meta{display:flex;flex-wrap:wrap;gap:22px;margin-top:14px}
-.meta-block .k{font-size:11px;letter-spacing:.07em;text-transform:uppercase;color:var(--silver-light);font-weight:700;margin-bottom:5px}
-.meta-block .v{font-size:14px;font-weight:600;color:var(--green-dark)}
-.ship-header-actions{display:flex;gap:10px;flex-wrap:wrap}
-.progress-pill-row{display:flex;align-items:center;gap:12px;margin-top:18px;padding-top:18px;border-top:1px solid var(--border-tint-soft)}
-.progress-bar-track{flex:1;max-width:340px;height:8px;border-radius:4px;background:var(--green-chip-bg);overflow:hidden}
+.ship-header-id h1{font-size:28px;letter-spacing:-.01em}
+.ship-header-strip{display:flex;align-items:stretch;gap:26px;padding-top:18px;border-top:1px solid var(--border-tint-soft);flex-wrap:wrap}
+.strip-cell{display:flex;flex-direction:column;justify-content:center;gap:6px;min-width:0}
+.strip-cell .k{font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--silver-light);font-weight:700}
+.strip-cell .v{font-size:14.5px;font-weight:600;color:var(--green-dark)}
+.strip-divider{width:1px;background:var(--border-tint);align-self:stretch}
+.strip-cell-grow{flex:1;min-width:220px}
+.progress-bar-track{height:8px;border-radius:4px;background:var(--green-chip-bg);overflow:hidden}
+.progress-bar-track.sm{height:7px;flex:1;max-width:220px}
 .progress-bar-fill{display:block;height:100%;background:var(--green-accent);border-radius:4px;transition:width .3s}
+.progress-inline{display:flex;align-items:center;gap:10px}
+.progress-frac{font-size:13px;font-weight:700;color:var(--green-dark);white-space:nowrap}
 
 /* Details grid */
 .detail-fields-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px 24px}
 .detail-field .k{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--silver-light);font-weight:700;margin-bottom:6px}
 .detail-field .v{font-size:14.5px;font-weight:600;color:var(--green-dark)}
+.quote-link{color:var(--green-dark);font-weight:700;text-decoration:underline;text-decoration-color:rgba(2,56,25,.35);text-underline-offset:2px;cursor:pointer}
+.quote-link:hover{text-decoration-color:var(--green-dark)}
 
-/* Container cards */
-.container-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px}
-.container-card{border:1px solid var(--border-tint);border-radius:var(--radius-lg);padding:16px 18px;position:relative}
-.container-card .cnum{font-family:var(--font-display);font-weight:600;font-size:15px;color:var(--green-dark);margin-bottom:10px;display:flex;justify-content:space-between;align-items:center}
-.container-card .crow{display:flex;justify-content:space-between;font-size:12.5px;color:var(--silver-dark);padding:4px 0}
-.container-card .crow .k{color:var(--silver-light)}
-.container-card .cedit{background:transparent;border:none;color:var(--silver-light);padding:4px;border-radius:6px}
-.container-card .cedit:hover{background:var(--green-light-surface);color:var(--green-dark)}
+/* Owner select (Assign Owner modal) */
+.owner-select-list{display:flex;flex-direction:column;gap:8px;max-height:340px;overflow:auto}
+.owner-select-row{display:flex;align-items:center;gap:12px;padding:10px 12px;border:1px solid var(--border-tint);border-radius:var(--radius-md);transition:.12s}
+.owner-select-row.is-primary{border-color:var(--green-accent);background:var(--green-light-surface)}
+.owner-select-row .owner-checkbox{width:18px;height:18px;accent-color:var(--green-dark);flex-shrink:0;cursor:pointer}
+.owner-select-row .who{flex:1;min-width:0}
+.owner-select-row .who .nm{font-weight:700;font-size:13.5px;color:var(--green-dark)}
+.owner-select-row .who .rl{font-size:11.5px;color:var(--silver-light)}
+.primary-toggle{
+  font-family:var(--font-display);font-weight:600;font-size:11.5px;padding:6px 12px;border-radius:var(--radius-sm);
+  background:var(--white);color:var(--green-dark);border:1.5px solid rgba(2,56,25,.25);cursor:pointer;white-space:nowrap;transition:.12s;
+}
+.primary-toggle:hover{border-color:var(--green-dark)}
+.primary-toggle.active{background:var(--green-accent);border-color:var(--green-accent);color:var(--green-dark)}
 
-/* Timeline (physical tracking) */
+/* Timeline (shipment tracking) */
 .timeline{position:relative;padding-left:6px}
 .timeline-item{display:flex;gap:16px;position:relative;padding-bottom:26px}
 .timeline-item:last-child{padding-bottom:0}
@@ -285,25 +303,17 @@ textarea.field-control{resize:vertical;min-height:70px}
 .timeline-item.pending .timeline-dot{background:var(--white);border-color:var(--border-tint);border-width:2px}
 .timeline-line{width:2px;flex:1;background:var(--border-tint);margin-top:2px}
 .timeline-content{flex:1;padding-bottom:2px}
+.track-top{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:3px}
+.track-source-tag{display:inline-flex;align-items:center;font-size:10px;font-weight:700;padding:3px 8px;border-radius:5px;text-transform:uppercase;letter-spacing:.04em;flex-shrink:0}
+.tag-terminal{background:var(--green-chip-bg);color:#4a5a3f}
+.tag-vessel{background:var(--green-light);color:var(--green-dark)}
+.tag-haulage{background:var(--gold-bg);color:var(--gold-text)}
 .timeline-content .ttitle{font-weight:700;color:var(--green-dark);font-size:13.5px}
 .timeline-item.pending .timeline-content .ttitle{color:var(--silver-light);font-weight:600}
 .timeline-content .tmeta{font-size:12px;color:var(--silver-light);margin-top:3px}
 
-/* Workstream / milestone */
-.workstream-card{margin-bottom:16px}
-.workstream-head{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;cursor:pointer;user-select:none}
-.workstream-head .left{display:flex;align-items:center;gap:12px}
-.workstream-head .wcount{font-size:12px;color:var(--silver-light);font-weight:600}
-.workstream-chevron{transition:transform .15s;color:var(--silver-light)}
-.workstream-card.collapsed .workstream-chevron{transform:rotate(-90deg)}
-.workstream-card.collapsed .milestone-list{display:none}
-.milestone-list{border-top:1px solid var(--border-tint-soft)}
-.milestone-row{display:grid;grid-template-columns:1.6fr 1fr 1fr 1fr 1.4fr auto;gap:14px;align-items:center;padding:14px 20px;border-bottom:1px solid var(--border-tint-soft)}
-.milestone-row:last-child{border-bottom:none}
-.milestone-row .m-name{font-weight:700;color:var(--green-dark);font-size:13.5px}
-.milestone-row .m-sub{font-size:11.5px;color:var(--silver-light);margin-top:2px}
-.milestone-row .m-cell-label{display:none}
-.milestone-row .m-notes{font-size:12.5px;color:var(--silver-dark)}
+/* Service delivery */
+.sla-breach-note{font-size:10.5px;color:var(--error-text);margin-top:4px;font-weight:700}
 
 /* Documents */
 .doc-header-stats{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:14px}
@@ -325,39 +335,21 @@ textarea.field-control{resize:vertical;min-height:70px}
 .file-pill .frm{background:transparent;border:none;color:var(--silver-light);flex-shrink:0}
 .file-pill .frm:hover{color:var(--error)}
 
-.doc-actions{display:flex;gap:4px}
-.doc-actions button{background:transparent;border:none;color:var(--silver-light);padding:6px;border-radius:6px;display:grid;place-items:center}
-.doc-actions button:hover{background:var(--green-light-surface);color:var(--green-dark)}
-.doc-actions button.danger:hover{background:var(--error-bg);color:var(--error)}
-
 .info-callout{display:flex;gap:14px;align-items:flex-start;background:var(--white);border:1px solid var(--border-tint);border-left:4px solid var(--green-accent);border-radius:var(--radius-lg);padding:16px 18px}
 .info-callout p{margin:0;font-size:13px;color:var(--silver-dark);line-height:1.6}
 
-.filter-row{display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap;align-items:center}
-.filter-chip{
-  font-family:var(--font-display);font-weight:600;font-size:12.5px;padding:8px 16px;border-radius:var(--radius-md);
-  background:var(--white);color:var(--green-dark);border:1.5px solid rgba(2,56,25,.2);cursor:pointer;transition:.12s;
-}
-.filter-chip:hover{border-color:var(--green-dark)}
-.filter-chip.active{background:var(--green-accent);color:var(--green-dark);border-color:var(--green-accent)}
-
-.page-head{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:22px;flex-wrap:wrap;gap:12px}
+.page-head{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:18px;flex-wrap:wrap;gap:12px}
 .page-head h1{font-size:24px;margin-bottom:4px}
 .page-head .sub{font-size:13.5px;color:var(--silver-light)}
 
-.checkbox-row{display:flex;align-items:center;gap:10px;margin-bottom:14px;cursor:pointer}
-.checkbox-box{width:20px;height:20px;border-radius:5px;border:1.5px solid var(--green-dark);background:var(--white);display:grid;place-items:center;flex-shrink:0;transition:.1s}
-.checkbox-box.checked{background:var(--green-accent);border-color:var(--green-accent)}
-.checkbox-label{font-size:13px;color:var(--silver-dark)}
-
-.two-col{display:grid;grid-template-columns:1.6fr 1fr;gap:22px;align-items:start}
-@media (max-width:1080px){.two-col{grid-template-columns:1fr}}
+.list-search{display:flex;align-items:center;gap:10px;background:var(--white);border:1.5px solid var(--border-tint);border-radius:var(--radius-md);padding:12px 16px;margin-bottom:18px;max-width:460px;transition:.12s}
+.list-search:focus-within{border-color:var(--green-dark);box-shadow:0 0 0 3px rgba(191,251,79,.25)}
+.list-search svg{color:var(--silver-light);flex-shrink:0}
+.list-search input{border:none;outline:none;background:transparent;font-size:13.5px;width:100%;color:var(--silver-dark)}
 
 @media (max-width:900px){
   .detail-fields-grid{grid-template-columns:repeat(2,1fr)}
   .form-grid{grid-template-columns:1fr}
-  .milestone-row{grid-template-columns:1fr;gap:6px}
-  .milestone-row .m-cell-label{display:inline;font-size:10.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--silver-light);font-weight:700;margin-right:6px}
 }
 </style>
 </head>
@@ -406,12 +398,6 @@ textarea.field-control{resize:vertical;min-height:70px}
   <div class="main">
     <header class="topbar">
       <div class="breadcrumbs" id="breadcrumbs"></div>
-      <div class="topbar-right">
-        <div class="topbar-search">
-          <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="M21 21l-4-4" stroke-linecap="round"></path></svg>
-          <input placeholder="Search job reference..." disabled title="Prototype — search not wired up">
-        </div>
-      </div>
     </header>
 
     <main class="content">
@@ -453,7 +439,10 @@ textarea.field-control{resize:vertical;min-height:70px}
           </div>
         </div>
 
-        <div class="filter-row" id="shipment-filters"></div>
+        <div class="list-search">
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="M21 21l-4-4" stroke-linecap="round"></path></svg>
+          <input type="text" id="shipment-search" placeholder="Search by Job Number or Shipment Owner...">
+        </div>
 
         <div class="card">
           <div class="table-wrap">
@@ -512,25 +501,35 @@ textarea.field-control{resize:vertical;min-height:70px}
                 Add Container
               </button>
             </div>
-            <div class="container-grid" id="container-grid"></div>
+            <div class="table-wrap">
+              <table class="data-table">
+                <thead>
+                  <tr><th>Container Number</th><th>Size</th><th>Type</th><th>Seal Number</th><th>Weight</th><th style="text-align:right">Actions</th></tr>
+                </thead>
+                <tbody id="container-tbody"></tbody>
+              </table>
+            </div>
           </div>
         </div>
 
         <!-- Tab: Progress -->
         <div class="tab-pane" id="tab-progress" style="display:none">
-          <div class="two-col">
-            <div>
-              <div class="card card-pad" style="margin-bottom:22px">
-                <h3 class="section-title">Service Delivery</h3>
-                <p class="section-sub">Milestones grouped by workstream. Completion is logged manually — milestones can run concurrently.</p>
-                <div id="workstream-list"></div>
-              </div>
+          <div class="card card-pad" style="margin-bottom:22px">
+            <h3 class="section-title">Service Delivery</h3>
+            <p class="section-sub">Milestones for this shipment. Completion is logged manually.</p>
+            <div class="table-wrap">
+              <table class="data-table">
+                <thead>
+                  <tr><th>Task</th><th>Owner</th><th>Status</th><th>SLA Health</th><th>Due Date</th><th style="text-align:right">Actions</th></tr>
+                </thead>
+                <tbody id="service-delivery-tbody"></tbody>
+              </table>
             </div>
-            <div class="card card-pad">
-              <h3 class="section-title">Physical Tracking</h3>
-              <p class="section-sub">Live OneTrack events. Read-only.</p>
-              <div class="timeline" id="physical-timeline"></div>
-            </div>
+          </div>
+          <div class="card card-pad">
+            <h3 class="section-title">Shipment Tracking</h3>
+            <div class="powered-by">Powered by <b>OneTrack365</b></div>
+            <div class="timeline" id="physical-timeline"></div>
           </div>
         </div>
 
@@ -552,7 +551,6 @@ textarea.field-control{resize:vertical;min-height:70px}
                 <thead>
                   <tr>
                     <th>File Name</th>
-                    <th>Document Type</th>
                     <th>Category</th>
                     <th>Uploaded By</th>
                     <th>Uploaded On</th>
@@ -573,21 +571,18 @@ textarea.field-control{resize:vertical;min-height:70px}
 
 <!-- ============================ MODALS ============================ -->
 
-<!-- Assign Owner -->
+<!-- Assign Owner (multi-select w/ Primary) -->
 <div class="modal-overlay" id="modal-assign-owner">
   <div class="modal">
     <div class="modal-head">
       <div>
         <h3>Assign Shipment Owner</h3>
-        <p>Choose the team member responsible for this shipment.</p>
+        <p>Choose everyone working this shipment, then mark exactly one as Primary.</p>
       </div>
       <button class="modal-close" data-close-modal><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18" stroke-linecap="round"></path></svg></button>
     </div>
     <div class="modal-body">
-      <div class="form-field filled">
-        <label class="field-label">Shipment Owner</label>
-        <select class="field-control" id="input-assign-owner"></select>
-      </div>
+      <div class="owner-select-list" id="owner-select-list"></div>
     </div>
     <div class="modal-foot">
       <button class="btn btn-outline" data-close-modal>Cancel</button>
@@ -602,7 +597,7 @@ textarea.field-control{resize:vertical;min-height:70px}
     <div class="modal-head">
       <div>
         <h3>Update Shipment Status</h3>
-        <p>Reflect the current operational stage of this job.</p>
+        <p>Set the overall status of this job.</p>
       </div>
       <button class="modal-close" data-close-modal><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18" stroke-linecap="round"></path></svg></button>
     </div>
@@ -610,14 +605,9 @@ textarea.field-control{resize:vertical;min-height:70px}
       <div class="form-field filled">
         <label class="field-label">Shipment Status</label>
         <select class="field-control" id="input-update-status">
-          <option>Booked</option>
-          <option>Documentation in Progress</option>
-          <option>In Transit</option>
-          <option>Arrived at Port of Discharge</option>
-          <option>Customs Clearance</option>
-          <option>Out for Delivery</option>
+          <option>Active</option>
           <option>Completed</option>
-          <option>On Hold</option>
+          <option>Cancelled</option>
         </select>
       </div>
       <div class="form-field">
@@ -704,29 +694,22 @@ textarea.field-control{resize:vertical;min-height:70px}
   </div>
 </div>
 
-<!-- Complete Milestone -->
+<!-- Mark Milestone Complete -->
 <div class="modal-overlay" id="modal-milestone">
   <div class="modal">
     <div class="modal-head">
       <div>
-        <h3>Mark Milestone Complete</h3>
-        <p id="milestone-modal-sub">Log completion details for this milestone.</p>
+        <h3>Mark Complete</h3>
+        <p id="milestone-modal-sub">Log completion for this milestone.</p>
       </div>
       <button class="modal-close" data-close-modal><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18" stroke-linecap="round"></path></svg></button>
     </div>
     <div class="modal-body">
-      <div class="form-field filled">
-        <label class="field-label">Completed By</label>
-        <input class="field-control" id="input-milestone-by" placeholder="Full name">
-      </div>
-      <div class="form-field filled">
-        <label class="field-label">Completed At</label>
-        <input class="field-control" id="input-milestone-at" type="datetime-local">
-      </div>
       <div class="form-field">
-        <label class="field-label">Notes (optional)</label>
-        <textarea class="field-control" id="input-milestone-notes" rows="3" placeholder="Any relevant detail..."></textarea>
+        <label class="field-label">Optional Comment</label>
+        <textarea class="field-control" id="input-milestone-comment" rows="3" placeholder="Add any relevant detail..."></textarea>
       </div>
+      <p class="field-hint">Completed by <b>Nkechi M.</b> at the current date and time — logged automatically.</p>
     </div>
     <div class="modal-foot">
       <button class="btn btn-outline" data-close-modal>Cancel</button>
@@ -754,35 +737,16 @@ textarea.field-control{resize:vertical;min-height:70px}
       </div>
       <div class="file-pill-list" id="file-pill-list"></div>
 
-      <div class="form-grid" style="margin-top:22px">
-        <div class="form-field">
-          <label class="field-label">Document Type (optional)</label>
-          <select class="field-control" id="input-doc-type">
-            <option value="">Select type…</option>
-            <option>Bill of Lading</option>
-            <option>Commercial Invoice</option>
-            <option>Packing List</option>
-            <option>Certificate of Origin</option>
-            <option>Customs Declaration</option>
-            <option>Insurance Certificate</option>
-            <option>Other</option>
-          </select>
-        </div>
-        <div class="form-field">
-          <label class="field-label">Category (optional)</label>
-          <select class="field-control" id="input-doc-category">
-            <option value="">Select category…</option>
-            <option>Shipping</option>
-            <option>Finance</option>
-            <option>Customs</option>
-            <option>Compliance</option>
-            <option>General</option>
-          </select>
-        </div>
-        <div class="form-field full">
-          <label class="field-label">Description (optional)</label>
-          <textarea class="field-control" id="input-doc-description" rows="2" placeholder="Brief note about these files..."></textarea>
-        </div>
+      <div class="form-field" style="margin-top:22px">
+        <label class="field-label">Category (optional)</label>
+        <select class="field-control" id="input-doc-category">
+          <option value="">Select category…</option>
+          <option>Shipping</option>
+          <option>Finance</option>
+          <option>Customs</option>
+          <option>Compliance</option>
+          <option>General</option>
+        </select>
       </div>
     </div>
     <div class="modal-foot">
@@ -843,6 +807,8 @@ textarea.field-control{resize:vertical;min-height:70px}
 /* ==========================================================================
    Mock data
    ========================================================================== */
+const CURRENT_USER = 'Nkechi M.';
+
 const TEAM = [
   {id:'u1', name:'James Adewale', role:'Sales Lead', initials:'JA', fill:'dark'},
   {id:'u2', name:'Sarah Adeyemi', role:'Ops Executive', initials:'SA', fill:'light'},
@@ -864,53 +830,54 @@ const SLA_CONFIG = {
   'Breached': {chip:'chip-error', dot:'var(--error)'},
 };
 
-const STATUS_CHIP = (status)=>{
-  const s = status.toLowerCase();
-  if(s.includes('completed')) return 'chip-success';
-  if(s.includes('hold')) return 'chip-error';
-  if(s.includes('transit')||s.includes('delivery')) return 'chip-warning';
-  return 'chip-neutral';
-};
+const STATUS_CLASS = { Active:'status-active', Completed:'status-completed', Cancelled:'status-cancelled' };
+function renderStatusChip(status){
+  const cls = STATUS_CLASS[status] || 'status-active';
+  return `<span class="status-chip ${cls}"><span class="status-dot"></span>${status}</span>`;
+}
 
-const WORKSTREAM_TEMPLATE = {
-  'Booking':[
-    {name:'Booking Confirmed', sla:'2 days'},
-    {name:'Carrier Allocation', sla:'1 day'},
-  ],
-  'Documentation':[
-    {name:'Bill of Lading Issued', sla:'3 days'},
-    {name:'Commercial Invoice Verified', sla:'2 days'},
-    {name:'Packing List Received', sla:'2 days'},
-  ],
-  'Finance':[
-    {name:'Freight Invoice Raised', sla:'3 days'},
-    {name:'Payment Confirmed', sla:'5 days'},
-  ],
-  'Customs':[
-    {name:'Customs Declaration Filed', sla:'2 days'},
-    {name:'Duties Assessed', sla:'2 days'},
-    {name:'Customs Cleared', sla:'4 days'},
-  ],
-  'Delivery':[
-    {name:'Delivery Order Issued', sla:'1 day'},
-    {name:'Final Delivery Confirmed', sla:'3 days'},
-  ],
-};
+function shipmentTypeOf(s){ return s.mode.includes('Import') ? 'Import' : s.mode.includes('Export') ? 'Export' : 'Cross-trade'; }
+function transportLabelOf(s){ return s.mode.includes('Ocean') ? 'Ocean Freight' : s.mode.includes('Air') ? 'Air Freight' : s.mode; }
+
+const MONTH_MAP = {Jan:0,Feb:1,Mar:2,Apr:3,May:4,Jun:5,Jul:6,Aug:7,Sep:8,Oct:9,Nov:10,Dec:11};
+function parseDisplayDate(str){
+  const [d,mon,y] = str.split(' ');
+  return new Date(parseInt(y,10), MONTH_MAP[mon], parseInt(d,10));
+}
+function formatDate(date){
+  return date.toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'});
+}
+function daysBetween(a,b){ return Math.round((b.getTime()-a.getTime())/86400000); }
+function computeLiveSlaHealth(dueDate){
+  if(!dueDate) return 'Healthy';
+  const diffDays = daysBetween(new Date(), dueDate);
+  if(diffDays < 0) return 'Breached';
+  if(diffDays <= 2) return 'At-Risk';
+  return 'Healthy';
+}
+
+const OCEAN_EXPORT_TEMPLATE = ['Booking Placement','Empty Container','Clean CCI','Draft BL to Customer','Gate-In','Inspection','Vessel Confirmation','Sailing Confirmation','OBL Issuance','Document Release'];
+const OCEAN_IMPORT_TEMPLATE = ['Pre-Alert Receipt','Form M Validation','PAAR Application','Draft Assessment','Final Assessment','THC Payment','Delivery','Empty Return','Post Delivery Docs','Document Release'];
 
 const PHYSICAL_TRACKING_TEMPLATE = [
-  {label:'Container Gated In · Origin Terminal', loc:'Shanghai Yangshan Port'},
-  {label:'Vessel Departed', loc:'Shanghai Yangshan Port'},
-  {label:'In Transit · Ocean Voyage', loc:'Indian Ocean'},
-  {label:'Transshipment', loc:'Port Klang, Malaysia'},
-  {label:'Vessel Arrived', loc:'Apapa Port, Lagos'},
-  {label:'Container Gated Out', loc:'Apapa Port, Lagos'},
+  {label:'Container Gated In · Origin Terminal', loc:'Shanghai Yangshan Port', source:'Terminal'},
+  {label:'Vessel Departed', loc:'Shanghai Yangshan Port', source:'Vessel'},
+  {label:'In Transit · Ocean Voyage', loc:'Indian Ocean', source:'Vessel'},
+  {label:'Transshipment', loc:'Port Klang, Malaysia', source:'Terminal'},
+  {label:'Vessel Arrived', loc:'Apapa Port, Lagos', source:'Vessel'},
+  {label:'Container Gated Out', loc:'Apapa Port, Lagos', source:'Terminal'},
+  {label:'Inland Haulage to Consignee', loc:'Lagos, Nigeria', source:'Haulage'},
 ];
+const SOURCE_TAG_CLASS = {Terminal:'tag-terminal', Vessel:'tag-vessel', Haulage:'tag-haulage'};
 
 function makeId(prefix){ return prefix + '-' + Math.random().toString(36).slice(2,8); }
 
 // Build a fleshed-out shipment detail object from a light list record + a seed for variety
 function buildShipmentDetail(base, seed){
-  const owner = teamMember(base.ownerId);
+  const primary = teamMember(base.ownerId);
+  const supporting = (base.supportingOwnerIds||[]).map(teamMember);
+  const shipTeamIds = [base.ownerId, ...(base.supportingOwnerIds||[])];
+
   const containerCount = 2 + (seed % 3);
   const containers = [];
   for(let i=0;i<containerCount;i++){
@@ -924,39 +891,51 @@ function buildShipmentDetail(base, seed){
     });
   }
 
-  const totalMilestones = seed % 2 === 0 ? 6 : 8;
-  let completedSoFar = base.completedMilestones;
-  const workstreams = {};
-  let idx = 0;
-  Object.keys(WORKSTREAM_TEMPLATE).forEach(ws=>{
-    workstreams[ws] = WORKSTREAM_TEMPLATE[ws].map(m=>{
-      idx++;
-      const isDone = idx <= completedSoFar;
-      return {
-        id: makeId('ms'),
-        name: m.name,
-        sla: m.sla,
-        status: isDone ? 'Completed' : (idx === completedSoFar+1 && base.status.includes('Progress') ? 'In Progress' : 'Not Started'),
-        completedBy: isDone ? teamMember(TEAM[(idx+seed)%TEAM.length].id).name : '',
-        completedAt: isDone ? new Date(Date.now() - (totalMilestones-idx)*86400000).toISOString().slice(0,16) : '',
-        notes: isDone && idx%3===0 ? 'Cleared without exceptions.' : '',
-      };
-    });
+  const template = base.mode.includes('Export') ? OCEAN_EXPORT_TEMPLATE : OCEAN_IMPORT_TEMPLATE;
+  const etdDate = parseDisplayDate(base.etd);
+  const etaDate = parseDisplayDate(base.eta);
+  const span = etaDate.getTime() - etdDate.getTime();
+  const completedCount = base.completedMilestones;
+
+  const milestones = template.map((name,i)=>{
+    const frac = template.length>1 ? i/(template.length-1) : 0;
+    let dueDate = new Date(etdDate.getTime() + span*frac);
+    if(i === template.length-1 && seed % 3 === 0) dueDate = null;
+    const isDone = i < completedCount;
+    let completedSlaHealth = null, completedBy = '', completedAt = null, comment = '';
+    if(isDone){
+      completedSlaHealth = ((i+seed) % 5 === 0) ? 'Breached' : 'Healthy';
+      completedBy = teamMember(shipTeamIds[(i+seed+1)%shipTeamIds.length]).name;
+      completedAt = new Date(Date.now() - (template.length-i)*86400000);
+      comment = (i%3===0) ? 'Cleared without exceptions.' : '';
+    }
+    return {
+      id: makeId('ms'),
+      name,
+      ownerId: shipTeamIds[(i+seed)%shipTeamIds.length],
+      status: isDone ? 'Completed' : 'Not Started',
+      dueDate,
+      completedBy,
+      completedAt,
+      completedSlaHealth,
+      comment,
+    };
   });
 
   const trackedCount = Math.min(PHYSICAL_TRACKING_TEMPLATE.length, 2 + (seed % 5));
   const physicalTracking = PHYSICAL_TRACKING_TEMPLATE.map((t,i)=>({
     label: t.label,
     location: t.loc,
+    source: t.source,
     timestamp: i < trackedCount ? new Date(Date.now() - (trackedCount-i)*3*3600000).toLocaleString('en-GB',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}) : null,
     done: i < trackedCount,
   }));
 
   const docSeedNames = [
-    ['Bill_of_Lading.pdf','Bill of Lading','Shipping'],
-    ['Commercial_Invoice.pdf','Commercial Invoice','Finance'],
-    ['Packing_List.xlsx','Packing List','Shipping'],
-    ['Certificate_of_Origin.pdf','Certificate of Origin','Compliance'],
+    ['Bill_of_Lading.pdf','Shipping'],
+    ['Commercial_Invoice.pdf','Finance'],
+    ['Packing_List.xlsx','Shipping'],
+    ['Certificate_of_Origin.pdf','Compliance'],
   ];
   const docCount = 1 + (seed % docSeedNames.length);
   const documents = [];
@@ -965,9 +944,8 @@ function buildShipmentDetail(base, seed){
     documents.push({
       id: makeId('doc'),
       name: d[0],
-      type: d[1],
-      category: d[2],
-      uploadedBy: teamMember(TEAM[(i+seed)%TEAM.length].id).name,
+      category: d[1],
+      uploadedBy: teamMember(shipTeamIds[(i+seed)%shipTeamIds.length]).name,
       uploadedOn: new Date(Date.now() - (docCount-i)*86400000*2).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}),
       isMock: true,
       fileUrl: null,
@@ -977,22 +955,21 @@ function buildShipmentDetail(base, seed){
 
   return {
     ...base,
-    owner,
+    owners: { primary, supporting },
     containers,
-    workstreams,
+    milestones,
     physicalTracking,
     documents,
-    slaHealth: base.slaHealth,
   };
 }
 
 const SHIPMENT_LIST_BASE = [
-  {jobRef:'OP-SHP-10231', customer:'Dangote Industries', route:'Shanghai → Lagos', mode:'Ocean Import', status:'In Transit', slaHealth:'Healthy', eta:'02 Aug 2026', ownerId:'u1', completedMilestones:4, quoteRef:'OP-QT-8821', incoterm:'CIF', origin:'Shanghai, China', destination:'Lagos, Nigeria', pol:'Shanghai Yangshan Port', pod:'Apapa Port, Lagos', etd:'12 Jul 2026', serviceType:'Full Container Load'},
-  {jobRef:'OP-SHP-10228', customer:'Nestlé West Africa', route:'Rotterdam → Tema', mode:'Ocean Import', status:'Customs Clearance', slaHealth:'At-Risk', eta:'29 Jul 2026', ownerId:'u2', completedMilestones:6, quoteRef:'OP-QT-8790', incoterm:'FOB', origin:'Rotterdam, Netherlands', destination:'Tema, Ghana', pol:'Port of Rotterdam', pod:'Tema Port', etd:'05 Jul 2026', serviceType:'Full Container Load'},
-  {jobRef:'OP-SHP-10219', customer:'Julius Berger Nigeria', route:'Hamburg → Lagos', mode:'Ocean Import', status:'Documentation in Progress', slaHealth:'Breached', eta:'20 Jul 2026', ownerId:'u3', completedMilestones:1, quoteRef:'OP-QT-8744', incoterm:'CFR', origin:'Hamburg, Germany', destination:'Lagos, Nigeria', pol:'Port of Hamburg', pod:'Apapa Port, Lagos', etd:'01 Jul 2026', serviceType:'Break Bulk'},
-  {jobRef:'OP-SHP-10214', customer:'MTN Nigeria', route:'Shenzhen → Lagos', mode:'Air Import', status:'Booked', slaHealth:'Healthy', eta:'31 Jul 2026', ownerId:'u4', completedMilestones:2, quoteRef:'OP-QT-8701', incoterm:'FCA', origin:'Shenzhen, China', destination:'Lagos, Nigeria', pol:'Shenzhen Bao\'an Airport', pod:'Murtala Muhammed Airport', etd:'27 Jul 2026', serviceType:'Air Freight'},
-  {jobRef:'OP-SHP-10201', customer:'Dufil Prima Foods', route:'Lagos → Douala', mode:'Ocean Export', status:'Out for Delivery', slaHealth:'Healthy', eta:'26 Jul 2026', ownerId:'u5', completedMilestones:7, quoteRef:'OP-QT-8650', incoterm:'CIF', origin:'Lagos, Nigeria', destination:'Douala, Cameroon', pol:'Apapa Port, Lagos', pod:'Port of Douala', etd:'14 Jul 2026', serviceType:'Full Container Load'},
-  {jobRef:'OP-SHP-10188', customer:'Nigerian Breweries', route:'Antwerp → Lagos', mode:'Ocean Import', status:'Completed', slaHealth:'Healthy', eta:'10 Jul 2026', ownerId:'u6', completedMilestones:8, quoteRef:'OP-QT-8590', incoterm:'CIF', origin:'Antwerp, Belgium', destination:'Lagos, Nigeria', pol:'Port of Antwerp', pod:'Apapa Port, Lagos', etd:'20 Jun 2026', serviceType:'Full Container Load'},
+  {jobRef:'OP-SHP-10231', customer:'Dangote Industries', route:'Shanghai → Lagos', mode:'Ocean Import', status:'Active', slaHealth:'Healthy', eta:'02 Aug 2026', ownerId:'u1', supportingOwnerIds:['u5','u6'], completedMilestones:4, quoteRef:'OP-QT-8821', incoterm:'CIF', origin:'Shanghai, China', destination:'Lagos, Nigeria', pol:'Shanghai Yangshan Port', pod:'Apapa Port, Lagos', etd:'12 Jul 2026', serviceType:'Full Container Load'},
+  {jobRef:'OP-SHP-10228', customer:'Nestlé West Africa', route:'Rotterdam → Tema', mode:'Ocean Import', status:'Active', slaHealth:'At-Risk', eta:'29 Jul 2026', ownerId:'u2', supportingOwnerIds:['u4'], completedMilestones:6, quoteRef:'OP-QT-8790', incoterm:'FOB', origin:'Rotterdam, Netherlands', destination:'Tema, Ghana', pol:'Port of Rotterdam', pod:'Tema Port', etd:'05 Jul 2026', serviceType:'Full Container Load'},
+  {jobRef:'OP-SHP-10219', customer:'Julius Berger Nigeria', route:'Hamburg → Lagos', mode:'Ocean Import', status:'Active', slaHealth:'Breached', eta:'20 Jul 2026', ownerId:'u3', supportingOwnerIds:[], completedMilestones:1, quoteRef:'OP-QT-8744', incoterm:'CFR', origin:'Hamburg, Germany', destination:'Lagos, Nigeria', pol:'Port of Hamburg', pod:'Apapa Port, Lagos', etd:'01 Jul 2026', serviceType:'Break Bulk'},
+  {jobRef:'OP-SHP-10214', customer:'MTN Nigeria', route:'Shenzhen → Lagos', mode:'Air Import', status:'Cancelled', slaHealth:'Healthy', eta:'31 Jul 2026', ownerId:'u4', supportingOwnerIds:['u1'], completedMilestones:2, quoteRef:'OP-QT-8701', incoterm:'FCA', origin:'Shenzhen, China', destination:'Lagos, Nigeria', pol:'Shenzhen Bao\'an Airport', pod:'Murtala Muhammed Airport', etd:'27 Jul 2026', serviceType:'Air Freight'},
+  {jobRef:'OP-SHP-10201', customer:'Dufil Prima Foods', route:'Lagos → Douala', mode:'Ocean Export', status:'Active', slaHealth:'Healthy', eta:'26 Jul 2026', ownerId:'u5', supportingOwnerIds:['u2','u3'], completedMilestones:7, quoteRef:'OP-QT-8650', incoterm:'CIF', origin:'Lagos, Nigeria', destination:'Douala, Cameroon', pol:'Apapa Port, Lagos', pod:'Port of Douala', etd:'14 Jul 2026', serviceType:'Full Container Load'},
+  {jobRef:'OP-SHP-10188', customer:'Nigerian Breweries', route:'Antwerp → Lagos', mode:'Ocean Import', status:'Completed', slaHealth:'Healthy', eta:'10 Jul 2026', ownerId:'u6', supportingOwnerIds:[], completedMilestones:10, quoteRef:'OP-QT-8590', incoterm:'CIF', origin:'Antwerp, Belgium', destination:'Lagos, Nigeria', pol:'Port of Antwerp', pod:'Apapa Port, Lagos', etd:'20 Jun 2026', serviceType:'Full Container Load'},
 ];
 
 const SHIPMENTS = {};
@@ -1007,14 +984,14 @@ SHIPMENT_LIST_BASE.forEach((base, i)=>{
 const state = {
   currentView: 'shipments',
   currentShipmentRef: null,
-  currentTab: 'overview',
-  shipmentFilter: 'All',
+  searchQuery: '',
   pendingFiles: [],
   editingContainerId: null,
   activeMilestone: null,
   activeDocUpdate: null,
   activeDocDelete: null,
 };
+const ownerModalState = { checked: new Set(), primary: null };
 
 function el(id){ return document.getElementById(id); }
 function currentShipment(){ return SHIPMENTS[state.currentShipmentRef]; }
@@ -1039,7 +1016,6 @@ function navTo(view){
 
 function openShipment(jobRef){
   state.currentShipmentRef = jobRef;
-  state.currentTab = 'overview';
   document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
   el('view-shipment-detail').classList.add('active');
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.toggle('active', n.dataset.nav==='shipments'));
@@ -1061,61 +1037,46 @@ function renderBreadcrumbs(){
     bc.innerHTML = `<span class="crumb">Shipments</span>`;
   } else if(state.currentView==='shipment-detail'){
     const s = currentShipment();
-    bc.innerHTML = `<span class="crumb link" data-nav="shipments">Shipments</span><span class="sep">/</span><span class="crumb">${s.jobRef}</span>`;
+    bc.innerHTML = `<span class="crumb">Shipments</span><span class="sep">/</span><span class="crumb crumb-current">${s.jobRef}</span>`;
   }
 }
-document.addEventListener('click', (e)=>{
-  const crumb = e.target.closest('.crumb.link');
-  if(crumb){ navTo('shipments'); }
-});
-
-document.querySelectorAll('.nav-item').forEach(item=>{
-  item.addEventListener('click', (e)=>{
-    e.preventDefault();
-    navTo(item.dataset.nav);
-  });
-});
 
 /* ==========================================================================
    Shipments list render
    ========================================================================== */
-function renderShipmentFilters(){
-  const statuses = ['All', ...new Set(Object.values(SHIPMENTS).map(s=>s.status))];
-  el('shipment-filters').innerHTML = statuses.map(s=>
-    `<button class="filter-chip ${state.shipmentFilter===s?'active':''}" data-filter="${s}">${s}</button>`
-  ).join('');
-  el('shipment-filters').querySelectorAll('.filter-chip').forEach(btn=>{
-    btn.addEventListener('click', ()=>{ state.shipmentFilter = btn.dataset.filter; renderShipmentFilters(); renderShipmentsList(); });
-  });
-}
+function ownersOf(s){ return { primary: s.owners.primary, supporting: s.owners.supporting, all: [s.owners.primary, ...s.owners.supporting] }; }
 
 function renderShipmentsList(){
-  const list = Object.values(SHIPMENTS).filter(s => state.shipmentFilter==='All' || s.status===state.shipmentFilter);
-  el('shipments-count-label').textContent = `${list.length} shipment${list.length!==1?'s':''}${state.shipmentFilter!=='All' ? ' · ' + state.shipmentFilter : ''}`;
+  const q = state.searchQuery.trim().toLowerCase();
+  const list = Object.values(SHIPMENTS).filter(s=>{
+    if(!q) return true;
+    const names = ownersOf(s).all.map(o=>o.name.toLowerCase()).join(' ');
+    return s.jobRef.toLowerCase().includes(q) || names.includes(q);
+  });
+  el('shipments-count-label').textContent = `${list.length} shipment${list.length!==1?'s':''}${q ? ' matching "'+state.searchQuery.trim()+'"' : ''}`;
 
   el('shipments-tbody').innerHTML = list.map(s=>{
     const sla = SLA_CONFIG[s.slaHealth];
+    const primary = s.owners.primary;
+    const supCount = s.owners.supporting.length;
     return `
     <tr class="clickable" data-jobref="${s.jobRef}">
       <td><b style="color:var(--green-dark);font-family:var(--font-display);font-weight:600">${s.jobRef}</b></td>
       <td>${s.customer}</td>
       <td>${s.route}</td>
       <td><span class="chip chip-neutral">${s.mode}</span></td>
-      <td><span class="chip ${STATUS_CHIP(s.status)}">${s.status}</span></td>
+      <td>${renderStatusChip(s.status)}</td>
       <td><span class="badge-sla ${sla.chip}"><span class="chip-dot" style="background:${sla.dot}"></span>${s.slaHealth}</span></td>
       <td>${s.eta}</td>
       <td>
         <div style="display:flex;align-items:center;gap:8px">
-          <div class="avatar avatar-sm" style="${avatarFillStyle(s.owner.fill)}">${s.owner.initials}</div>
-          <span style="font-size:12.5px;color:var(--silver-dark)">${s.owner.name.split(' ')[0]}</span>
+          <div class="avatar avatar-sm" style="${avatarFillStyle(primary.fill)}">${primary.initials}</div>
+          <span style="font-size:12.5px;color:var(--silver-dark)">${primary.name.split(' ')[0]}</span>
+          ${supCount ? `<span class="chip chip-neutral" style="padding:2px 7px;font-size:10px">+${supCount}</span>` : ''}
         </div>
       </td>
     </tr>`;
-  }).join('');
-
-  el('shipments-tbody').querySelectorAll('tr.clickable').forEach(row=>{
-    row.addEventListener('click', ()=> openShipment(row.dataset.jobref));
-  });
+  }).join('') || `<tr><td colspan="8" style="text-align:center;color:var(--silver-light);padding:40px">No shipments match your search.</td></tr>`;
 }
 
 /* ==========================================================================
@@ -1125,74 +1086,74 @@ function renderShipmentDetail(){
   renderShipHeader();
   renderShipDetailFields();
   renderContainers();
-  renderWorkstreams();
-  renderPhysicalTimeline();
+  renderServiceDelivery();
+  renderShipmentTracking();
   renderDocuments();
 }
 
 function renderShipHeader(){
   const s = currentShipment();
   const sla = SLA_CONFIG[s.slaHealth];
-  const totalMilestones = Object.values(s.workstreams).flat().length;
-  const doneMilestones = Object.values(s.workstreams).flat().filter(m=>m.status==='Completed').length;
-  const pct = Math.round((doneMilestones/totalMilestones)*100);
+  const total = s.milestones.length;
+  const done = s.milestones.filter(m=>m.status==='Completed').length;
+  const pct = total ? Math.round((done/total)*100) : 0;
 
   el('ship-header').innerHTML = `
-    <div class="ship-header-top">
-      <div>
-        <div class="ship-header-id">
-          <h1>${s.jobRef}</h1>
-          <span class="chip ${STATUS_CHIP(s.status)}">${s.status}</span>
-          <span class="badge-sla ${sla.chip}"><span class="chip-dot" style="background:${sla.dot}"></span>${s.slaHealth}</span>
-        </div>
-        <div style="font-size:14px;color:var(--silver-dark);margin-top:8px">
-          <b style="color:var(--green-dark)">${s.customer}</b> &nbsp;·&nbsp; ${s.mode} &nbsp;•&nbsp; ${s.route}
+    <div class="ship-header-row1">
+      <div class="ship-header-id">
+        <h1>${s.jobRef}</h1>
+        ${renderStatusChip(s.status)}
+        <span class="badge-sla ${sla.chip}"><span class="chip-dot" style="background:${sla.dot}"></span>${s.slaHealth}</span>
+      </div>
+      <div class="dropdown">
+        <button class="btn btn-solid dropdown-toggle" type="button">
+          Actions
+          <svg class="chevron" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+        </button>
+        <div class="dropdown-menu">
+          <button class="dropdown-item" data-ship-action="assign-owner">
+            <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"></circle><path d="M4 21v-1a8 8 0 0116 0v1"></path></svg>
+            Assign Shipment Owner
+          </button>
+          <button class="dropdown-item" data-ship-action="update-status">
+            <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 12l4 4L21 4" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+            Update Shipment Status
+          </button>
+          <button class="dropdown-item" data-ship-action="edit-shipment">
+            <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"></path><path d="M18.5 2.5a2.1 2.1 0 013 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+            Edit Shipment
+          </button>
         </div>
       </div>
-      <div class="ship-header-actions">
-        <button class="btn btn-outline btn-sm" id="btn-assign-owner">
-          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"></circle><path d="M4 21v-1a8 8 0 0116 0v1"></path></svg>
-          Assign Owner
-        </button>
-        <button class="btn btn-outline btn-sm" id="btn-update-status">
-          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 12l4 4L21 4" stroke-linecap="round" stroke-linejoin="round"></path></svg>
-          Update Status
-        </button>
-        <button class="btn btn-solid btn-sm" id="btn-edit-shipment">
-          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"></path><path d="M18.5 2.5a2.1 2.1 0 013 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
-          Edit Shipment
-        </button>
+    </div>
+    <div class="ship-header-strip">
+      <div class="strip-cell"><div class="k">Customer</div><div class="v">${s.customer}</div></div>
+      <span class="strip-divider"></span>
+      <div class="strip-cell"><div class="k">Shipment Type</div><div class="v">${shipmentTypeOf(s)}</div></div>
+      <span class="strip-divider"></span>
+      <div class="strip-cell"><div class="k">Route</div><div class="v">${transportLabelOf(s)} · ${s.route}</div></div>
+      <span class="strip-divider"></span>
+      <div class="strip-cell strip-cell-grow">
+        <div class="k">Service Delivery Progress</div>
+        <div class="v progress-inline">
+          <span class="progress-bar-track sm"><span class="progress-bar-fill" style="width:${pct}%"></span></span>
+          <span class="progress-frac">${done}/${total} Completed</span>
+        </div>
       </div>
-    </div>
-
-    <div class="ship-header-meta">
-      <div class="meta-block"><div class="k">Shipment Owner</div><div class="v" style="display:flex;align-items:center;gap:8px">
-        <div class="avatar avatar-sm" style="${avatarFillStyle(s.owner.fill)}">${s.owner.initials}</div>${s.owner.name}
-      </div></div>
-      <div class="meta-block"><div class="k">ETD</div><div class="v">${s.etd}</div></div>
-      <div class="meta-block"><div class="k">ETA</div><div class="v">${s.eta}</div></div>
-      <div class="meta-block"><div class="k">Quote Reference</div><div class="v">${s.quoteRef}</div></div>
-    </div>
-
-    <div class="progress-pill-row">
-      <span style="font-family:var(--font-display);font-weight:600;font-size:13px;color:var(--green-dark);white-space:nowrap">Service Delivery Progress</span>
-      <div class="progress-bar-track"><span class="progress-bar-fill" style="width:${pct}%"></span></div>
-      <span style="font-size:13px;font-weight:700;color:var(--green-dark);white-space:nowrap">${doneMilestones}/${totalMilestones} Completed</span>
     </div>
   `;
-
-  el('btn-assign-owner').addEventListener('click', openAssignOwnerModal);
-  el('btn-update-status').addEventListener('click', openUpdateStatusModal);
-  el('btn-edit-shipment').addEventListener('click', openEditShipmentModal);
 }
 
 function renderShipDetailFields(){
   const s = currentShipment();
+  const primary = s.owners.primary, supporting = s.owners.supporting;
   const fields = [
-    ['Quote Reference', s.quoteRef],
-    ['Shipment Owner', s.owner.name],
+    ['Customer', s.customer],
+    ['Quote Reference', `<a href="#" class="quote-link" data-quote-link>${s.quoteRef}</a>`],
+    ['Primary Owner', `<div style="display:flex;align-items:center;gap:8px"><div class="avatar avatar-sm" style="${avatarFillStyle(primary.fill)}">${primary.initials}</div>${primary.name}</div>`],
+    ['Supporting Team', supporting.length ? supporting.map(o=>o.name).join(', ') : '—'],
     ['Transport Mode', s.mode],
-    ['Shipment Type', s.mode.includes('Import') ? 'Import' : s.mode.includes('Export') ? 'Export' : 'Cross-trade'],
+    ['Shipment Type', shipmentTypeOf(s)],
     ['Service Type', s.serviceType],
     ['Incoterm', s.incoterm],
     ['Origin', s.origin],
@@ -1209,70 +1170,41 @@ function renderShipDetailFields(){
 
 function renderContainers(){
   const s = currentShipment();
-  el('container-grid').innerHTML = s.containers.map(c=>`
-    <div class="container-card">
-      <div class="cnum">${c.number}
-        <button class="cedit" data-cid="${c.id}" title="Edit container">
-          <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"></path><path d="M18.5 2.5a2.1 2.1 0 013 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
-        </button>
-      </div>
-      <div class="crow"><span class="k">Size</span><span>${c.size}</span></div>
-      <div class="crow"><span class="k">Type</span><span>${c.type}</span></div>
-      <div class="crow"><span class="k">Seal Number</span><span>${c.seal || '—'}</span></div>
-      <div class="crow"><span class="k">Weight</span><span>${c.weight || '—'}</span></div>
-    </div>
-  `).join('') || `<div class="section-sub" style="grid-column:1/-1">No containers added yet.</div>`;
-
-  el('container-grid').querySelectorAll('.cedit').forEach(btn=>{
-    btn.addEventListener('click', ()=> openContainerModal(btn.dataset.cid));
-  });
+  el('container-tbody').innerHTML = s.containers.map(c=>`
+    <tr>
+      <td><b style="color:var(--green-dark)">${c.number}</b></td>
+      <td>${c.size}</td>
+      <td>${c.type}</td>
+      <td>${c.seal || '—'}</td>
+      <td>${c.weight || '—'}</td>
+      <td style="text-align:right"><button class="btn btn-ghost btn-icon" data-cid="${c.id}" title="Edit container"><svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"></path><path d="M18.5 2.5a2.1 2.1 0 013 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg></button></td>
+    </tr>
+  `).join('') || `<tr><td colspan="6" style="text-align:center;color:var(--silver-light);padding:30px">No containers added yet.</td></tr>`;
 }
 
-function renderWorkstreams(){
+function renderServiceDelivery(){
   const s = currentShipment();
-  el('workstream-list').innerHTML = Object.entries(s.workstreams).map(([wsName, milestones])=>{
-    const done = milestones.filter(m=>m.status==='Completed').length;
+  el('service-delivery-tbody').innerHTML = s.milestones.map(m=>{
+    const owner = teamMember(m.ownerId);
+    const health = m.status==='Completed' ? m.completedSlaHealth : computeLiveSlaHealth(m.dueDate);
+    const slaCfg = SLA_CONFIG[health];
+    const dueLabel = m.dueDate ? formatDate(m.dueDate) : '—';
     return `
-    <div class="workstream-card card" style="margin-top:14px">
-      <div class="workstream-head" data-ws-toggle>
-        <div class="left">
-          <svg class="workstream-chevron" width="16" height="16" fill="none" stroke="#023819" stroke-width="2.2" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"></path></svg>
-          <h4 style="font-size:15px">${wsName}</h4>
-        </div>
-        <span class="wcount">${done}/${milestones.length} completed</span>
-      </div>
-      <div class="milestone-list">
-        ${milestones.map(m=>renderMilestoneRow(m)).join('')}
-      </div>
-    </div>`;
+    <tr>
+      <td><b style="color:var(--green-dark)">${m.name}</b></td>
+      <td><div style="display:flex;align-items:center;gap:8px"><div class="avatar avatar-sm" style="${avatarFillStyle(owner.fill)}">${owner.initials}</div>${owner.name.split(' ')[0]}</div></td>
+      <td>
+        <span class="chip ${m.status==='Completed'?'chip-success':'chip-neutral'}">${m.status}</span>
+        ${m.status==='Completed' && m.completedSlaHealth==='Breached' ? '<div class="sla-breach-note">⚠ Completed After SLA Breach</div>' : ''}
+      </td>
+      <td><span class="badge-sla ${slaCfg.chip}"><span class="chip-dot" style="background:${slaCfg.dot}"></span>${health}</span></td>
+      <td>${dueLabel}</td>
+      <td style="text-align:right">${m.status!=='Completed' ? `<button class="btn btn-outline btn-sm" data-complete-ms="${m.id}">Mark Complete</button>` : `<svg width="18" height="18" fill="none" stroke="#1F8A5B" stroke-width="2.4" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5" stroke-linecap="round" stroke-linejoin="round"></path></svg>`}</td>
+    </tr>`;
   }).join('');
-
-  el('workstream-list').querySelectorAll('[data-ws-toggle]').forEach(head=>{
-    head.addEventListener('click', ()=> head.closest('.workstream-card').classList.toggle('collapsed'));
-  });
-  el('workstream-list').querySelectorAll('[data-complete-ms]').forEach(btn=>{
-    btn.addEventListener('click', (e)=>{ e.stopPropagation(); openMilestoneModal(btn.dataset.completeMs); });
-  });
 }
 
-function renderMilestoneRow(m){
-  const statusChip = m.status==='Completed' ? 'chip-success' : m.status==='In Progress' ? 'chip-warning' : 'chip-neutral';
-  return `
-  <div class="milestone-row">
-    <div>
-      <div class="m-name">${m.name}</div>
-    </div>
-    <div><span class="m-cell-label">Status</span><span class="chip ${statusChip}">${m.status}</span></div>
-    <div><span class="m-cell-label">SLA</span><span style="font-size:12.5px;color:var(--silver-dark)">${m.sla}</span></div>
-    <div><span class="m-cell-label">Completed By</span><span style="font-size:12.5px;color:var(--silver-dark)">${m.completedBy || '—'}</span></div>
-    <div><span class="m-cell-label">Completed At</span><span class="m-notes">${m.completedAt ? new Date(m.completedAt).toLocaleString('en-GB',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'}) : '—'}${m.notes ? '<br><span style=\"color:var(--silver-light)\">'+m.notes+'</span>' : ''}</span></div>
-    <div style="text-align:right">
-      ${m.status!=='Completed' ? `<button class="btn btn-outline btn-sm" data-complete-ms="${m.id}">Mark Complete</button>` : `<svg width="18" height="18" fill="none" stroke="#1F8A5B" stroke-width="2.4" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5" stroke-linecap="round" stroke-linejoin="round"></path></svg>`}
-    </div>
-  </div>`;
-}
-
-function renderPhysicalTimeline(){
+function renderShipmentTracking(){
   const s = currentShipment();
   el('physical-timeline').innerHTML = s.physicalTracking.map((ev,i)=>`
     <div class="timeline-item ${ev.done?'':'pending'}">
@@ -1281,7 +1213,10 @@ function renderPhysicalTimeline(){
         ${i < s.physicalTracking.length-1 ? '<span class="timeline-line"></span>' : ''}
       </div>
       <div class="timeline-content">
-        <div class="ttitle">${ev.label}</div>
+        <div class="track-top">
+          <span class="track-source-tag ${SOURCE_TAG_CLASS[ev.source]}">${ev.source}</span>
+          <span class="ttitle">${ev.label}</span>
+        </div>
         <div class="tmeta">${ev.location}${ev.timestamp ? ' · ' + ev.timestamp : ' · Pending'}</div>
       </div>
     </div>
@@ -1299,65 +1234,67 @@ function renderDocuments(){
           <b style="color:var(--green-dark);font-weight:600">${d.name}</b>
         </div>
       </td>
-      <td>${d.type || '<span style="color:var(--silver-light)">—</span>'}</td>
       <td>${d.category ? `<span class="chip chip-neutral">${d.category}</span>` : '<span style="color:var(--silver-light)">—</span>'}</td>
       <td>${d.uploadedBy}</td>
       <td>${d.uploadedOn}</td>
-      <td>
-        <div class="doc-actions" style="justify-content:flex-end">
-          <button title="View" data-doc-view="${d.id}"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"></path><circle cx="12" cy="12" r="3"></circle></svg></button>
-          <button title="Download" data-doc-download="${d.id}"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 3v12M7 10l5 5 5-5M4 21h16" stroke-linecap="round" stroke-linejoin="round"></path></svg></button>
-          <button title="Update File" data-doc-update="${d.id}"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"></path><path d="M18.5 2.5a2.1 2.1 0 013 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg></button>
-          <button title="Delete" class="danger" data-doc-delete="${d.id}"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 6h18M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2m3 0v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6h14z" stroke-linecap="round" stroke-linejoin="round"></path></svg></button>
+      <td style="text-align:right">
+        <div class="dropdown">
+          <button class="btn btn-ghost btn-icon dropdown-toggle" title="Actions"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="2"></circle><circle cx="12" cy="12" r="2"></circle><circle cx="19" cy="12" r="2"></circle></svg></button>
+          <div class="dropdown-menu dropdown-menu-sm">
+            <button class="dropdown-item" data-doc-view="${d.id}">View</button>
+            <button class="dropdown-item" data-doc-update="${d.id}">Update File</button>
+            <button class="dropdown-item" data-doc-download="${d.id}">Download</button>
+            <button class="dropdown-item dropdown-item-danger" data-doc-delete="${d.id}">Delete</button>
+          </div>
         </div>
       </td>
     </tr>
-  `).join('') || `<tr><td colspan="6" style="text-align:center;color:var(--silver-light);padding:30px">No documents uploaded yet.</td></tr>`;
-
-  el('documents-tbody').querySelectorAll('[data-doc-view]').forEach(b=> b.addEventListener('click', ()=> viewDocument(b.dataset.docView)));
-  el('documents-tbody').querySelectorAll('[data-doc-download]').forEach(b=> b.addEventListener('click', ()=> downloadDocument(b.dataset.docDownload)));
-  el('documents-tbody').querySelectorAll('[data-doc-update]').forEach(b=> b.addEventListener('click', ()=> openUpdateFileModal(b.dataset.docUpdate)));
-  el('documents-tbody').querySelectorAll('[data-doc-delete]').forEach(b=> b.addEventListener('click', ()=> openDeleteDocModal(b.dataset.docDelete)));
+  `).join('') || `<tr><td colspan="5" style="text-align:center;color:var(--silver-light);padding:30px">No documents uploaded yet.</td></tr>`;
 }
 
 /* ==========================================================================
    Tabs
    ========================================================================== */
-document.querySelectorAll('.tab-btn').forEach(btn=>{
-  btn.addEventListener('click', ()=>{
-    state.currentTab = btn.dataset.tab;
-    document.querySelectorAll('.tab-btn').forEach(b=>b.classList.toggle('active', b===btn));
-    document.querySelectorAll('.tab-pane').forEach(p=>p.style.display='none');
-    el('tab-'+btn.dataset.tab).style.display='block';
-  });
-});
+function switchTab(tab){
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.toggle('active', b.dataset.tab===tab));
+  document.querySelectorAll('.tab-pane').forEach(p=>p.style.display='none');
+  el('tab-'+tab).style.display='block';
+}
 
 /* ==========================================================================
    Modal helpers
    ========================================================================== */
 function openModal(id){ el(id).classList.add('open'); }
 function closeModal(id){ el(id).classList.remove('open'); }
-document.querySelectorAll('[data-close-modal]').forEach(btn=>{
-  btn.addEventListener('click', (e)=>{ closeModal(e.target.closest('.modal-overlay').id); });
-});
-document.querySelectorAll('.modal-overlay').forEach(ov=>{
-  ov.addEventListener('click', (e)=>{ if(e.target===ov) closeModal(ov.id); });
-});
 
 /* --- Assign Owner --- */
 function openAssignOwnerModal(){
   const s = currentShipment();
-  el('input-assign-owner').innerHTML = TEAM.map(t=>`<option value="${t.id}" ${t.id===s.owner.id?'selected':''}>${t.name} — ${t.role}</option>`).join('');
+  ownerModalState.checked = new Set([s.owners.primary.id, ...s.owners.supporting.map(o=>o.id)]);
+  ownerModalState.primary = s.owners.primary.id;
+  renderOwnerSelectList();
   openModal('modal-assign-owner');
+}
+function renderOwnerSelectList(){
+  el('owner-select-list').innerHTML = TEAM.map(t=>{
+    const isChecked = ownerModalState.checked.has(t.id);
+    const isPrimary = ownerModalState.primary === t.id;
+    return `
+    <div class="owner-select-row ${isPrimary?'is-primary':''}">
+      <input type="checkbox" class="owner-checkbox" data-owner-check="${t.id}" ${isChecked?'checked':''}>
+      <div class="avatar avatar-sm" style="${avatarFillStyle(t.fill)}">${t.initials}</div>
+      <div class="who"><div class="nm">${t.name}</div><div class="rl">${t.role}</div></div>
+      <button type="button" class="primary-toggle ${isPrimary?'active':''}" data-owner-primary="${t.id}">${isPrimary ? '★ Primary' : 'Set Primary'}</button>
+    </div>`;
+  }).join('');
 }
 el('save-assign-owner').addEventListener('click', ()=>{
   const s = currentShipment();
-  const newOwnerId = el('input-assign-owner').value;
-  s.owner = teamMember(newOwnerId);
-  s.ownerId = newOwnerId;
-  renderShipHeader(); renderShipDetailFields();
+  const supporting = [...ownerModalState.checked].filter(id=>id!==ownerModalState.primary).map(teamMember);
+  s.owners = { primary: teamMember(ownerModalState.primary), supporting };
+  renderShipHeader(); renderShipDetailFields(); renderShipmentsList();
   closeModal('modal-assign-owner');
-  showToast('Shipment owner updated to ' + s.owner.name);
+  showToast('Shipment ownership updated');
 });
 
 /* --- Update Status --- */
@@ -1378,7 +1315,7 @@ el('save-update-status').addEventListener('click', ()=>{
 
 /* --- Edit Shipment --- */
 const EDIT_SHIPMENT_FIELDS = [
-  ['quoteRef','Quote Reference'],['mode','Transport Mode'],['serviceType','Service Type'],['incoterm','Incoterm'],
+  ['customer','Customer'],['quoteRef','Quote Reference'],['mode','Transport Mode'],['serviceType','Service Type'],['incoterm','Incoterm'],
   ['origin','Origin'],['destination','Destination'],['pol','Port of Loading'],['pod','Port of Discharge'],
   ['etd','ETD'],['eta','ETA'],
 ];
@@ -1415,7 +1352,6 @@ function openContainerModal(containerId){
   el('input-container-weight').value = c ? c.weight : '';
   openModal('modal-container');
 }
-el('btn-add-container').addEventListener('click', ()=> openContainerModal(null));
 el('save-container').addEventListener('click', ()=>{
   const s = currentShipment();
   const num = el('input-container-number').value.trim();
@@ -1443,33 +1379,20 @@ el('save-container').addEventListener('click', ()=>{
 function openMilestoneModal(msId){
   state.activeMilestone = msId;
   const s = currentShipment();
-  let target = null, wsName = null;
-  Object.entries(s.workstreams).forEach(([name, list])=>{
-    const found = list.find(m=>m.id===msId);
-    if(found){ target = found; wsName = name; }
-  });
-  el('milestone-modal-sub').textContent = `${wsName} · ${target.name}`;
-  el('input-milestone-by').value = '';
-  const now = new Date();
-  now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
-  el('input-milestone-at').value = now.toISOString().slice(0,16);
-  el('input-milestone-notes').value = '';
+  const m = s.milestones.find(x=>x.id===msId);
+  el('milestone-modal-sub').textContent = m.name;
+  el('input-milestone-comment').value = '';
   openModal('modal-milestone');
 }
 el('save-milestone').addEventListener('click', ()=>{
-  const by = el('input-milestone-by').value.trim();
-  if(!by){ showToast('Please enter who completed this milestone', 'error'); return; }
   const s = currentShipment();
-  Object.values(s.workstreams).forEach(list=>{
-    const m = list.find(x=>x.id===state.activeMilestone);
-    if(m){
-      m.status = 'Completed';
-      m.completedBy = by;
-      m.completedAt = el('input-milestone-at').value;
-      m.notes = el('input-milestone-notes').value.trim();
-    }
-  });
-  renderWorkstreams(); renderShipHeader();
+  const m = s.milestones.find(x=>x.id===state.activeMilestone);
+  m.status = 'Completed';
+  m.completedBy = CURRENT_USER;
+  m.completedAt = new Date();
+  m.completedSlaHealth = computeLiveSlaHealth(m.dueDate);
+  m.comment = el('input-milestone-comment').value.trim();
+  renderServiceDelivery(); renderShipHeader();
   closeModal('modal-milestone');
   showToast('Milestone marked complete');
 });
@@ -1485,14 +1408,12 @@ function formatBytes(bytes){
   return (bytes/(1024*1024)).toFixed(1) + ' MB';
 }
 
-el('btn-upload-docs').addEventListener('click', ()=>{
+function openUploadDocsModal(){
   state.pendingFiles = [];
-  el('input-doc-type').value = '';
   el('input-doc-category').value = '';
-  el('input-doc-description').value = '';
   renderFilePillList();
   openModal('modal-upload-docs');
-});
+}
 
 const dropzone = el('dropzone');
 const fileInput = el('file-input');
@@ -1525,24 +1446,19 @@ function renderFilePillList(){
       <button class="frm" data-remove-file="${i}"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18" stroke-linecap="round"></path></svg></button>
     </div>
   `).join('');
-  el('file-pill-list').querySelectorAll('[data-remove-file]').forEach(btn=>{
-    btn.addEventListener('click', ()=>{ state.pendingFiles.splice(+btn.dataset.removeFile,1); renderFilePillList(); });
-  });
   el('save-upload-docs').disabled = state.pendingFiles.length===0;
 }
 
 el('save-upload-docs').addEventListener('click', ()=>{
   const s = currentShipment();
-  const type = el('input-doc-type').value;
   const category = el('input-doc-category').value;
   const today = new Date().toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'});
   state.pendingFiles.forEach(f=>{
     s.documents.push({
       id: makeId('doc'),
       name: f.name,
-      type: type,
       category: category,
-      uploadedBy: 'Nkechi M.',
+      uploadedBy: CURRENT_USER,
       uploadedOn: today,
       isMock:false,
       fileUrl: URL.createObjectURL(f),
@@ -1577,7 +1493,7 @@ function openUpdateFileModal(id){
   el('update-file-sub').textContent = `Replacing file for "${d.name}"`;
   el('update-file-name').textContent = 'Select a replacement file';
   el('save-update-file').disabled = true;
-  el('save-update-file').dataset.newFile = '';
+  pendingReplacementFile = null;
   openModal('modal-update-file');
 }
 const dropzoneUpdate = el('dropzone-update');
@@ -1603,7 +1519,7 @@ el('save-update-file').addEventListener('click', ()=>{
   d.fileUrl = URL.createObjectURL(pendingReplacementFile);
   d.size = pendingReplacementFile.size;
   d.uploadedOn = new Date().toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'});
-  d.uploadedBy = 'Nkechi M.';
+  d.uploadedBy = CURRENT_USER;
   pendingReplacementFile = null;
   renderDocuments();
   closeModal('modal-update-file');
@@ -1624,9 +1540,109 @@ el('confirm-delete-doc').addEventListener('click', ()=>{
 });
 
 /* ==========================================================================
+   Global delegated click handling
+   (covers all elements that get recreated by innerHTML re-renders)
+   ========================================================================== */
+document.body.addEventListener('click', (e)=>{
+  const t = e.target;
+
+  // dropdown toggle (Actions button, row overflow menus)
+  const toggle = t.closest('.dropdown-toggle');
+  if(toggle){
+    const wrapper = toggle.closest('.dropdown');
+    const wasOpen = wrapper.classList.contains('open');
+    document.querySelectorAll('.dropdown.open').forEach(w=>w.classList.remove('open'));
+    if(!wasOpen) wrapper.classList.add('open');
+    return;
+  }
+  const dropdownItem = t.closest('.dropdown-item');
+  if(dropdownItem){
+    document.querySelectorAll('.dropdown.open').forEach(w=>w.classList.remove('open'));
+  } else if(!t.closest('.dropdown-menu')){
+    document.querySelectorAll('.dropdown.open').forEach(w=>w.classList.remove('open'));
+  }
+
+  const navItem = t.closest('.nav-item');
+  if(navItem){ e.preventDefault(); navTo(navItem.dataset.nav); return; }
+
+  const row = t.closest('tr.clickable');
+  if(row){ openShipment(row.dataset.jobref); return; }
+
+  const tabBtn = t.closest('.tab-btn');
+  if(tabBtn){ switchTab(tabBtn.dataset.tab); return; }
+
+  const closeBtn = t.closest('[data-close-modal]');
+  if(closeBtn){ closeModal(closeBtn.closest('.modal-overlay').id); return; }
+
+  if(t.classList && t.classList.contains('modal-overlay')){ closeModal(t.id); return; }
+
+  if(t.closest('#btn-add-container')){ openContainerModal(null); return; }
+  const cEdit = t.closest('[data-cid]');
+  if(cEdit){ openContainerModal(cEdit.dataset.cid); return; }
+
+  const msBtn = t.closest('[data-complete-ms]');
+  if(msBtn){ openMilestoneModal(msBtn.dataset.completeMs); return; }
+
+  const shipAction = t.closest('[data-ship-action]');
+  if(shipAction){
+    const action = shipAction.dataset.shipAction;
+    if(action==='assign-owner') openAssignOwnerModal();
+    else if(action==='update-status') openUpdateStatusModal();
+    else if(action==='edit-shipment') openEditShipmentModal();
+    return;
+  }
+
+  const ownerCheckEl = t.closest('[data-owner-check]');
+  if(ownerCheckEl){
+    const uid = ownerCheckEl.dataset.ownerCheck;
+    const wantsChecked = ownerCheckEl.checked;
+    if(!wantsChecked && uid === ownerModalState.primary){
+      const remaining = [...ownerModalState.checked].filter(id=>id!==uid);
+      if(remaining.length){
+        ownerModalState.checked.delete(uid);
+        ownerModalState.primary = remaining[0];
+      } else {
+        showToast('A primary owner is required', 'error');
+      }
+    } else if(wantsChecked){
+      ownerModalState.checked.add(uid);
+    } else {
+      ownerModalState.checked.delete(uid);
+    }
+    renderOwnerSelectList();
+    return;
+  }
+  const ownerPrimaryBtn = t.closest('[data-owner-primary]');
+  if(ownerPrimaryBtn){
+    const uid = ownerPrimaryBtn.dataset.ownerPrimary;
+    ownerModalState.primary = uid;
+    ownerModalState.checked.add(uid);
+    renderOwnerSelectList();
+    return;
+  }
+
+  const quoteLink = t.closest('[data-quote-link]');
+  if(quoteLink){ e.preventDefault(); showToast('Quote navigation isn\'t wired up in this prototype yet'); return; }
+
+  if(t.closest('#btn-upload-docs')){ openUploadDocsModal(); return; }
+  const docView = t.closest('[data-doc-view]');
+  if(docView){ viewDocument(docView.dataset.docView); return; }
+  const docDl = t.closest('[data-doc-download]');
+  if(docDl){ downloadDocument(docDl.dataset.docDownload); return; }
+  const docUpd = t.closest('[data-doc-update]');
+  if(docUpd){ openUpdateFileModal(docUpd.dataset.docUpdate); return; }
+  const docDel = t.closest('[data-doc-delete]');
+  if(docDel){ openDeleteDocModal(docDel.dataset.docDelete); return; }
+});
+
+el('shipment-search').addEventListener('input', (e)=>{
+  state.searchQuery = e.target.value;
+  renderShipmentsList();
+});
+
+/* ==========================================================================
    Init
    ========================================================================== */
-renderShipmentFilters();
 renderShipmentsList();
 renderBreadcrumbs();
 </script>
