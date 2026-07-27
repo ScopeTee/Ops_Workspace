@@ -160,9 +160,8 @@ input,select,textarea{font-family:var(--font-body)}
 
 .badge-sla{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:700;padding:6px 13px;border-radius:999px}
 .badge-sla .sla-icon{display:inline-flex;flex-shrink:0}
-.badge-sla.sm{padding:3px 9px;font-size:10.5px;gap:5px}
-
-.status-stack{display:flex;flex-direction:column;gap:4px;align-items:flex-start}
+.badge-sla.sm{padding:3px 9px;font-size:11px;gap:5px}
+.status-chip.sm{padding:3px 9px;font-size:11px;gap:5px}
 
 .avatar{display:grid;place-items:center;border-radius:10px;font-family:var(--font-display);font-weight:600;flex-shrink:0}
 .avatar-sm{width:32px;height:32px;font-size:11.5px;border-radius:8px}
@@ -198,10 +197,10 @@ table{width:100%;border-collapse:collapse}
 .sla-history-note{font-size:10.5px;margin-top:4px;font-weight:700}
 .sla-history-note.breach{color:var(--error-text)}
 .sla-history-note.at-risk{color:var(--gold-text)}
-
-.task-owner-btn{display:inline-flex;align-items:center;gap:7px;background:transparent;border:1px solid transparent;border-radius:6px;padding:4px 8px 4px 4px;font-size:12.5px;font-weight:600;color:var(--silver-dark);cursor:pointer;transition:.12s}
-.task-owner-btn:hover{background:var(--green-light-surface);border-color:var(--border-tint)}
-.task-owner-btn .chevron-sm{color:var(--silver-light);flex-shrink:0}
+.task-owner-cell{display:flex;flex-wrap:wrap;gap:8px}
+.task-owner-cell .owner-pill{display:flex;align-items:center;gap:6px}
+.task-owner-cell .owner-pill span{font-size:12px;color:var(--silver-dark)}
+.task-owner-unassigned{color:var(--silver-light);font-style:italic;font-size:12.5px}
 
 .form-field{position:relative;margin-bottom:18px}
 .form-field label.field-label{
@@ -221,6 +220,13 @@ select.field-control{appearance:none;background-image:url("data:image/svg+xml,%3
 textarea.field-control{resize:vertical;min-height:70px}
 .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:0 16px}
 .form-grid .full{grid-column:1 / -1}
+
+.searchable-field{position:relative}
+.ss-menu{position:absolute;left:0;right:0;top:calc(100% + 4px);background:var(--white);border:1px solid var(--border-tint);border-radius:var(--radius-md);box-shadow:var(--shadow-e3);max-height:220px;overflow:auto;z-index:60;display:none}
+.ss-menu.open{display:block}
+.ss-option{padding:9px 12px;font-size:13px;color:var(--green-dark);cursor:pointer}
+.ss-option:hover{background:var(--green-light-surface)}
+.ss-empty{padding:9px 12px;font-size:12.5px;color:var(--silver-light)}
 
 /* Empty / placeholder state */
 .placeholder-page{display:flex;align-items:center;justify-content:center;min-height:60vh}
@@ -243,7 +249,7 @@ textarea.field-control{resize:vertical;min-height:70px}
   background:var(--white);border-radius:var(--radius-xl);box-shadow:var(--shadow-e3);width:100%;max-width:520px;
   max-height:88vh;display:flex;flex-direction:column;
 }
-.modal.modal-wide{max-width:700px}
+.modal.modal-wide{max-width:720px}
 .modal-head{display:flex;align-items:flex-start;justify-content:space-between;padding:22px 26px;border-bottom:1px solid var(--border-tint)}
 .modal-head h3{font-size:18px}
 .modal-head p{font-size:12.5px;color:var(--silver-light);margin:4px 0 0}
@@ -263,7 +269,6 @@ textarea.field-control{resize:vertical;min-height:70px}
 .dropdown-item:hover{background:var(--green-light-surface)}
 .dropdown-item-danger{color:var(--error)}
 .dropdown-item-danger:hover{background:var(--error-bg)}
-.task-owner-dropdown .dropdown-menu{max-height:280px;overflow:auto}
 
 /* Toast */
 #toast-wrap{position:fixed;bottom:24px;right:24px;z-index:2000;display:flex;flex-direction:column;gap:10px}
@@ -288,36 +293,53 @@ textarea.field-control{resize:vertical;min-height:70px}
 .strip-cell .k{font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--silver-light);font-weight:700}
 .strip-cell .v{font-size:14.5px;font-weight:600;color:var(--green-dark)}
 .strip-divider{width:1px;background:var(--border-tint);align-self:stretch}
-.strip-cell-grow{flex:1;min-width:220px}
-.progress-bar-track{height:8px;border-radius:4px;background:var(--green-chip-bg);overflow:hidden}
-.progress-bar-track.sm{height:7px;flex:1;max-width:220px}
-.progress-bar-fill{display:block;height:100%;background:var(--green-accent);border-radius:4px;transition:width .3s}
-.progress-inline{display:flex;align-items:center;gap:10px}
-.progress-frac{font-size:13px;font-weight:700;color:var(--green-dark);white-space:nowrap}
 
 /* Details grid */
-.detail-fields-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px 24px}
+.detail-fields-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:20px 24px}
 .detail-field .k-row{display:flex;align-items:center;gap:5px;margin-bottom:6px}
 .detail-field .k-row svg{color:var(--silver-light);flex-shrink:0}
 .detail-field .k{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--silver-light);font-weight:700;margin-bottom:6px}
 .detail-field .v{font-size:14.5px;font-weight:600;color:var(--green-dark)}
+.detail-field .v .v-sub{font-size:11px;font-weight:500;color:var(--silver-light);margin-top:2px}
 .quote-link{color:var(--green-dark);font-weight:700;text-decoration:underline;text-decoration-color:rgba(2,56,25,.35);text-underline-offset:2px;cursor:pointer}
 .quote-link:hover{text-decoration-color:var(--green-dark)}
 
-/* Owner select (Assign Owner modal) */
-.owner-select-list{display:flex;flex-direction:column;gap:8px;max-height:340px;overflow:auto}
-.owner-select-row{display:flex;align-items:center;gap:12px;padding:10px 12px;border:1px solid var(--border-tint);border-radius:var(--radius-md);transition:.12s}
+.overview-layout{display:grid;grid-template-columns:4fr 1fr;gap:22px;align-items:stretch}
+@media (max-width:1100px){
+  .overview-layout{grid-template-columns:1fr}
+  .overview-layout .shipment-team-card{display:none}
+}
+
+/* Shipment Team (read-only display) */
+.team-primary-row{display:flex;align-items:center;gap:12px}
+.crown-badge{color:var(--gold);display:inline-flex;flex-shrink:0}
+.team-name{font-family:var(--font-display);font-weight:600;font-size:15px;color:var(--green-dark)}
+.team-name-sm{font-size:13.5px;font-weight:600;color:var(--silver-dark)}
+.team-divider{height:1px;background:var(--border-tint);margin:16px 0}
+.team-supporting-list{display:flex;flex-direction:column;gap:14px}
+.team-member-row{display:flex;align-items:center;gap:12px}
+.team-empty{font-size:13px;color:var(--silver-light)}
+
+/* Owner select (Shipment Team modal) */
+.owner-select-list{display:flex;flex-direction:column;gap:8px;max-height:400px;overflow:auto}
+.owner-select-row{display:flex;align-items:center;gap:12px;padding:10px 12px;border:1px solid var(--border-tint);border-radius:var(--radius-md);transition:.12s;flex-wrap:wrap}
 .owner-select-row.is-primary{border-color:var(--green-accent);background:var(--green-light-surface)}
 .owner-select-row .owner-checkbox{width:18px;height:18px;accent-color:var(--green-dark);flex-shrink:0;cursor:pointer}
-.owner-select-row .who{flex:1;min-width:0}
+.owner-select-row .who{flex:1;min-width:120px}
 .owner-select-row .who .nm{font-weight:700;font-size:13.5px;color:var(--green-dark)}
 .owner-select-row .who .rl{font-size:11.5px;color:var(--silver-light)}
-.primary-toggle{
-  font-family:var(--font-display);font-weight:600;font-size:11.5px;padding:6px 12px;border-radius:var(--radius-sm);
-  background:var(--white);color:var(--green-dark);border:1.5px solid rgba(2,56,25,.25);cursor:pointer;white-space:nowrap;transition:.12s;
-}
-.primary-toggle:hover{border-color:var(--green-dark)}
-.primary-toggle.active{background:var(--green-accent);border-color:var(--green-accent);color:var(--green-dark)}
+.resp-toggle-btn{display:inline-flex;align-items:center;gap:6px;min-width:150px;justify-content:space-between;background:var(--white);border:1.5px solid rgba(2,56,25,.2);border-radius:var(--radius-sm);padding:7px 10px;font-size:11.5px;font-weight:600;color:var(--silver-dark);cursor:pointer;transition:.12s}
+.resp-toggle-btn:hover{border-color:var(--green-dark)}
+.resp-toggle-btn .resp-summary{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:150px}
+.resp-toggle-btn-placeholder{min-width:150px;height:32px;flex-shrink:0}
+.resp-option{display:flex;align-items:center;gap:8px;width:100%;text-align:left;background:transparent;border:none;padding:8px 10px;border-radius:6px;font-size:12.5px;font-weight:600;color:var(--green-dark);cursor:pointer}
+.resp-option:hover{background:var(--green-light-surface)}
+.resp-option .resp-checkbox{width:14px;height:14px;border:1.5px solid rgba(2,56,25,.3);border-radius:4px;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--white)}
+.resp-option.checked .resp-checkbox{background:var(--green-accent);border-color:var(--green-accent);color:var(--green-dark)}
+.crown-btn{background:transparent;border:none;padding:6px;border-radius:6px;cursor:pointer;color:var(--silver-light);display:inline-flex;align-items:center;justify-content:center;transition:.12s;flex-shrink:0}
+.crown-btn:hover{background:var(--green-light-surface);color:var(--gold-text)}
+.crown-btn.filled{color:var(--gold)}
+.crown-btn-placeholder{width:32px;height:32px;flex-shrink:0}
 
 /* Progress tab layout */
 .progress-layout{display:grid;grid-template-columns:1.9fr 1fr;gap:22px;align-items:start}
@@ -354,6 +376,7 @@ textarea.field-control{resize:vertical;min-height:70px}
 .dropzone svg{margin-bottom:10px}
 .dropzone .dz-title{font-weight:700;color:var(--green-dark);font-size:14px;margin-bottom:4px}
 .dropzone .dz-sub{font-size:12px;color:var(--silver-light)}
+.upload-hints{margin-top:10px;display:flex;flex-direction:column;gap:2px}
 .file-pill-list{display:flex;flex-direction:column;gap:8px;margin-top:16px}
 .file-pill{display:flex;align-items:center;gap:10px;background:var(--green-light-surface);border-radius:var(--radius-md);padding:9px 12px;font-size:12.5px}
 .file-pill .fname{flex:1;font-weight:600;color:var(--green-dark);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -371,7 +394,6 @@ textarea.field-control{resize:vertical;min-height:70px}
 .list-search input{border:none;outline:none;background:transparent;font-size:13.5px;width:100%;color:var(--silver-dark)}
 
 @media (max-width:900px){
-  .detail-fields-grid{grid-template-columns:repeat(2,1fr)}
   .form-grid{grid-template-columns:1fr}
 }
 </style>
@@ -481,7 +503,7 @@ textarea.field-control{resize:vertical;min-height:70px}
 
         <div class="list-search">
           <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="M21 21l-4-4" stroke-linecap="round"></path></svg>
-          <input type="text" id="shipment-search" placeholder="Search by Shipment Reference or Shipment Owner...">
+          <input type="text" id="shipment-search" placeholder="Search by Shipment Number or Shipment Owner...">
         </div>
 
         <div class="card">
@@ -489,12 +511,13 @@ textarea.field-control{resize:vertical;min-height:70px}
             <table class="data-table">
               <thead>
                 <tr>
-                  <th>Shipment Reference</th>
+                  <th>Shipment Number</th>
                   <th>Customer</th>
-                  <th>Route</th>
-                  <th>Shipment Type</th>
+                  <th>POL</th>
+                  <th>POD</th>
                   <th>Transport Mode</th>
-                  <th>Status</th>
+                  <th>Shipment Status</th>
+                  <th>SLA Status</th>
                   <th>Owner</th>
                 </tr>
               </thead>
@@ -533,14 +556,17 @@ textarea.field-control{resize:vertical;min-height:70px}
 
         <!-- Tab: Overview -->
         <div class="tab-pane" id="tab-overview">
-          <div class="card card-pad" style="margin-bottom:22px">
-            <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:18px">
-              <div>
-                <h3 class="section-title">Shipment Details</h3>
-                <p class="section-sub" style="margin:0">Core reference data for this job.</p>
-              </div>
+          <div class="overview-layout" style="margin-bottom:22px">
+            <div class="card card-pad">
+              <h3 class="section-title">Shipment Details</h3>
+              <p class="section-sub" style="margin:0 0 18px">Core reference data for this job.</p>
+              <div class="detail-fields-grid" id="ship-detail-fields"></div>
             </div>
-            <div class="detail-fields-grid" id="ship-detail-fields"></div>
+            <div class="card card-pad shipment-team-card">
+              <h3 class="section-title">Shipment Team</h3>
+              <p class="section-sub">Who's assigned to this shipment.</p>
+              <div id="shipment-team-display"></div>
+            </div>
           </div>
 
           <div class="card card-pad">
@@ -572,7 +598,10 @@ textarea.field-control{resize:vertical;min-height:70px}
         <div class="tab-pane" id="tab-progress" style="display:none">
           <div class="progress-layout">
             <div class="card card-pad">
-              <h3 class="section-title">Service Delivery</h3>
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
+                <h3 class="section-title" style="margin-bottom:0">Service Delivery</h3>
+                <span class="chip chip-neutral" id="service-delivery-template-pill"></span>
+              </div>
               <p class="section-sub">Milestones for this shipment. Completion is logged manually.</p>
               <div class="table-wrap">
                 <table class="data-table">
@@ -611,7 +640,7 @@ textarea.field-control{resize:vertical;min-height:70px}
                     <th>File Name</th>
                     <th>Category</th>
                     <th>Uploaded By</th>
-                    <th>Uploaded On</th>
+                    <th>Date &amp; Time</th>
                     <th style="text-align:right">Actions</th>
                   </tr>
                 </thead>
@@ -629,13 +658,13 @@ textarea.field-control{resize:vertical;min-height:70px}
 
 <!-- ============================ MODALS ============================ -->
 
-<!-- Assign Owner (multi-select w/ Primary) -->
+<!-- Shipment Team (multi-select, responsibilities, Primary Owner) -->
 <div class="modal-overlay" id="modal-assign-owner">
-  <div class="modal">
+  <div class="modal modal-wide">
     <div class="modal-head">
       <div>
-        <h3>Assign Shipment Owner</h3>
-        <p>Choose everyone working this shipment, then mark exactly one as Primary.</p>
+        <h3>Shipment Team</h3>
+        <p>Select the people working on this shipment, assign responsibilities, and designate one Primary Owner.</p>
       </div>
       <button class="modal-close" data-close-modal><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18" stroke-linecap="round"></path></svg></button>
     </div>
@@ -782,7 +811,7 @@ textarea.field-control{resize:vertical;min-height:70px}
     <div class="modal-head">
       <div>
         <h3>Upload Documents</h3>
-        <p>Multiple files supported · any file type · max 25MB per file</p>
+        <p>Add supporting files for this shipment.</p>
       </div>
       <button class="modal-close" data-close-modal><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18" stroke-linecap="round"></path></svg></button>
     </div>
@@ -792,6 +821,10 @@ textarea.field-control{resize:vertical;min-height:70px}
         <svg width="30" height="30" fill="none" stroke="#023819" stroke-width="1.6" viewBox="0 0 24 24"><path d="M12 16V4M6 10l6-6 6 6M4 20h16" stroke-linecap="round" stroke-linejoin="round"></path></svg>
         <div class="dz-title">Drag & drop files here</div>
         <div class="dz-sub">or click to browse from your device</div>
+      </div>
+      <div class="upload-hints">
+        <p class="field-hint">Supported formats: PDF, DOC, DOCX, XLS, XLSX, CSV, JPG, JPEG, PNG, GIF, ZIP</p>
+        <p class="field-hint">Maximum file size: 25 MB per file</p>
       </div>
       <div class="file-pill-list" id="file-pill-list"></div>
 
@@ -870,7 +903,8 @@ const ICON_X = `<svg width="10" height="10" fill="none" stroke="currentColor" st
 const ICON_WARN = `<svg width="10" height="10" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path d="M12 9v4M12 16h.01" stroke-linecap="round"></path><circle cx="12" cy="12" r="9"></circle></svg>`;
 const ICON_BUILDING = `<svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 21h18M5 21V7l6-4 6 4v14M9 9h1M9 13h1M14 9h1M14 13h1"></path></svg>`;
 const ICON_PERSON = `<svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"></circle><path d="M4 21v-1a8 8 0 0116 0v1"></path></svg>`;
-const ICON_ROUTE = `<svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="6" cy="19" r="2"></circle><circle cx="18" cy="5" r="2"></circle><path d="M6 17V13a4 4 0 014-4h4a4 4 0 004-4"></path></svg>`;
+const ICON_CROWN_FILLED = `<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M3 18h18l-1.6-9.5-4.9 4-2.5-7.3-2.5 7.3-4.9-4L3 18z"></path><rect x="3" y="19" width="18" height="2" rx="1"></rect></svg>`;
+const ICON_CROWN_OUTLINE = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 18h18l-1.6-9.5-4.9 4-2.5-7.3-2.5 7.3-4.9-4L3 18z" stroke-linejoin="round"></path><path d="M3 20h18" stroke-linecap="round"></path></svg>`;
 const SOURCE_ICON = {
   Terminal: `<svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 21h18M5 21V9l7-6 7 6v12M9 21v-6h6v6"></path></svg>`,
   Vessel: `<svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 17l1.2-5h13.6L20 17M6 12V7h3V5h6v2h3v5M3 21c1.3 0 1.3-1.3 2.6-1.3S7.9 21 9.2 21s1.3-1.3 2.6-1.3S14.1 21 15.4 21s1.3-1.3 2.6-1.3S20.3 21 21.6 21" stroke-linecap="round" stroke-linejoin="round"></path></svg>`,
@@ -897,6 +931,8 @@ function avatarFillStyle(fill){
   return 'background:var(--green-dark);color:var(--green-accent)';
 }
 
+const RESPONSIBILITIES = ['Operations Manager','Operations Officer','Documentation Officer','Finance Officer','QA Officer','CX Officer','Clearing Officer','Transport Coordinator'];
+
 const SLA_CONFIG = {
   'Healthy': {chip:'chip-success', dot:'var(--success)'},
   'At-Risk': {chip:'chip-warning', dot:'var(--gold)'},
@@ -905,16 +941,45 @@ const SLA_CONFIG = {
 function slaIcon(health){ return health==='Healthy' ? ICON_CHECK : ICON_WARN; }
 
 const STATUS_CLASS = { Active:'status-active', Completed:'status-completed', Cancelled:'status-cancelled' };
-function renderStatusChip(status){
+function renderStatusChip(status, sizeClass=''){
   const cls = STATUS_CLASS[status] || 'status-active';
   let icon = `<span class="status-dot"></span>`;
   if(status==='Completed') icon = `<span class="status-icon">${ICON_CHECK}</span>`;
   else if(status==='Cancelled') icon = `<span class="status-icon">${ICON_X}</span>`;
-  return `<span class="status-chip ${cls}">${icon}${status}</span>`;
+  return `<span class="status-chip ${cls} ${sizeClass}">${icon}${status}</span>`;
 }
 
 function shipmentTypeOf(s){ return s.mode.includes('Import') ? 'Import' : s.mode.includes('Export') ? 'Export' : 'Cross-trade'; }
 function transportLabelOf(s){ return s.mode.includes('Ocean') ? 'Ocean Freight' : s.mode.includes('Air') ? 'Air Freight' : s.mode; }
+function templateLabelOf(s){ return s.mode.includes('Export') ? 'OneExport' : 'OneImport'; }
+
+const PORTS = [
+  {code:'CNSHA', name:'Shanghai Yangshan Port'},
+  {code:'NGLOS', name:'Apapa Port, Lagos'},
+  {code:'NLRTM', name:'Port of Rotterdam'},
+  {code:'GHTEM', name:'Tema Port'},
+  {code:'DEHAM', name:'Port of Hamburg'},
+  {code:'CNSZX', name:"Shenzhen Bao'an Airport"},
+  {code:'NGLOS', name:'Murtala Muhammed Airport'},
+  {code:'CMDLA', name:'Port of Douala'},
+  {code:'BEANR', name:'Port of Antwerp'},
+  {code:'SGSIN', name:'Port of Singapore'},
+  {code:'USNYC', name:'Port of New York'},
+  {code:'GBFXT', name:'Port of Felixstowe'},
+  {code:'ESVLC', name:'Port of Valencia'},
+  {code:'KRPUS', name:'Port of Busan'},
+  {code:'CNTAO', name:'Port of Qingdao'},
+  {code:'AEJEA', name:'Jebel Ali Port, Dubai'},
+];
+const LOCODE_MAP = Object.fromEntries(PORTS.map(p=>[p.name, p.code]));
+function locodeOf(portName){ return LOCODE_MAP[portName] || portName; }
+
+const LOCATIONS = [
+  'Shanghai, China','Lagos, Nigeria','Rotterdam, Netherlands','Tema, Ghana','Hamburg, Germany',
+  'Shenzhen, China','Douala, Cameroon','Antwerp, Belgium','Singapore','Dubai, UAE',
+  'Mombasa, Kenya','Durban, South Africa','New York, USA','Felixstowe, United Kingdom',
+  'Valencia, Spain','Tianjin, China','Busan, South Korea','Qingdao, China','Ningbo, China','Santos, Brazil',
+];
 
 const MONTH_MAP = {Jan:0,Feb:1,Mar:2,Apr:3,May:4,Jun:5,Jul:6,Aug:7,Sep:8,Oct:9,Nov:10,Dec:11};
 function parseDisplayDate(str){
@@ -923,6 +988,22 @@ function parseDisplayDate(str){
 }
 function formatDate(date){
   return date.toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'});
+}
+function displayDateToInputValue(str){
+  const date = parseDisplayDate(str);
+  const pad = n => String(n).padStart(2,'0');
+  return `${date.getFullYear()}-${pad(date.getMonth()+1)}-${pad(date.getDate())}`;
+}
+function inputDateToDisplay(val){
+  const [y,m,d] = val.split('-').map(Number);
+  return formatDate(new Date(y, m-1, d));
+}
+function formatPortDisplay(name){
+  const p = PORTS.find(x=>x.name===name);
+  return p ? `${p.code} — ${p.name}` : name;
+}
+function formatDateTime(date){
+  return `${formatDate(date)} • ${date.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'})}`;
 }
 function formatDueDateTime(date){
   if(!date) return '—';
@@ -943,8 +1024,30 @@ function computeLiveSlaHealth(dueDate){
   return 'Healthy';
 }
 
-const OCEAN_EXPORT_TEMPLATE = ['Booking Placement','Empty Container','Clean CCI','Draft BL to Customer','Gate-In','Inspection','Vessel Confirmation','Sailing Confirmation','OBL Issuance','Document Release'];
-const OCEAN_IMPORT_TEMPLATE = ['Pre-Alert Receipt','Form M Validation','PAAR Application','Draft Assessment','Final Assessment','THC Payment','Delivery','Empty Return','Post Delivery Docs','Document Release'];
+const OCEAN_EXPORT_TEMPLATE = [
+  {name:'Booking Placement', responsibility:'Operations Officer'},
+  {name:'Empty Container', responsibility:'Transport Coordinator'},
+  {name:'Clean CCI', responsibility:'Documentation Officer'},
+  {name:'Draft BL to Customer', responsibility:'Documentation Officer'},
+  {name:'Gate-In', responsibility:'Transport Coordinator'},
+  {name:'Inspection', responsibility:'QA Officer'},
+  {name:'Vessel Confirmation', responsibility:'Operations Manager'},
+  {name:'Sailing Confirmation', responsibility:'Operations Manager'},
+  {name:'OBL Issuance', responsibility:'Documentation Officer'},
+  {name:'Document Release', responsibility:'CX Officer'},
+];
+const OCEAN_IMPORT_TEMPLATE = [
+  {name:'Pre-Alert Receipt', responsibility:'CX Officer'},
+  {name:'Form M Validation', responsibility:'Documentation Officer'},
+  {name:'PAAR Application', responsibility:'Clearing Officer'},
+  {name:'Draft Assessment', responsibility:'Clearing Officer'},
+  {name:'Final Assessment', responsibility:'Clearing Officer'},
+  {name:'THC Payment', responsibility:'Finance Officer'},
+  {name:'Delivery', responsibility:'Transport Coordinator'},
+  {name:'Empty Return', responsibility:'Transport Coordinator'},
+  {name:'Post Delivery Docs', responsibility:'Documentation Officer'},
+  {name:'Document Release', responsibility:'CX Officer'},
+];
 
 const PHYSICAL_TRACKING_TEMPLATE = [
   {label:'Container Gated In · Origin Terminal', loc:'Shanghai Yangshan Port', source:'Terminal'},
@@ -959,11 +1062,31 @@ const SOURCE_TAG_CLASS = {Terminal:'tag-terminal', Vessel:'tag-vessel', Haulage:
 
 function makeId(prefix){ return prefix + '-' + Math.random().toString(36).slice(2,8); }
 
+// Deterministic mock responsibility assignment per shipment team, with one guaranteed
+// "Unassigned" demo case (seed 7 / Dufil, Export template, missing QA Officer coverage)
+function assignResponsibilities(shipTeamIds, seed){
+  const resp = {};
+  resp[shipTeamIds[0]] = ['Operations Manager'];
+  const pool = RESPONSIBILITIES.filter(r=>r!=='Operations Manager');
+  let poolIdx = seed % pool.length;
+  for(let i=1;i<shipTeamIds.length;i++){
+    const id = shipTeamIds[i];
+    if(!resp[id]) resp[id] = [];
+    resp[id].push(pool[poolIdx % pool.length]); poolIdx++;
+    resp[id].push(pool[poolIdx % pool.length]); poolIdx++;
+  }
+  if(seed===7){
+    Object.keys(resp).forEach(id=>{ resp[id] = resp[id].filter(r=>r!=='QA Officer'); });
+  }
+  return resp;
+}
+
 // Build a fleshed-out shipment detail object from a light list record + a seed for variety
 function buildShipmentDetail(base, seed){
   const primary = teamMember(base.ownerId);
   const supporting = (base.supportingOwnerIds||[]).map(teamMember);
   const shipTeamIds = [base.ownerId, ...(base.supportingOwnerIds||[])];
+  const responsibilities = assignResponsibilities(shipTeamIds, seed);
 
   const containerCount = 2 + (seed % 3);
   const containers = [];
@@ -984,12 +1107,11 @@ function buildShipmentDetail(base, seed){
   const span = etaDate.getTime() - etdDate.getTime();
   const completedCount = base.completedMilestones;
 
-  const milestones = template.map((name,i)=>{
+  const milestones = template.map((t,i)=>{
     const frac = template.length>1 ? i/(template.length-1) : 0;
     let dueDate = new Date(etdDate.getTime() + span*frac);
     dueDate.setHours(9 + ((i*3)%8), (i%2)*30, 0, 0);
     if(i === template.length-1 && seed % 3 === 0) dueDate = null;
-    // Demo overrides so "Today" / "Tomorrow" relative labels are always visible regardless of viewing date
     if(seed===3 && i===4){ dueDate = new Date(); dueDate.setHours(14,30,0,0); }
     if(seed===4 && i===6){ dueDate = new Date(); dueDate.setDate(dueDate.getDate()+1); dueDate.setHours(10,0,0,0); }
     const isDone = i < completedCount;
@@ -1002,8 +1124,8 @@ function buildShipmentDetail(base, seed){
     }
     return {
       id: makeId('ms'),
-      name,
-      ownerId: shipTeamIds[(i+seed)%shipTeamIds.length],
+      name: t.name,
+      responsibility: t.responsibility,
       status: isDone ? 'Completed' : 'Not Started',
       dueDate,
       completedBy,
@@ -1037,7 +1159,7 @@ function buildShipmentDetail(base, seed){
       name: d[0],
       category: d[1],
       uploadedBy: teamMember(shipTeamIds[(i+seed)%shipTeamIds.length]).name,
-      uploadedOn: new Date(Date.now() - (docCount-i)*86400000*2).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}),
+      uploadedOn: new Date(Date.now() - (docCount-i)*86400000*2 - i*3600000*7),
       isMock: true,
       fileUrl: null,
       size: null,
@@ -1046,7 +1168,7 @@ function buildShipmentDetail(base, seed){
 
   return {
     ...base,
-    owners: { primary, supporting },
+    owners: { primary, supporting, responsibilities },
     containers,
     milestones,
     physicalTracking,
@@ -1055,12 +1177,12 @@ function buildShipmentDetail(base, seed){
 }
 
 const SHIPMENT_LIST_BASE = [
-  {jobRef:'ZELO000001', customer:'Dangote Industries', route:'Shanghai → Lagos', mode:'Ocean Import', status:'Active', slaHealth:'Healthy', eta:'02 Aug 2026', ownerId:'u1', supportingOwnerIds:['u5','u6'], completedMilestones:4, quoteRef:'OP-QT-8821', incoterm:'CIF', origin:'Shanghai, China', destination:'Lagos, Nigeria', pol:'Shanghai Yangshan Port', pod:'Apapa Port, Lagos', etd:'12 Jul 2026', serviceType:'Full Container Load'},
-  {jobRef:'ZELO000002', customer:'Nestlé West Africa', route:'Rotterdam → Tema', mode:'Ocean Import', status:'Active', slaHealth:'At-Risk', eta:'29 Jul 2026', ownerId:'u2', supportingOwnerIds:['u4'], completedMilestones:6, quoteRef:'OP-QT-8790', incoterm:'FOB', origin:'Rotterdam, Netherlands', destination:'Tema, Ghana', pol:'Port of Rotterdam', pod:'Tema Port', etd:'05 Jul 2026', serviceType:'Full Container Load'},
-  {jobRef:'ZELO000003', customer:'Julius Berger Nigeria', route:'Hamburg → Lagos', mode:'Ocean Import', status:'Active', slaHealth:'Breached', eta:'20 Jul 2026', ownerId:'u3', supportingOwnerIds:[], completedMilestones:1, quoteRef:'OP-QT-8744', incoterm:'CFR', origin:'Hamburg, Germany', destination:'Lagos, Nigeria', pol:'Port of Hamburg', pod:'Apapa Port, Lagos', etd:'01 Jul 2026', serviceType:'Break Bulk'},
-  {jobRef:'ZELO000004', customer:'MTN Nigeria', route:'Shenzhen → Lagos', mode:'Air Import', status:'Cancelled', slaHealth:'Healthy', eta:'31 Jul 2026', ownerId:'u4', supportingOwnerIds:['u1'], completedMilestones:2, quoteRef:'OP-QT-8701', incoterm:'FCA', origin:'Shenzhen, China', destination:'Lagos, Nigeria', pol:'Shenzhen Bao\'an Airport', pod:'Murtala Muhammed Airport', etd:'27 Jul 2026', serviceType:'Air Freight'},
-  {jobRef:'ZELO000005', customer:'Dufil Prima Foods', route:'Lagos → Douala', mode:'Ocean Export', status:'Active', slaHealth:'Healthy', eta:'26 Jul 2026', ownerId:'u5', supportingOwnerIds:['u2','u3'], completedMilestones:7, quoteRef:'OP-QT-8650', incoterm:'CIF', origin:'Lagos, Nigeria', destination:'Douala, Cameroon', pol:'Apapa Port, Lagos', pod:'Port of Douala', etd:'14 Jul 2026', serviceType:'Full Container Load'},
-  {jobRef:'ZELO000006', customer:'Nigerian Breweries', route:'Antwerp → Lagos', mode:'Ocean Import', status:'Completed', slaHealth:'Healthy', eta:'10 Jul 2026', ownerId:'u6', supportingOwnerIds:[], completedMilestones:10, quoteRef:'OP-QT-8590', incoterm:'CIF', origin:'Antwerp, Belgium', destination:'Lagos, Nigeria', pol:'Port of Antwerp', pod:'Apapa Port, Lagos', etd:'20 Jun 2026', serviceType:'Full Container Load'},
+  {jobRef:'ZELO000001', customer:'Dangote Industries', route:'Shanghai → Lagos', mode:'Ocean Import', status:'Active', slaHealth:'Healthy', eta:'02 Aug 2026', ownerId:'u1', supportingOwnerIds:['u5','u6'], completedMilestones:4, quoteRef:'OP-QT-8821', bl:'MEDUSH0123456', incoterm:'CIF', origin:'Shanghai, China', destination:'Lagos, Nigeria', pol:'Shanghai Yangshan Port', pod:'Apapa Port, Lagos', etd:'12 Jul 2026', serviceType:'FCL'},
+  {jobRef:'ZELO000002', customer:'Nestlé West Africa', route:'Rotterdam → Tema', mode:'Ocean Import', status:'Active', slaHealth:'At-Risk', eta:'29 Jul 2026', ownerId:'u2', supportingOwnerIds:['u4'], completedMilestones:6, quoteRef:'OP-QT-8790', bl:'MSCURTM998211', incoterm:'FOB', origin:'Rotterdam, Netherlands', destination:'Tema, Ghana', pol:'Port of Rotterdam', pod:'Tema Port', etd:'05 Jul 2026', serviceType:'FCL'},
+  {jobRef:'ZELO000003', customer:'Julius Berger Nigeria', route:'Hamburg → Lagos', mode:'Ocean Import', status:'Active', slaHealth:'Breached', eta:'20 Jul 2026', ownerId:'u3', supportingOwnerIds:[], completedMilestones:1, quoteRef:'OP-QT-8744', bl:'HLCUHAM774410', incoterm:'CFR', origin:'Hamburg, Germany', destination:'Lagos, Nigeria', pol:'Port of Hamburg', pod:'Apapa Port, Lagos', etd:'01 Jul 2026', serviceType:'Break Bulk'},
+  {jobRef:'ZELO000004', customer:'MTN Nigeria', route:'Shenzhen → Lagos', mode:'Air Import', status:'Cancelled', slaHealth:'Healthy', eta:'31 Jul 2026', ownerId:'u4', supportingOwnerIds:['u1'], completedMilestones:2, quoteRef:'OP-QT-8701', bl:'MAWB-176-882130', incoterm:'FCA', origin:'Shenzhen, China', destination:'Lagos, Nigeria', pol:'Shenzhen Bao\'an Airport', pod:'Murtala Muhammed Airport', etd:'27 Jul 2026', serviceType:'Air Freight'},
+  {jobRef:'ZELO000005', customer:'Dufil Prima Foods', route:'Lagos → Douala', mode:'Ocean Export', status:'Active', slaHealth:'Healthy', eta:'26 Jul 2026', ownerId:'u5', supportingOwnerIds:['u2','u3'], completedMilestones:7, quoteRef:'OP-QT-8650', bl:'OOLU2384910X', incoterm:'CIF', origin:'Lagos, Nigeria', destination:'Douala, Cameroon', pol:'Apapa Port, Lagos', pod:'Port of Douala', etd:'14 Jul 2026', serviceType:'FCL'},
+  {jobRef:'ZELO000006', customer:'Nigerian Breweries', route:'Antwerp → Lagos', mode:'Ocean Import', status:'Completed', slaHealth:'Healthy', eta:'10 Jul 2026', ownerId:'u6', supportingOwnerIds:[], completedMilestones:10, quoteRef:'OP-QT-8590', bl:'APLU5567234B', incoterm:'CIF', origin:'Antwerp, Belgium', destination:'Lagos, Nigeria', pol:'Port of Antwerp', pod:'Apapa Port, Lagos', etd:'20 Jun 2026', serviceType:'FCL'},
 ];
 
 const SHIPMENTS = {};
@@ -1082,7 +1204,7 @@ const state = {
   activeDocUpdate: null,
   activeDocDelete: null,
 };
-const ownerModalState = { checked: new Set(), primary: null };
+const ownerModalState = { checked: new Set(), primary: null, responsibilities: {}, openRespUid: null };
 
 function el(id){ return document.getElementById(id); }
 function currentShipment(){ return SHIPMENTS[state.currentShipmentRef]; }
@@ -1149,29 +1271,23 @@ function renderShipmentsList(){
   el('shipments-tbody').innerHTML = list.map(s=>{
     const sla = SLA_CONFIG[s.slaHealth];
     const primary = s.owners.primary;
-    const supCount = s.owners.supporting.length;
     return `
     <tr class="clickable" data-jobref="${s.jobRef}">
       <td><b style="color:var(--green-dark);font-family:var(--font-display);font-weight:600">${s.jobRef}</b></td>
       <td>${s.customer}</td>
-      <td>${s.route}</td>
-      <td><span class="chip chip-neutral">${shipmentTypeOf(s)}</span></td>
+      <td>${locodeOf(s.pol)}</td>
+      <td>${locodeOf(s.pod)}</td>
       <td><span class="chip chip-neutral">${transportLabelOf(s)}</span></td>
-      <td>
-        <div class="status-stack">
-          ${renderStatusChip(s.status)}
-          <span class="badge-sla sm ${sla.chip}"><span class="sla-icon">${slaIcon(s.slaHealth)}</span>${s.slaHealth}</span>
-        </div>
-      </td>
+      <td>${renderStatusChip(s.status)}</td>
+      <td><span class="badge-sla ${sla.chip}"><span class="sla-icon">${slaIcon(s.slaHealth)}</span>${s.slaHealth}</span></td>
       <td>
         <div style="display:flex;align-items:center;gap:8px">
           <div class="avatar avatar-sm" style="${avatarFillStyle(primary.fill)}">${primary.initials}</div>
           <span style="font-size:12.5px;color:var(--silver-dark)">${primary.name.split(' ')[0]}</span>
-          ${supCount ? `<span class="chip chip-neutral" style="padding:2px 7px;font-size:10px">+${supCount}</span>` : ''}
         </div>
       </td>
     </tr>`;
-  }).join('') || `<tr><td colspan="7" style="text-align:center;color:var(--silver-light);padding:40px">No shipments match your search.</td></tr>`;
+  }).join('') || `<tr><td colspan="8" style="text-align:center;color:var(--silver-light);padding:40px">No shipments match your search.</td></tr>`;
 }
 
 /* ==========================================================================
@@ -1180,6 +1296,7 @@ function renderShipmentsList(){
 function renderShipmentDetail(){
   renderShipHeader();
   renderShipDetailFields();
+  renderShipmentTeamDisplay();
   renderContainers();
   renderServiceDelivery();
   renderShipmentTracking();
@@ -1189,16 +1306,11 @@ function renderShipmentDetail(){
 function renderShipHeader(){
   const s = currentShipment();
   const sla = SLA_CONFIG[s.slaHealth];
-  const total = s.milestones.length;
-  const done = s.milestones.filter(m=>m.status==='Completed').length;
-  const pct = total ? Math.round((done/total)*100) : 0;
 
   el('ship-header').innerHTML = `
     <div class="ship-header-row1">
       <div class="ship-header-id">
         <h1>${s.jobRef}</h1>
-        ${renderStatusChip(s.status)}
-        <span class="badge-sla ${sla.chip}"><span class="sla-icon">${slaIcon(s.slaHealth)}</span>${s.slaHealth}</span>
       </div>
       <div class="dropdown">
         <button class="btn btn-solid dropdown-toggle" type="button">
@@ -1208,7 +1320,7 @@ function renderShipHeader(){
         <div class="dropdown-menu">
           <button class="dropdown-item" data-ship-action="assign-owner">
             <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"></circle><path d="M4 21v-1a8 8 0 0116 0v1"></path></svg>
-            Assign Shipment Owner
+            Shipment Team
           </button>
           <button class="dropdown-item" data-ship-action="update-status">
             <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 12l4 4L21 4" stroke-linecap="round" stroke-linejoin="round"></path></svg>
@@ -1227,40 +1339,33 @@ function renderShipHeader(){
         <div class="v">${s.customer}</div>
       </div>
       <span class="strip-divider"></span>
-      <div class="strip-cell"><div class="k">Shipment Type</div><div class="v">${shipmentTypeOf(s)}</div></div>
+      <div class="strip-cell"><div class="k">Transport Mode</div><div class="v">${transportLabelOf(s)}</div></div>
       <span class="strip-divider"></span>
-      <div class="strip-cell">
-        <div class="k-row">${ICON_ROUTE}<span class="k">Route</span></div>
-        <div class="v">${transportLabelOf(s)} · ${s.route}</div>
-      </div>
+      <div class="strip-cell"><div class="k">POL</div><div class="v">${locodeOf(s.pol)}</div></div>
       <span class="strip-divider"></span>
-      <div class="strip-cell strip-cell-grow">
-        <div class="k">Service Delivery Progress</div>
-        <div class="v progress-inline">
-          <span class="progress-bar-track sm"><span class="progress-bar-fill" style="width:${pct}%"></span></span>
-          <span class="progress-frac">${done}/${total} Completed</span>
-        </div>
-      </div>
+      <div class="strip-cell"><div class="k">POD</div><div class="v">${locodeOf(s.pod)}</div></div>
+      <span class="strip-divider"></span>
+      <div class="strip-cell"><div class="k">Status</div><div class="v">${renderStatusChip(s.status, 'sm')}</div></div>
+      <span class="strip-divider"></span>
+      <div class="strip-cell"><div class="k">SLA</div><div class="v"><span class="badge-sla sm ${sla.chip}"><span class="sla-icon">${slaIcon(s.slaHealth)}</span>${s.slaHealth}</span></div></div>
     </div>
   `;
 }
 
 function renderShipDetailFields(){
   const s = currentShipment();
-  const primary = s.owners.primary, supporting = s.owners.supporting;
   const fields = [
     [`${ICON_BUILDING}<span>Customer</span>`, s.customer],
     ['Quote Reference', `<a href="#" class="quote-link" data-quote-link>${s.quoteRef}</a>`],
-    [`${ICON_PERSON}<span>Primary Owner</span>`, `<div style="display:flex;align-items:center;gap:8px"><div class="avatar avatar-sm" style="${avatarFillStyle(primary.fill)}">${primary.initials}</div>${primary.name}</div>`],
-    [`${ICON_PERSON}<span>Supporting Team</span>`, supporting.length ? supporting.map(o=>o.name).join(', ') : '—'],
+    ['Bill of Lading (B/L)', s.bl],
     ['Transport Mode', s.mode],
     ['Shipment Type', shipmentTypeOf(s)],
     ['Service Type', s.serviceType],
     ['Incoterm', s.incoterm],
     ['Origin', s.origin],
     ['Destination', s.destination],
-    ['Port of Loading', s.pol],
-    ['Port of Discharge', s.pod],
+    ['Port of Loading', `${locodeOf(s.pol)}<div class="v-sub">${s.pol}</div>`],
+    ['Port of Discharge', `${locodeOf(s.pod)}<div class="v-sub">${s.pod}</div>`],
     ['ETD', s.etd],
     ['ETA', s.eta],
   ];
@@ -1268,6 +1373,27 @@ function renderShipDetailFields(){
     const label = k.includes('<svg') ? `<div class="k-row">${k}</div>` : `<div class="k">${k}</div>`;
     return `<div class="detail-field">${label}<div class="v">${v}</div></div>`;
   }).join('');
+}
+
+function renderShipmentTeamDisplay(){
+  const s = currentShipment();
+  const primary = s.owners.primary, supporting = s.owners.supporting;
+  let html = `
+    <div class="team-primary-row">
+      <span class="crown-badge">${ICON_CROWN_FILLED}</span>
+      <div class="avatar avatar-md" style="${avatarFillStyle(primary.fill)}">${primary.initials}</div>
+      <div class="team-name">${primary.name}</div>
+    </div>`;
+  if(supporting.length){
+    html += `<div class="team-divider"></div><div class="team-supporting-list">`;
+    html += supporting.map(o=>`
+      <div class="team-member-row">
+        <div class="avatar avatar-sm" style="${avatarFillStyle(o.fill)}">${o.initials}</div>
+        <div class="team-name-sm">${o.name}</div>
+      </div>`).join('');
+    html += `</div>`;
+  }
+  el('shipment-team-display').innerHTML = html;
 }
 
 function renderContainers(){
@@ -1284,10 +1410,16 @@ function renderContainers(){
   `).join('') || `<tr><td colspan="6" style="text-align:center;color:var(--silver-light);padding:30px">No containers added yet.</td></tr>`;
 }
 
+function resolveTaskOwners(s, responsibility){
+  const resp = s.owners.responsibilities || {};
+  return Object.keys(resp).filter(uid => (resp[uid]||[]).includes(responsibility)).map(teamMember);
+}
+
 function renderServiceDelivery(){
   const s = currentShipment();
+  el('service-delivery-template-pill').textContent = templateLabelOf(s);
   el('service-delivery-tbody').innerHTML = s.milestones.map(m=>{
-    const owner = teamMember(m.ownerId);
+    const owners = resolveTaskOwners(s, m.responsibility);
     const isDone = m.status==='Completed';
     const liveHealth = isDone ? null : computeLiveSlaHealth(m.dueDate);
     const rowClass = !isDone && liveHealth==='Breached' ? 'sla-breached' : !isDone && liveHealth==='At-Risk' ? 'sla-at-risk' : '';
@@ -1295,21 +1427,13 @@ function renderServiceDelivery(){
     let historyNote = '';
     if(isDone && m.completedSlaHealth==='Breached') historyNote = '<div class="sla-history-note breach">⚠ After Breach</div>';
     else if(isDone && m.completedSlaHealth==='At-Risk') historyNote = '<div class="sla-history-note at-risk">⚠ Completed While At-Risk</div>';
+    const ownerCell = owners.length
+      ? `<div class="task-owner-cell">${owners.map(o=>`<div class="owner-pill"><div class="avatar avatar-sm" style="${avatarFillStyle(o.fill)}">${o.initials}</div><span>${o.name.split(' ')[0]}</span></div>`).join('')}</div>`
+      : `<span class="task-owner-unassigned">Unassigned</span>`;
     return `
     <tr class="${rowClass}">
       <td><b class="task-name">${m.name}</b></td>
-      <td>
-        <div class="dropdown task-owner-dropdown">
-          <button type="button" class="task-owner-btn dropdown-toggle">
-            <div class="avatar avatar-sm" style="${avatarFillStyle(owner.fill)}">${owner.initials}</div>
-            <span>${owner.name.split(' ')[0]}</span>
-            <svg class="chevron-sm" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.4" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"></path></svg>
-          </button>
-          <div class="dropdown-menu dropdown-menu-sm">
-            ${TEAM.map(t=>`<button class="dropdown-item" data-reassign-task="${m.id}" data-new-owner="${t.id}"><div class="avatar avatar-sm" style="${avatarFillStyle(t.fill)}">${t.initials}</div>${t.name}</button>`).join('')}
-          </div>
-        </div>
-      </td>
+      <td>${ownerCell}</td>
       <td class="due-cell">${dueLabel}</td>
       <td>
         <span class="chip ${isDone?'chip-success':'chip-neutral'}">${m.status}</span>
@@ -1352,7 +1476,7 @@ function renderDocuments(){
       </td>
       <td>${d.category ? `<span class="chip chip-neutral">${d.category}</span>` : '<span style="color:var(--silver-light)">—</span>'}</td>
       <td>${d.uploadedBy}</td>
-      <td>${d.uploadedOn}</td>
+      <td>${formatDateTime(d.uploadedOn)}</td>
       <td style="text-align:right">
         <div class="dropdown">
           <button class="btn btn-ghost btn-icon dropdown-toggle" title="Actions"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="2"></circle><circle cx="12" cy="12" r="2"></circle><circle cx="19" cy="12" r="2"></circle></svg></button>
@@ -1383,11 +1507,16 @@ function switchTab(tab){
 function openModal(id){ el(id).classList.add('open'); }
 function closeModal(id){ el(id).classList.remove('open'); }
 
-/* --- Assign Owner --- */
+/* --- Shipment Team modal --- */
 function openAssignOwnerModal(){
   const s = currentShipment();
   ownerModalState.checked = new Set([s.owners.primary.id, ...s.owners.supporting.map(o=>o.id)]);
   ownerModalState.primary = s.owners.primary.id;
+  ownerModalState.responsibilities = {};
+  Object.keys(s.owners.responsibilities||{}).forEach(uid=>{
+    ownerModalState.responsibilities[uid] = [...s.owners.responsibilities[uid]];
+  });
+  ownerModalState.openRespUid = null;
   renderOwnerSelectList();
   openModal('modal-assign-owner');
 }
@@ -1395,22 +1524,44 @@ function renderOwnerSelectList(){
   el('owner-select-list').innerHTML = TEAM.map(t=>{
     const isChecked = ownerModalState.checked.has(t.id);
     const isPrimary = ownerModalState.primary === t.id;
+    const myResp = ownerModalState.responsibilities[t.id] || [];
+    const respDropdown = isChecked ? `
+      <div class="dropdown">
+        <button type="button" class="resp-toggle-btn dropdown-toggle" data-resp-owner="${t.id}">
+          <span class="resp-summary">${myResp.length ? myResp.join(', ') : 'Add responsibility'}</span>
+          <svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.4" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+        </button>
+        <div class="dropdown-menu dropdown-menu-sm">
+          ${RESPONSIBILITIES.map(r=>`<button type="button" class="resp-option ${myResp.includes(r)?'checked':''}" data-resp-toggle="${t.id}::${r}"><span class="resp-checkbox">${myResp.includes(r)?ICON_CHECK:''}</span>${r}</button>`).join('')}
+        </div>
+      </div>` : `<span class="resp-toggle-btn-placeholder"></span>`;
+    const crownBtn = isChecked
+      ? `<button type="button" class="crown-btn ${isPrimary?'filled':''}" data-owner-primary="${t.id}" title="${isPrimary?'Primary Owner':'Make Primary Owner'}">${isPrimary?ICON_CROWN_FILLED:ICON_CROWN_OUTLINE}</button>`
+      : `<span class="crown-btn-placeholder"></span>`;
     return `
     <div class="owner-select-row ${isPrimary?'is-primary':''}">
       <input type="checkbox" class="owner-checkbox" data-owner-check="${t.id}" ${isChecked?'checked':''}>
       <div class="avatar avatar-sm" style="${avatarFillStyle(t.fill)}">${t.initials}</div>
       <div class="who"><div class="nm">${t.name}</div><div class="rl">${t.role}</div></div>
-      <button type="button" class="primary-toggle ${isPrimary?'active':''}" data-owner-primary="${t.id}">${isPrimary ? '★ Primary' : 'Set Primary'}</button>
+      ${respDropdown}
+      ${crownBtn}
     </div>`;
   }).join('');
+  if(ownerModalState.openRespUid){
+    const toggle = el('owner-select-list').querySelector(`[data-resp-owner="${ownerModalState.openRespUid}"]`);
+    const wrapper = toggle ? toggle.closest('.dropdown') : null;
+    if(wrapper) wrapper.classList.add('open');
+  }
 }
 el('save-assign-owner').addEventListener('click', ()=>{
   const s = currentShipment();
   const supporting = [...ownerModalState.checked].filter(id=>id!==ownerModalState.primary).map(teamMember);
-  s.owners = { primary: teamMember(ownerModalState.primary), supporting };
-  renderShipHeader(); renderShipDetailFields(); renderShipmentsList();
+  const finalResp = {};
+  ownerModalState.checked.forEach(uid=>{ finalResp[uid] = ownerModalState.responsibilities[uid] || []; });
+  s.owners = { primary: teamMember(ownerModalState.primary), supporting, responsibilities: finalResp };
+  renderShipHeader(); renderShipDetailFields(); renderShipmentTeamDisplay(); renderShipmentsList(); renderServiceDelivery();
   closeModal('modal-assign-owner');
-  showToast('Shipment ownership updated');
+  showToast('Shipment team updated');
 });
 
 /* --- Update Status --- */
@@ -1430,27 +1581,90 @@ el('save-update-status').addEventListener('click', ()=>{
 });
 
 /* --- Edit Shipment --- */
+const TRANSPORT_MODE_OPTIONS = ['Ocean Import','Ocean Export','Air Import','Air Export','Haulage'];
+const SERVICE_TYPE_OPTIONS = ['FCL','LCL','Break Bulk','Air Freight'];
+const INCOTERM_OPTIONS = ['EXW','FCA','FOB','CFR','CIF','DAP','DDP'];
+
 const EDIT_SHIPMENT_FIELDS = [
-  ['customer','Customer'],['quoteRef','Quote Reference'],['mode','Transport Mode'],['serviceType','Service Type'],['incoterm','Incoterm'],
-  ['origin','Origin'],['destination','Destination'],['pol','Port of Loading'],['pod','Port of Discharge'],
-  ['etd','ETD'],['eta','ETA'],
+  {key:'customer', label:'Customer', type:'text'},
+  {key:'quoteRef', label:'Quote Reference', type:'text'},
+  {key:'bl', label:'Bill of Lading (B/L)', type:'text'},
+  {key:'mode', label:'Transport Mode', type:'select', options:TRANSPORT_MODE_OPTIONS},
+  {key:'serviceType', label:'Service Type', type:'select', options:SERVICE_TYPE_OPTIONS},
+  {key:'incoterm', label:'Incoterm', type:'select', options:INCOTERM_OPTIONS},
+  {key:'origin', label:'Origin', type:'location'},
+  {key:'destination', label:'Destination', type:'location'},
+  {key:'pol', label:'Port of Loading', type:'port'},
+  {key:'pod', label:'Port of Discharge', type:'port'},
+  {key:'etd', label:'ETD', type:'date'},
+  {key:'eta', label:'ETA', type:'date'},
 ];
+
+function renderEditField(f, s){
+  const val = s[f.key];
+  if(f.type==='select'){
+    const opts = f.options.map(o=>`<option ${o===val?'selected':''}>${o}</option>`).join('');
+    return `<div class="form-field filled"><label class="field-label">${f.label}</label><select class="field-control" data-edit-field="${f.key}">${opts}</select></div>`;
+  }
+  if(f.type==='date'){
+    return `<div class="form-field filled"><label class="field-label">${f.label}</label><input type="date" class="field-control" data-edit-field="${f.key}" data-field-type="date" value="${displayDateToInputValue(val)}"></div>`;
+  }
+  if(f.type==='location' || f.type==='port'){
+    const displayVal = f.type==='port' ? formatPortDisplay(val) : val;
+    return `
+    <div class="form-field filled searchable-field" data-ss-mode="${f.type}">
+      <label class="field-label">${f.label}</label>
+      <input type="text" class="field-control ss-display" autocomplete="off" value="${displayVal}" placeholder="Search...">
+      <input type="hidden" data-edit-field="${f.key}" value="${val}">
+      <div class="ss-menu"></div>
+    </div>`;
+  }
+  return `<div class="form-field filled"><label class="field-label">${f.label}</label><input class="field-control" data-edit-field="${f.key}" value="${val}"></div>`;
+}
+
+function wireSearchableFields(){
+  el('edit-shipment-form').querySelectorAll('.searchable-field').forEach(field=>{
+    const mode = field.dataset.ssMode;
+    const display = field.querySelector('.ss-display');
+    const hidden = field.querySelector('[data-edit-field]');
+    const menu = field.querySelector('.ss-menu');
+    const options = mode==='port'
+      ? PORTS.map(p=>({value:p.name, label:`${p.code} — ${p.name}`, search:`${p.code} ${p.name}`.toLowerCase()}))
+      : LOCATIONS.map(loc=>({value:loc, label:loc, search:loc.toLowerCase()}));
+    function renderMenu(list){
+      menu.innerHTML = list.length ? list.map(o=>`<div class="ss-option" data-value="${o.value}">${o.label}</div>`).join('') : `<div class="ss-empty">No matches</div>`;
+      menu.classList.add('open');
+    }
+    display.addEventListener('focus', ()=> renderMenu(options.slice(0,8)));
+    display.addEventListener('input', ()=>{
+      const q = display.value.toLowerCase();
+      renderMenu(options.filter(o=>o.search.includes(q)).slice(0,8));
+    });
+    menu.addEventListener('mousedown', (e)=>{
+      const opt = e.target.closest('.ss-option');
+      if(!opt) return;
+      e.preventDefault();
+      hidden.value = opt.dataset.value;
+      display.value = mode==='port' ? formatPortDisplay(opt.dataset.value) : opt.dataset.value;
+      menu.classList.remove('open');
+    });
+    display.addEventListener('blur', ()=>{ setTimeout(()=>menu.classList.remove('open'), 120); });
+  });
+}
+
 function openEditShipmentModal(){
   const s = currentShipment();
-  el('edit-shipment-form').innerHTML = EDIT_SHIPMENT_FIELDS.map(([key,label])=>`
-    <div class="form-field filled">
-      <label class="field-label">${label}</label>
-      <input class="field-control" data-edit-field="${key}" value="${s[key]}">
-    </div>
-  `).join('');
+  el('edit-shipment-form').innerHTML = EDIT_SHIPMENT_FIELDS.map(f=>renderEditField(f, s)).join('');
+  wireSearchableFields();
   openModal('modal-edit-shipment');
 }
 el('save-edit-shipment').addEventListener('click', ()=>{
   const s = currentShipment();
   el('edit-shipment-form').querySelectorAll('[data-edit-field]').forEach(input=>{
-    s[input.dataset.editField] = input.value;
+    const key = input.dataset.editField;
+    s[key] = input.dataset.fieldType==='date' ? inputDateToDisplay(input.value) : input.value;
   });
-  renderShipHeader(); renderShipDetailFields(); renderShipmentsList();
+  renderShipHeader(); renderShipDetailFields(); renderShipmentsList(); renderServiceDelivery();
   closeModal('modal-edit-shipment');
   showToast('Shipment details saved');
 });
@@ -1508,7 +1722,7 @@ el('save-milestone').addEventListener('click', ()=>{
   m.completedAt = new Date();
   m.completedSlaHealth = computeLiveSlaHealth(m.dueDate);
   m.comment = el('input-milestone-comment').value.trim();
-  renderServiceDelivery(); renderShipHeader();
+  renderServiceDelivery();
   closeModal('modal-milestone');
   showToast('Milestone marked complete');
 });
@@ -1568,14 +1782,13 @@ function renderFilePillList(){
 el('save-upload-docs').addEventListener('click', ()=>{
   const s = currentShipment();
   const category = el('input-doc-category').value;
-  const today = new Date().toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'});
   state.pendingFiles.forEach(f=>{
     s.documents.push({
       id: makeId('doc'),
       name: f.name,
       category: category,
       uploadedBy: CURRENT_USER,
-      uploadedOn: today,
+      uploadedOn: new Date(),
       isMock:false,
       fileUrl: URL.createObjectURL(f),
       size: f.size,
@@ -1634,7 +1847,7 @@ el('save-update-file').addEventListener('click', ()=>{
   d.name = pendingReplacementFile.name;
   d.fileUrl = URL.createObjectURL(pendingReplacementFile);
   d.size = pendingReplacementFile.size;
-  d.uploadedOn = new Date().toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'});
+  d.uploadedOn = new Date();
   d.uploadedBy = CURRENT_USER;
   pendingReplacementFile = null;
   renderDocuments();
@@ -1662,7 +1875,21 @@ el('confirm-delete-doc').addEventListener('click', ()=>{
 document.body.addEventListener('click', (e)=>{
   const t = e.target;
 
-  // dropdown toggle (Actions button, row overflow menus, task owner selector)
+  // responsibility checklist option — must stay open across multiple toggles,
+  // so handle before the generic dropdown-close logic below
+  const respOption = t.closest('[data-resp-toggle]');
+  if(respOption){
+    const [uid, respName] = respOption.dataset.respToggle.split('::');
+    if(!ownerModalState.responsibilities[uid]) ownerModalState.responsibilities[uid] = [];
+    const arr = ownerModalState.responsibilities[uid];
+    const idx = arr.indexOf(respName);
+    if(idx>=0) arr.splice(idx,1); else arr.push(respName);
+    ownerModalState.openRespUid = uid;
+    renderOwnerSelectList();
+    return;
+  }
+
+  // dropdown toggle (Actions button, row overflow menus, responsibility selector)
   const toggle = t.closest('.dropdown-toggle');
   if(toggle){
     const wrapper = toggle.closest('.dropdown');
@@ -1704,16 +1931,6 @@ document.body.addEventListener('click', (e)=>{
 
   const msBtn = t.closest('[data-complete-ms]');
   if(msBtn){ openMilestoneModal(msBtn.dataset.completeMs); return; }
-
-  const reassignBtn = t.closest('[data-reassign-task]');
-  if(reassignBtn){
-    const s = currentShipment();
-    const m = s.milestones.find(x=>x.id===reassignBtn.dataset.reassignTask);
-    m.ownerId = reassignBtn.dataset.newOwner;
-    renderServiceDelivery();
-    showToast('Task reassigned to ' + teamMember(reassignBtn.dataset.newOwner).name);
-    return;
-  }
 
   const shipAction = t.closest('[data-ship-action]');
   if(shipAction){
