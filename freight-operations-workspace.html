@@ -1,0 +1,1634 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OnePort 365 · Freight Operations Workspace</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Open+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ==========================================================================
+   OnePort 365 — Design Tokens
+   ========================================================================== */
+:root{
+  --green-dark:#023819;
+  --green-dark-hover:#03571f;
+  --green-accent:#BFFB4F;
+  --green-accent-hover:#a9e83a;
+  --green-light:#D1DBBD;
+  --green-light-surface:#F4F6EF;
+  --green-chip-bg:#EDEFE8;
+  --gold:#FFCC1A;
+  --gold-bg:#FFF3CC;
+  --gold-text:#8a6a00;
+  --success:#1F8A5B;
+  --success-bg:#E1F1E8;
+  --success-text:#0f7a45;
+  --error:#FF1A1A;
+  --error-bg:#FDE0E0;
+  --error-text:#cc1414;
+  --cream:#FDFBF1;
+  --white:#FFFFFF;
+  --silver-light:#808080;
+  --silver-dark:#383838;
+  --border-tint: rgba(2,56,25,.12);
+  --border-tint-soft: rgba(2,56,25,.07);
+  --radius-sm:6px;
+  --radius-md:8px;
+  --radius-lg:12px;
+  --radius-xl:16px;
+  --shadow-e1: 0 1px 2px rgba(2,56,25,.05), 0 1px 3px rgba(2,56,25,.04);
+  --shadow-e2: 0 2px 4px rgba(2,56,25,.05), 0 8px 20px -8px rgba(2,56,25,.14);
+  --shadow-e3: 0 4px 8px rgba(2,56,25,.06), 0 18px 40px -16px rgba(2,56,25,.22);
+  --font-display:'Poppins', system-ui, sans-serif;
+  --font-body:'Open Sans', system-ui, sans-serif;
+}
+
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  font-family:var(--font-body);
+  color:var(--silver-dark);
+  background:var(--cream);
+  font-size:14px;
+  line-height:1.55;
+  -webkit-font-smoothing:antialiased;
+}
+h1,h2,h3,h4{font-family:var(--font-display);color:var(--green-dark);margin:0}
+button{font-family:var(--font-body);cursor:pointer}
+input,select,textarea{font-family:var(--font-body)}
+::-webkit-scrollbar{width:9px;height:9px}
+::-webkit-scrollbar-thumb{background:rgba(2,56,25,.18);border-radius:10px}
+::-webkit-scrollbar-track{background:transparent}
+
+/* ==========================================================================
+   App Shell
+   ========================================================================== */
+.app-shell{display:flex;min-height:100vh}
+
+/* --- Sidebar --- */
+.sidebar{
+  width:236px;flex-shrink:0;background:var(--green-dark);color:var(--cream);
+  display:flex;flex-direction:column;padding:24px 16px;position:sticky;top:0;height:100vh;
+}
+.sidebar-logo{display:flex;align-items:center;gap:10px;padding:6px 8px 26px;border-bottom:1px solid rgba(253,251,241,.12);margin-bottom:22px}
+.sidebar-logo .mark{width:34px;height:34px;border-radius:9px;background:var(--green-accent);display:grid;place-items:center;font-family:var(--font-display);font-weight:700;font-size:14px;color:var(--green-dark);flex-shrink:0}
+.sidebar-logo .word{font-family:var(--font-display);font-weight:600;font-size:15.5px;letter-spacing:-.01em;color:var(--cream)}
+.sidebar-logo .sub{font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:rgba(253,251,241,.55);margin-top:1px}
+
+.nav-section-label{font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:rgba(253,251,241,.4);font-weight:700;padding:0 10px;margin-bottom:8px}
+.nav-list{list-style:none;margin:0 0 22px;padding:0;display:flex;flex-direction:column;gap:3px}
+.nav-item{
+  display:flex;align-items:center;gap:11px;padding:10px 12px;border-radius:var(--radius-md);
+  color:rgba(253,251,241,.75);font-weight:600;font-size:13.5px;text-decoration:none;
+  transition:.14s;position:relative;
+}
+.nav-item svg{flex-shrink:0;opacity:.85}
+.nav-item:hover{background:rgba(253,251,241,.08);color:var(--cream)}
+.nav-item.active{background:var(--green-accent);color:var(--green-dark)}
+.nav-item.active svg{opacity:1}
+
+.sidebar-footer{margin-top:auto;padding-top:16px;border-top:1px solid rgba(253,251,241,.12)}
+.sidebar-user{display:flex;align-items:center;gap:10px;padding:8px}
+.sidebar-user .avatar{width:34px;height:34px;border-radius:9px;background:rgba(253,251,241,.12);display:grid;place-items:center;font-family:var(--font-display);font-weight:600;font-size:12.5px;color:var(--cream)}
+.sidebar-user .name{font-size:13px;font-weight:700;color:var(--cream)}
+.sidebar-user .role{font-size:11px;color:rgba(253,251,241,.55)}
+
+/* --- Main --- */
+.main{flex:1;min-width:0;display:flex;flex-direction:column}
+.topbar{
+  display:flex;align-items:center;justify-content:space-between;padding:18px 32px;
+  background:var(--white);border-bottom:1px solid var(--border-tint);position:sticky;top:0;z-index:20;
+}
+.breadcrumbs{display:flex;align-items:center;gap:8px;font-size:13.5px;font-family:var(--font-body)}
+.breadcrumbs .crumb{color:var(--silver-light)}
+.breadcrumbs .crumb.link{color:var(--green-dark);font-weight:600;cursor:pointer}
+.breadcrumbs .crumb.link:hover{text-decoration:underline}
+.breadcrumbs .sep{color:var(--silver-light)}
+.topbar-right{display:flex;align-items:center;gap:14px}
+.topbar-search{
+  display:flex;align-items:center;gap:8px;background:var(--green-light-surface);border-radius:var(--radius-md);
+  padding:8px 12px;width:240px;border:1px solid transparent;
+}
+.topbar-search input{border:none;outline:none;background:transparent;font-size:13px;width:100%;color:var(--silver-dark)}
+.topbar-search svg{flex-shrink:0;color:var(--silver-light)}
+
+.content{padding:28px 32px 64px;flex:1}
+.view{display:none}
+.view.active{display:block}
+
+/* ==========================================================================
+   Reusable components
+   ========================================================================== */
+.card{background:var(--white);border:1px solid var(--border-tint);border-radius:var(--radius-xl);box-shadow:var(--shadow-e1)}
+.card-pad{padding:22px 24px}
+.section-title{font-family:var(--font-display);font-weight:600;font-size:17px;color:var(--green-dark);margin:0 0 4px}
+.section-sub{font-size:13px;color:var(--silver-light);margin:0 0 18px}
+.eyebrow{font-family:var(--font-body);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--silver-light);font-weight:700}
+
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;border:none;cursor:pointer;
+  font-family:var(--font-display);font-weight:600;font-size:13.5px;border-radius:var(--radius-md);
+  padding:11px 18px;transition:.15s;white-space:nowrap;
+}
+.btn svg{flex-shrink:0}
+.btn-accent{background:var(--green-accent);color:var(--green-dark)}
+.btn-accent:hover{background:var(--green-accent-hover)}
+.btn-solid{background:var(--green-dark);color:var(--green-accent)}
+.btn-solid:hover{background:var(--green-dark-hover)}
+.btn-outline{background:var(--white);color:var(--green-dark);border:1.5px solid var(--green-dark)}
+.btn-outline:hover{background:var(--green-dark);color:var(--green-accent)}
+.btn-ghost{background:transparent;color:var(--green-dark);padding:8px 10px}
+.btn-ghost:hover{background:var(--green-light-surface)}
+.btn-danger-ghost{background:transparent;color:var(--error);padding:8px 10px;font-weight:600}
+.btn-danger-ghost:hover{background:var(--error-bg)}
+.btn-sm{padding:8px 13px;font-size:12.5px}
+.btn:disabled{background:#8FA08C;color:var(--cream);cursor:not-allowed}
+.btn-icon{width:36px;height:36px;padding:0;border-radius:var(--radius-md)}
+
+.chip{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;font-weight:700;padding:4px 10px;border-radius:var(--radius-sm);white-space:nowrap}
+.chip-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.chip-neutral{background:var(--green-chip-bg);color:#4a5a3f}
+.chip-success{background:var(--success-bg);color:var(--success-text)}
+.chip-warning{background:var(--gold-bg);color:var(--gold-text)}
+.chip-error{background:var(--error-bg);color:var(--error-text)}
+.chip-dark{background:var(--green-dark);color:var(--green-accent)}
+.chip-accent{background:var(--green-accent);color:var(--green-dark)}
+.chip-pill{border-radius:999px}
+
+.badge-sla{display:inline-flex;align-items:center;gap:7px;font-size:12.5px;font-weight:700;padding:6px 13px;border-radius:999px}
+
+.avatar{display:grid;place-items:center;border-radius:10px;font-family:var(--font-display);font-weight:600;flex-shrink:0}
+.avatar-sm{width:32px;height:32px;font-size:11.5px;border-radius:8px}
+.avatar-md{width:40px;height:40px;font-size:13.5px}
+.avatar-lg{width:52px;height:52px;font-size:17px;border-radius:13px}
+
+.owner-chip{display:flex;align-items:center;gap:10px;background:var(--green-light-surface);border:1px solid var(--border-tint);border-radius:var(--radius-lg);padding:9px 12px}
+.owner-chip .who .nm{font-family:var(--font-body);font-weight:700;font-size:13.5px;color:var(--green-dark)}
+.owner-chip .who .rl{font-size:11.5px;color:var(--silver-light)}
+
+.tabs{display:flex;gap:8px;border-bottom:1px solid var(--border-tint);margin-bottom:24px}
+.tab-btn{
+  background:transparent;border:none;padding:12px 4px;margin-right:22px;font-family:var(--font-display);
+  font-weight:600;font-size:14.5px;color:var(--silver-light);cursor:pointer;position:relative;top:1px;
+  border-bottom:2.5px solid transparent;
+}
+.tab-btn:hover{color:var(--green-dark)}
+.tab-btn.active{color:var(--green-dark);border-bottom-color:var(--green-accent)}
+
+table{width:100%;border-collapse:collapse}
+.data-table thead th{
+  text-align:left;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--silver-light);
+  font-weight:700;padding:0 14px 12px;border-bottom:1px solid var(--border-tint);white-space:nowrap;
+}
+.data-table tbody td{padding:14px;border-bottom:1px solid var(--border-tint-soft);font-size:13.5px;vertical-align:middle}
+.data-table tbody tr:last-child td{border-bottom:none}
+.data-table tbody tr.clickable{cursor:pointer;transition:.12s}
+.data-table tbody tr.clickable:hover{background:var(--green-light-surface)}
+.table-wrap{overflow-x:auto}
+
+.form-field{position:relative;margin-bottom:18px}
+.form-field label.field-label{
+  position:absolute;top:-8px;left:11px;background:var(--white);padding:0 5px;font-size:11px;color:var(--silver-light);
+  font-weight:600;z-index:1;
+}
+.form-field.focused label.field-label,.form-field.filled label.field-label{color:var(--green-dark)}
+.form-field.err label.field-label{color:var(--error)}
+.field-control{
+  width:100%;border:1.5px solid rgba(2,56,25,.35);border-radius:var(--radius-md);padding:14px 14px;
+  font-size:14px;color:var(--green-dark);background:var(--white);outline:none;transition:.12s;
+}
+.field-control:focus{border-color:var(--green-dark);border-width:2px;padding:13px 13px}
+.form-field.err .field-control{border-color:var(--error);border-width:2px;color:var(--error)}
+.field-error-msg{font-size:11.5px;color:var(--error);margin-top:6px}
+.field-hint{font-size:11.5px;color:var(--silver-light);margin-top:6px}
+select.field-control{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='none' stroke='%23808080' stroke-width='2' viewBox='0 0 24 24'%3E%3Cpath d='M6 9l6 6 6-6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center;padding-right:38px}
+textarea.field-control{resize:vertical;min-height:70px}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:0 16px}
+.form-grid .full{grid-column:1 / -1}
+
+/* Empty / placeholder state */
+.placeholder-page{display:flex;align-items:center;justify-content:center;min-height:60vh}
+.placeholder-card{text-align:center;max-width:420px;padding:48px 40px}
+.placeholder-card .icon-wrap{
+  width:64px;height:64px;border-radius:16px;background:var(--green-light-surface);margin:0 auto 22px;
+  display:grid;place-items:center;
+}
+.placeholder-card h2{font-size:22px;margin-bottom:10px}
+.placeholder-card p{font-size:14px;color:var(--silver-light);line-height:1.6;margin:0}
+.placeholder-tag{display:inline-block;margin-top:20px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:700;color:var(--silver-light);background:var(--green-chip-bg);padding:6px 14px;border-radius:999px}
+
+/* Modal */
+.modal-overlay{
+  position:fixed;inset:0;background:rgba(2,20,10,.45);display:none;align-items:center;justify-content:center;
+  z-index:1000;padding:24px;backdrop-filter:blur(1.5px);
+}
+.modal-overlay.open{display:flex}
+.modal{
+  background:var(--white);border-radius:var(--radius-xl);box-shadow:var(--shadow-e3);width:100%;max-width:520px;
+  max-height:88vh;display:flex;flex-direction:column;
+}
+.modal.modal-wide{max-width:700px}
+.modal-head{display:flex;align-items:flex-start;justify-content:space-between;padding:22px 26px;border-bottom:1px solid var(--border-tint)}
+.modal-head h3{font-size:18px}
+.modal-head p{font-size:12.5px;color:var(--silver-light);margin:4px 0 0}
+.modal-close{background:transparent;border:none;color:var(--silver-light);padding:4px;border-radius:6px;line-height:0}
+.modal-close:hover{background:var(--green-light-surface);color:var(--green-dark)}
+.modal-body{padding:24px 26px;overflow-y:auto}
+.modal-foot{display:flex;justify-content:flex-end;gap:10px;padding:18px 26px;border-top:1px solid var(--border-tint)}
+
+/* Toast */
+#toast-wrap{position:fixed;bottom:24px;right:24px;z-index:2000;display:flex;flex-direction:column;gap:10px}
+.toast{
+  background:var(--green-dark);color:var(--cream);padding:13px 18px;border-radius:var(--radius-md);font-size:13px;
+  font-weight:600;box-shadow:var(--shadow-e3);display:flex;align-items:center;gap:10px;min-width:220px;
+  animation:toast-in .18s ease-out;
+}
+.toast.success{background:var(--green-dark)}
+.toast.error{background:#3a0d0d}
+@keyframes toast-in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+/* Header block on Shipment Detail */
+.ship-header-card{padding:26px 28px 24px;margin-bottom:24px}
+.ship-header-top{display:flex;justify-content:space-between;align-items:flex-start;gap:20px;flex-wrap:wrap;margin-bottom:18px}
+.ship-header-id{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.ship-header-id h1{font-size:26px}
+.ship-header-meta{display:flex;flex-wrap:wrap;gap:22px;margin-top:14px}
+.meta-block .k{font-size:11px;letter-spacing:.07em;text-transform:uppercase;color:var(--silver-light);font-weight:700;margin-bottom:5px}
+.meta-block .v{font-size:14px;font-weight:600;color:var(--green-dark)}
+.ship-header-actions{display:flex;gap:10px;flex-wrap:wrap}
+.progress-pill-row{display:flex;align-items:center;gap:12px;margin-top:18px;padding-top:18px;border-top:1px solid var(--border-tint-soft)}
+.progress-bar-track{flex:1;max-width:340px;height:8px;border-radius:4px;background:var(--green-chip-bg);overflow:hidden}
+.progress-bar-fill{display:block;height:100%;background:var(--green-accent);border-radius:4px;transition:width .3s}
+
+/* Details grid */
+.detail-fields-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px 24px}
+.detail-field .k{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--silver-light);font-weight:700;margin-bottom:6px}
+.detail-field .v{font-size:14.5px;font-weight:600;color:var(--green-dark)}
+
+/* Container cards */
+.container-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px}
+.container-card{border:1px solid var(--border-tint);border-radius:var(--radius-lg);padding:16px 18px;position:relative}
+.container-card .cnum{font-family:var(--font-display);font-weight:600;font-size:15px;color:var(--green-dark);margin-bottom:10px;display:flex;justify-content:space-between;align-items:center}
+.container-card .crow{display:flex;justify-content:space-between;font-size:12.5px;color:var(--silver-dark);padding:4px 0}
+.container-card .crow .k{color:var(--silver-light)}
+.container-card .cedit{background:transparent;border:none;color:var(--silver-light);padding:4px;border-radius:6px}
+.container-card .cedit:hover{background:var(--green-light-surface);color:var(--green-dark)}
+
+/* Timeline (physical tracking) */
+.timeline{position:relative;padding-left:6px}
+.timeline-item{display:flex;gap:16px;position:relative;padding-bottom:26px}
+.timeline-item:last-child{padding-bottom:0}
+.timeline-item .rail{position:relative;display:flex;flex-direction:column;align-items:center;flex-shrink:0}
+.timeline-dot{width:14px;height:14px;border-radius:50%;background:var(--green-dark);border:3px solid var(--green-accent);z-index:1;flex-shrink:0;margin-top:2px}
+.timeline-item.pending .timeline-dot{background:var(--white);border-color:var(--border-tint);border-width:2px}
+.timeline-line{width:2px;flex:1;background:var(--border-tint);margin-top:2px}
+.timeline-content{flex:1;padding-bottom:2px}
+.timeline-content .ttitle{font-weight:700;color:var(--green-dark);font-size:13.5px}
+.timeline-item.pending .timeline-content .ttitle{color:var(--silver-light);font-weight:600}
+.timeline-content .tmeta{font-size:12px;color:var(--silver-light);margin-top:3px}
+
+/* Workstream / milestone */
+.workstream-card{margin-bottom:16px}
+.workstream-head{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;cursor:pointer;user-select:none}
+.workstream-head .left{display:flex;align-items:center;gap:12px}
+.workstream-head .wcount{font-size:12px;color:var(--silver-light);font-weight:600}
+.workstream-chevron{transition:transform .15s;color:var(--silver-light)}
+.workstream-card.collapsed .workstream-chevron{transform:rotate(-90deg)}
+.workstream-card.collapsed .milestone-list{display:none}
+.milestone-list{border-top:1px solid var(--border-tint-soft)}
+.milestone-row{display:grid;grid-template-columns:1.6fr 1fr 1fr 1fr 1.4fr auto;gap:14px;align-items:center;padding:14px 20px;border-bottom:1px solid var(--border-tint-soft)}
+.milestone-row:last-child{border-bottom:none}
+.milestone-row .m-name{font-weight:700;color:var(--green-dark);font-size:13.5px}
+.milestone-row .m-sub{font-size:11.5px;color:var(--silver-light);margin-top:2px}
+.milestone-row .m-cell-label{display:none}
+.milestone-row .m-notes{font-size:12.5px;color:var(--silver-dark)}
+
+/* Documents */
+.doc-header-stats{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:14px}
+.doc-count{display:flex;align-items:center;gap:14px}
+.doc-count .num{font-family:var(--font-display);font-weight:600;font-size:32px;color:var(--green-dark)}
+.doc-count .lbl{font-size:12.5px;color:var(--silver-light)}
+.dropzone{
+  border:2px dashed rgba(2,56,25,.28);border-radius:var(--radius-lg);padding:34px 20px;text-align:center;
+  background:var(--green-light-surface);transition:.15s;cursor:pointer;
+}
+.dropzone.dragover{border-color:var(--green-dark);background:var(--green-light)}
+.dropzone svg{margin-bottom:10px}
+.dropzone .dz-title{font-weight:700;color:var(--green-dark);font-size:14px;margin-bottom:4px}
+.dropzone .dz-sub{font-size:12px;color:var(--silver-light)}
+.file-pill-list{display:flex;flex-direction:column;gap:8px;margin-top:16px}
+.file-pill{display:flex;align-items:center;gap:10px;background:var(--green-light-surface);border-radius:var(--radius-md);padding:9px 12px;font-size:12.5px}
+.file-pill .fname{flex:1;font-weight:600;color:var(--green-dark);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.file-pill .fsize{color:var(--silver-light);flex-shrink:0}
+.file-pill .frm{background:transparent;border:none;color:var(--silver-light);flex-shrink:0}
+.file-pill .frm:hover{color:var(--error)}
+
+.doc-actions{display:flex;gap:4px}
+.doc-actions button{background:transparent;border:none;color:var(--silver-light);padding:6px;border-radius:6px;display:grid;place-items:center}
+.doc-actions button:hover{background:var(--green-light-surface);color:var(--green-dark)}
+.doc-actions button.danger:hover{background:var(--error-bg);color:var(--error)}
+
+.info-callout{display:flex;gap:14px;align-items:flex-start;background:var(--white);border:1px solid var(--border-tint);border-left:4px solid var(--green-accent);border-radius:var(--radius-lg);padding:16px 18px}
+.info-callout p{margin:0;font-size:13px;color:var(--silver-dark);line-height:1.6}
+
+.filter-row{display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap;align-items:center}
+.filter-chip{
+  font-family:var(--font-display);font-weight:600;font-size:12.5px;padding:8px 16px;border-radius:var(--radius-md);
+  background:var(--white);color:var(--green-dark);border:1.5px solid rgba(2,56,25,.2);cursor:pointer;transition:.12s;
+}
+.filter-chip:hover{border-color:var(--green-dark)}
+.filter-chip.active{background:var(--green-accent);color:var(--green-dark);border-color:var(--green-accent)}
+
+.page-head{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:22px;flex-wrap:wrap;gap:12px}
+.page-head h1{font-size:24px;margin-bottom:4px}
+.page-head .sub{font-size:13.5px;color:var(--silver-light)}
+
+.checkbox-row{display:flex;align-items:center;gap:10px;margin-bottom:14px;cursor:pointer}
+.checkbox-box{width:20px;height:20px;border-radius:5px;border:1.5px solid var(--green-dark);background:var(--white);display:grid;place-items:center;flex-shrink:0;transition:.1s}
+.checkbox-box.checked{background:var(--green-accent);border-color:var(--green-accent)}
+.checkbox-label{font-size:13px;color:var(--silver-dark)}
+
+.two-col{display:grid;grid-template-columns:1.6fr 1fr;gap:22px;align-items:start}
+@media (max-width:1080px){.two-col{grid-template-columns:1fr}}
+
+@media (max-width:900px){
+  .detail-fields-grid{grid-template-columns:repeat(2,1fr)}
+  .form-grid{grid-template-columns:1fr}
+  .milestone-row{grid-template-columns:1fr;gap:6px}
+  .milestone-row .m-cell-label{display:inline;font-size:10.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--silver-light);font-weight:700;margin-right:6px}
+}
+</style>
+</head>
+<body>
+
+<div class="app-shell">
+
+  <!-- ============================ SIDEBAR ============================ -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div class="mark">OP</div>
+      <div>
+        <div class="word">OnePort 365</div>
+        <div class="sub">Ops Workspace</div>
+      </div>
+    </div>
+
+    <div class="nav-section-label">Menu</div>
+    <ul class="nav-list">
+      <li><a href="#" class="nav-item" data-nav="dashboard">
+        <svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="9" rx="1.5"></rect><rect x="14" y="3" width="7" height="5" rx="1.5"></rect><rect x="14" y="12" width="7" height="9" rx="1.5"></rect><rect x="3" y="16" width="7" height="5" rx="1.5"></rect></svg>
+        Dashboard
+      </a></li>
+      <li><a href="#" class="nav-item" data-nav="quotes">
+        <svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 3h6a2 2 0 012 2v14l-5-3-5 3V5a2 2 0 012-2z"></path></svg>
+        Quotes
+      </a></li>
+      <li><a href="#" class="nav-item active" data-nav="shipments">
+        <svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="1" y="7" width="15" height="11" rx="1.5"></rect><path d="M16 10h3.5L22 13.5V18h-6"></path><circle cx="6" cy="20" r="2"></circle><circle cx="17.5" cy="20" r="2"></circle></svg>
+        Shipments
+      </a></li>
+    </ul>
+
+    <div class="sidebar-footer">
+      <div class="sidebar-user">
+        <div class="avatar">NM</div>
+        <div>
+          <div class="name">Nkechi M.</div>
+          <div class="role">Operations Lead</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ============================ MAIN ============================ -->
+  <div class="main">
+    <header class="topbar">
+      <div class="breadcrumbs" id="breadcrumbs"></div>
+      <div class="topbar-right">
+        <div class="topbar-search">
+          <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="M21 21l-4-4" stroke-linecap="round"></path></svg>
+          <input placeholder="Search job reference..." disabled title="Prototype — search not wired up">
+        </div>
+      </div>
+    </header>
+
+    <main class="content">
+
+      <!-- ===================== DASHBOARD (placeholder) ===================== -->
+      <section class="view" id="view-dashboard">
+        <div class="placeholder-page">
+          <div class="card placeholder-card">
+            <div class="icon-wrap">
+              <svg width="28" height="28" fill="none" stroke="#023819" stroke-width="1.8" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="9" rx="1.5"></rect><rect x="14" y="3" width="7" height="5" rx="1.5"></rect><rect x="14" y="12" width="7" height="9" rx="1.5"></rect><rect x="3" y="16" width="7" height="5" rx="1.5"></rect></svg>
+            </div>
+            <h2>Dashboard</h2>
+            <p>Operational overview and key metrics will live here — active shipments, SLA health, and team workload at a glance.</p>
+            <span class="placeholder-tag">Coming soon</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===================== QUOTES (placeholder) ===================== -->
+      <section class="view" id="view-quotes">
+        <div class="placeholder-page">
+          <div class="card placeholder-card">
+            <div class="icon-wrap">
+              <svg width="28" height="28" fill="none" stroke="#023819" stroke-width="1.8" viewBox="0 0 24 24"><path d="M9 3h6a2 2 0 012 2v14l-5-3-5 3V5a2 2 0 012-2z"></path></svg>
+            </div>
+            <h2>Quotes</h2>
+            <p>The RFQ and quoting workspace — request tracking, readiness scoring, and rate management — will be built out here.</p>
+            <span class="placeholder-tag">Coming soon</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===================== SHIPMENTS LIST ===================== -->
+      <section class="view active" id="view-shipments">
+        <div class="page-head">
+          <div>
+            <h1>Shipments</h1>
+            <div class="sub" id="shipments-count-label">Loading shipments…</div>
+          </div>
+        </div>
+
+        <div class="filter-row" id="shipment-filters"></div>
+
+        <div class="card">
+          <div class="table-wrap">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Job Reference</th>
+                  <th>Customer</th>
+                  <th>Route</th>
+                  <th>Mode</th>
+                  <th>Status</th>
+                  <th>SLA</th>
+                  <th>ETA</th>
+                  <th>Owner</th>
+                </tr>
+              </thead>
+              <tbody id="shipments-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===================== SHIPMENT DETAIL ===================== -->
+      <section class="view" id="view-shipment-detail">
+
+        <!-- Header -->
+        <div class="card ship-header-card" id="ship-header"></div>
+
+        <!-- Tabs -->
+        <div class="tabs">
+          <button class="tab-btn active" data-tab="overview">Overview</button>
+          <button class="tab-btn" data-tab="progress">Progress</button>
+          <button class="tab-btn" data-tab="documents">Documents</button>
+        </div>
+
+        <!-- Tab: Overview -->
+        <div class="tab-pane" id="tab-overview">
+          <div class="card card-pad" style="margin-bottom:22px">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:18px">
+              <div>
+                <h3 class="section-title">Shipment Details</h3>
+                <p class="section-sub" style="margin:0">Core reference data for this job.</p>
+              </div>
+            </div>
+            <div class="detail-fields-grid" id="ship-detail-fields"></div>
+          </div>
+
+          <div class="card card-pad">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:18px;flex-wrap:wrap;gap:12px">
+              <div>
+                <h3 class="section-title">Containers</h3>
+                <p class="section-sub" style="margin:0">Equipment assigned to this shipment.</p>
+              </div>
+              <button class="btn btn-accent btn-sm" id="btn-add-container">
+                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" stroke-linecap="round"></path></svg>
+                Add Container
+              </button>
+            </div>
+            <div class="container-grid" id="container-grid"></div>
+          </div>
+        </div>
+
+        <!-- Tab: Progress -->
+        <div class="tab-pane" id="tab-progress" style="display:none">
+          <div class="two-col">
+            <div>
+              <div class="card card-pad" style="margin-bottom:22px">
+                <h3 class="section-title">Service Delivery</h3>
+                <p class="section-sub">Milestones grouped by workstream. Completion is logged manually — milestones can run concurrently.</p>
+                <div id="workstream-list"></div>
+              </div>
+            </div>
+            <div class="card card-pad">
+              <h3 class="section-title">Physical Tracking</h3>
+              <p class="section-sub">Live OneTrack events. Read-only.</p>
+              <div class="timeline" id="physical-timeline"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab: Documents -->
+        <div class="tab-pane" id="tab-documents" style="display:none">
+          <div class="card card-pad">
+            <div class="doc-header-stats">
+              <div class="doc-count">
+                <span class="num" id="doc-total-count">0</span>
+                <span class="lbl">documents uploaded</span>
+              </div>
+              <button class="btn btn-accent" id="btn-upload-docs">
+                <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M12 16V4M6 10l6-6 6 6M4 20h16" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+                Upload Documents
+              </button>
+            </div>
+            <div class="table-wrap">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>File Name</th>
+                    <th>Document Type</th>
+                    <th>Category</th>
+                    <th>Uploaded By</th>
+                    <th>Uploaded On</th>
+                    <th style="text-align:right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="documents-tbody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+      </section>
+
+    </main>
+  </div>
+</div>
+
+<!-- ============================ MODALS ============================ -->
+
+<!-- Assign Owner -->
+<div class="modal-overlay" id="modal-assign-owner">
+  <div class="modal">
+    <div class="modal-head">
+      <div>
+        <h3>Assign Shipment Owner</h3>
+        <p>Choose the team member responsible for this shipment.</p>
+      </div>
+      <button class="modal-close" data-close-modal><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18" stroke-linecap="round"></path></svg></button>
+    </div>
+    <div class="modal-body">
+      <div class="form-field filled">
+        <label class="field-label">Shipment Owner</label>
+        <select class="field-control" id="input-assign-owner"></select>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-outline" data-close-modal>Cancel</button>
+      <button class="btn btn-accent" id="save-assign-owner">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- Update Status -->
+<div class="modal-overlay" id="modal-update-status">
+  <div class="modal">
+    <div class="modal-head">
+      <div>
+        <h3>Update Shipment Status</h3>
+        <p>Reflect the current operational stage of this job.</p>
+      </div>
+      <button class="modal-close" data-close-modal><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18" stroke-linecap="round"></path></svg></button>
+    </div>
+    <div class="modal-body">
+      <div class="form-field filled">
+        <label class="field-label">Shipment Status</label>
+        <select class="field-control" id="input-update-status">
+          <option>Booked</option>
+          <option>Documentation in Progress</option>
+          <option>In Transit</option>
+          <option>Arrived at Port of Discharge</option>
+          <option>Customs Clearance</option>
+          <option>Out for Delivery</option>
+          <option>Completed</option>
+          <option>On Hold</option>
+        </select>
+      </div>
+      <div class="form-field">
+        <label class="field-label">Notes (optional)</label>
+        <textarea class="field-control" id="input-update-status-notes" rows="3" placeholder="Add context for this status change..."></textarea>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-outline" data-close-modal>Cancel</button>
+      <button class="btn btn-accent" id="save-update-status">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- Edit Shipment -->
+<div class="modal-overlay" id="modal-edit-shipment">
+  <div class="modal modal-wide">
+    <div class="modal-head">
+      <div>
+        <h3>Edit Shipment</h3>
+        <p>Update the core reference details for this job.</p>
+      </div>
+      <button class="modal-close" data-close-modal><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18" stroke-linecap="round"></path></svg></button>
+    </div>
+    <div class="modal-body">
+      <div class="form-grid" id="edit-shipment-form"></div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-outline" data-close-modal>Cancel</button>
+      <button class="btn btn-accent" id="save-edit-shipment">Save Changes</button>
+    </div>
+  </div>
+</div>
+
+<!-- Add / Edit Container -->
+<div class="modal-overlay" id="modal-container">
+  <div class="modal">
+    <div class="modal-head">
+      <div>
+        <h3 id="container-modal-title">Add Container</h3>
+        <p>Single-step entry — no assignment workflow.</p>
+      </div>
+      <button class="modal-close" data-close-modal><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18" stroke-linecap="round"></path></svg></button>
+    </div>
+    <div class="modal-body">
+      <div class="form-field">
+        <label class="field-label">Container Number</label>
+        <input class="field-control" id="input-container-number" placeholder="e.g. OOCU7452209">
+      </div>
+      <div class="form-grid">
+        <div class="form-field">
+          <label class="field-label">Size</label>
+          <select class="field-control" id="input-container-size">
+            <option>20ft</option>
+            <option>40ft</option>
+            <option>40ft HC</option>
+            <option>45ft HC</option>
+          </select>
+        </div>
+        <div class="form-field">
+          <label class="field-label">Type</label>
+          <select class="field-control" id="input-container-type">
+            <option>Dry</option>
+            <option>Reefer</option>
+            <option>Open Top</option>
+            <option>Flat Rack</option>
+            <option>Tank</option>
+          </select>
+        </div>
+        <div class="form-field">
+          <label class="field-label">Seal Number (optional)</label>
+          <input class="field-control" id="input-container-seal" placeholder="e.g. SL-88213">
+        </div>
+        <div class="form-field">
+          <label class="field-label">Weight (optional)</label>
+          <input class="field-control" id="input-container-weight" placeholder="e.g. 18,200 kg">
+        </div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-outline" data-close-modal>Cancel</button>
+      <button class="btn btn-accent" id="save-container">Save Container</button>
+    </div>
+  </div>
+</div>
+
+<!-- Complete Milestone -->
+<div class="modal-overlay" id="modal-milestone">
+  <div class="modal">
+    <div class="modal-head">
+      <div>
+        <h3>Mark Milestone Complete</h3>
+        <p id="milestone-modal-sub">Log completion details for this milestone.</p>
+      </div>
+      <button class="modal-close" data-close-modal><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18" stroke-linecap="round"></path></svg></button>
+    </div>
+    <div class="modal-body">
+      <div class="form-field filled">
+        <label class="field-label">Completed By</label>
+        <input class="field-control" id="input-milestone-by" placeholder="Full name">
+      </div>
+      <div class="form-field filled">
+        <label class="field-label">Completed At</label>
+        <input class="field-control" id="input-milestone-at" type="datetime-local">
+      </div>
+      <div class="form-field">
+        <label class="field-label">Notes (optional)</label>
+        <textarea class="field-control" id="input-milestone-notes" rows="3" placeholder="Any relevant detail..."></textarea>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-outline" data-close-modal>Cancel</button>
+      <button class="btn btn-accent" id="save-milestone">Mark Complete</button>
+    </div>
+  </div>
+</div>
+
+<!-- Upload Documents -->
+<div class="modal-overlay" id="modal-upload-docs">
+  <div class="modal modal-wide">
+    <div class="modal-head">
+      <div>
+        <h3>Upload Documents</h3>
+        <p>Multiple files supported · any file type · max 25MB per file</p>
+      </div>
+      <button class="modal-close" data-close-modal><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18" stroke-linecap="round"></path></svg></button>
+    </div>
+    <div class="modal-body">
+      <div class="dropzone" id="dropzone">
+        <input type="file" id="file-input" multiple style="display:none">
+        <svg width="30" height="30" fill="none" stroke="#023819" stroke-width="1.6" viewBox="0 0 24 24"><path d="M12 16V4M6 10l6-6 6 6M4 20h16" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+        <div class="dz-title">Drag & drop files here</div>
+        <div class="dz-sub">or click to browse from your device</div>
+      </div>
+      <div class="file-pill-list" id="file-pill-list"></div>
+
+      <div class="form-grid" style="margin-top:22px">
+        <div class="form-field">
+          <label class="field-label">Document Type (optional)</label>
+          <select class="field-control" id="input-doc-type">
+            <option value="">Select type…</option>
+            <option>Bill of Lading</option>
+            <option>Commercial Invoice</option>
+            <option>Packing List</option>
+            <option>Certificate of Origin</option>
+            <option>Customs Declaration</option>
+            <option>Insurance Certificate</option>
+            <option>Other</option>
+          </select>
+        </div>
+        <div class="form-field">
+          <label class="field-label">Category (optional)</label>
+          <select class="field-control" id="input-doc-category">
+            <option value="">Select category…</option>
+            <option>Shipping</option>
+            <option>Finance</option>
+            <option>Customs</option>
+            <option>Compliance</option>
+            <option>General</option>
+          </select>
+        </div>
+        <div class="form-field full">
+          <label class="field-label">Description (optional)</label>
+          <textarea class="field-control" id="input-doc-description" rows="2" placeholder="Brief note about these files..."></textarea>
+        </div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-outline" data-close-modal>Cancel</button>
+      <button class="btn btn-accent" id="save-upload-docs" disabled>Upload Files</button>
+    </div>
+  </div>
+</div>
+
+<!-- Update File (replace) -->
+<div class="modal-overlay" id="modal-update-file">
+  <div class="modal">
+    <div class="modal-head">
+      <div>
+        <h3>Update File</h3>
+        <p id="update-file-sub">Replace the file for this document record.</p>
+      </div>
+      <button class="modal-close" data-close-modal><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18" stroke-linecap="round"></path></svg></button>
+    </div>
+    <div class="modal-body">
+      <div class="dropzone" id="dropzone-update">
+        <input type="file" id="file-input-update" style="display:none">
+        <svg width="26" height="26" fill="none" stroke="#023819" stroke-width="1.6" viewBox="0 0 24 24"><path d="M12 16V4M6 10l6-6 6 6M4 20h16" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+        <div class="dz-title" id="update-file-name">Select a replacement file</div>
+        <div class="dz-sub">Metadata stays the same — only the file changes</div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-outline" data-close-modal>Cancel</button>
+      <button class="btn btn-accent" id="save-update-file" disabled>Replace File</button>
+    </div>
+  </div>
+</div>
+
+<!-- Delete Document Confirm -->
+<div class="modal-overlay" id="modal-delete-doc">
+  <div class="modal">
+    <div class="modal-head">
+      <div>
+        <h3>Delete Document</h3>
+        <p>This action cannot be undone in this prototype session.</p>
+      </div>
+      <button class="modal-close" data-close-modal><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18" stroke-linecap="round"></path></svg></button>
+    </div>
+    <div class="modal-body">
+      <p style="font-size:14px;color:var(--silver-dark);margin:0">Are you sure you want to delete <b id="delete-doc-name" style="color:var(--green-dark)"></b>?</p>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-outline" data-close-modal>Cancel</button>
+      <button class="btn" style="background:var(--error);color:#fff" id="confirm-delete-doc">Delete</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast-wrap"></div>
+
+<script>
+/* ==========================================================================
+   Mock data
+   ========================================================================== */
+const TEAM = [
+  {id:'u1', name:'James Adewale', role:'Sales Lead', initials:'JA', fill:'dark'},
+  {id:'u2', name:'Sarah Adeyemi', role:'Ops Executive', initials:'SA', fill:'light'},
+  {id:'u3', name:'Michael Ibe', role:'Quotes Manager', initials:'MI', fill:'dark'},
+  {id:'u4', name:'Titi Aluko', role:'Customs Coordinator', initials:'TA', fill:'gold'},
+  {id:'u5', name:'Chidi Eze', role:'Documentation', initials:'CE', fill:'dark'},
+  {id:'u6', name:'Ada Nwosu', role:'Finance', initials:'AN', fill:'light'},
+];
+function teamMember(id){ return TEAM.find(t=>t.id===id); }
+function avatarFillStyle(fill){
+  if(fill==='light') return 'background:var(--green-light);color:var(--green-dark)';
+  if(fill==='gold') return 'background:var(--gold);color:var(--green-dark)';
+  return 'background:var(--green-dark);color:var(--green-accent)';
+}
+
+const SLA_CONFIG = {
+  'Healthy': {chip:'chip-success', dot:'var(--success)'},
+  'At-Risk': {chip:'chip-warning', dot:'var(--gold)'},
+  'Breached': {chip:'chip-error', dot:'var(--error)'},
+};
+
+const STATUS_CHIP = (status)=>{
+  const s = status.toLowerCase();
+  if(s.includes('completed')) return 'chip-success';
+  if(s.includes('hold')) return 'chip-error';
+  if(s.includes('transit')||s.includes('delivery')) return 'chip-warning';
+  return 'chip-neutral';
+};
+
+const WORKSTREAM_TEMPLATE = {
+  'Booking':[
+    {name:'Booking Confirmed', sla:'2 days'},
+    {name:'Carrier Allocation', sla:'1 day'},
+  ],
+  'Documentation':[
+    {name:'Bill of Lading Issued', sla:'3 days'},
+    {name:'Commercial Invoice Verified', sla:'2 days'},
+    {name:'Packing List Received', sla:'2 days'},
+  ],
+  'Finance':[
+    {name:'Freight Invoice Raised', sla:'3 days'},
+    {name:'Payment Confirmed', sla:'5 days'},
+  ],
+  'Customs':[
+    {name:'Customs Declaration Filed', sla:'2 days'},
+    {name:'Duties Assessed', sla:'2 days'},
+    {name:'Customs Cleared', sla:'4 days'},
+  ],
+  'Delivery':[
+    {name:'Delivery Order Issued', sla:'1 day'},
+    {name:'Final Delivery Confirmed', sla:'3 days'},
+  ],
+};
+
+const PHYSICAL_TRACKING_TEMPLATE = [
+  {label:'Container Gated In · Origin Terminal', loc:'Shanghai Yangshan Port'},
+  {label:'Vessel Departed', loc:'Shanghai Yangshan Port'},
+  {label:'In Transit · Ocean Voyage', loc:'Indian Ocean'},
+  {label:'Transshipment', loc:'Port Klang, Malaysia'},
+  {label:'Vessel Arrived', loc:'Apapa Port, Lagos'},
+  {label:'Container Gated Out', loc:'Apapa Port, Lagos'},
+];
+
+function makeId(prefix){ return prefix + '-' + Math.random().toString(36).slice(2,8); }
+
+// Build a fleshed-out shipment detail object from a light list record + a seed for variety
+function buildShipmentDetail(base, seed){
+  const owner = teamMember(base.ownerId);
+  const containerCount = 2 + (seed % 3);
+  const containers = [];
+  for(let i=0;i<containerCount;i++){
+    containers.push({
+      id: makeId('cnt'),
+      number: `${['OOCU','MSCU','MAEU','CMAU'][(seed+i)%4]}${7000000+seed*137+i*91}`,
+      size: ['20ft','40ft','40ft HC'][(seed+i)%3],
+      type: ['Dry','Reefer','Dry','Dry'][(seed+i)%4],
+      seal: i%2===0 ? `SL-${8800+seed+i}` : '',
+      weight: i%3!==0 ? `${17000+seed*40+i*300} kg` : '',
+    });
+  }
+
+  const totalMilestones = seed % 2 === 0 ? 6 : 8;
+  let completedSoFar = base.completedMilestones;
+  const workstreams = {};
+  let idx = 0;
+  Object.keys(WORKSTREAM_TEMPLATE).forEach(ws=>{
+    workstreams[ws] = WORKSTREAM_TEMPLATE[ws].map(m=>{
+      idx++;
+      const isDone = idx <= completedSoFar;
+      return {
+        id: makeId('ms'),
+        name: m.name,
+        sla: m.sla,
+        status: isDone ? 'Completed' : (idx === completedSoFar+1 && base.status.includes('Progress') ? 'In Progress' : 'Not Started'),
+        completedBy: isDone ? teamMember(TEAM[(idx+seed)%TEAM.length].id).name : '',
+        completedAt: isDone ? new Date(Date.now() - (totalMilestones-idx)*86400000).toISOString().slice(0,16) : '',
+        notes: isDone && idx%3===0 ? 'Cleared without exceptions.' : '',
+      };
+    });
+  });
+
+  const trackedCount = Math.min(PHYSICAL_TRACKING_TEMPLATE.length, 2 + (seed % 5));
+  const physicalTracking = PHYSICAL_TRACKING_TEMPLATE.map((t,i)=>({
+    label: t.label,
+    location: t.loc,
+    timestamp: i < trackedCount ? new Date(Date.now() - (trackedCount-i)*3*3600000).toLocaleString('en-GB',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}) : null,
+    done: i < trackedCount,
+  }));
+
+  const docSeedNames = [
+    ['Bill_of_Lading.pdf','Bill of Lading','Shipping'],
+    ['Commercial_Invoice.pdf','Commercial Invoice','Finance'],
+    ['Packing_List.xlsx','Packing List','Shipping'],
+    ['Certificate_of_Origin.pdf','Certificate of Origin','Compliance'],
+  ];
+  const docCount = 1 + (seed % docSeedNames.length);
+  const documents = [];
+  for(let i=0;i<docCount;i++){
+    const d = docSeedNames[i];
+    documents.push({
+      id: makeId('doc'),
+      name: d[0],
+      type: d[1],
+      category: d[2],
+      uploadedBy: teamMember(TEAM[(i+seed)%TEAM.length].id).name,
+      uploadedOn: new Date(Date.now() - (docCount-i)*86400000*2).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}),
+      isMock: true,
+      fileUrl: null,
+      size: null,
+    });
+  }
+
+  return {
+    ...base,
+    owner,
+    containers,
+    workstreams,
+    physicalTracking,
+    documents,
+    slaHealth: base.slaHealth,
+  };
+}
+
+const SHIPMENT_LIST_BASE = [
+  {jobRef:'OP-SHP-10231', customer:'Dangote Industries', route:'Shanghai → Lagos', mode:'Ocean Import', status:'In Transit', slaHealth:'Healthy', eta:'02 Aug 2026', ownerId:'u1', completedMilestones:4, quoteRef:'OP-QT-8821', incoterm:'CIF', origin:'Shanghai, China', destination:'Lagos, Nigeria', pol:'Shanghai Yangshan Port', pod:'Apapa Port, Lagos', etd:'12 Jul 2026', serviceType:'Full Container Load'},
+  {jobRef:'OP-SHP-10228', customer:'Nestlé West Africa', route:'Rotterdam → Tema', mode:'Ocean Import', status:'Customs Clearance', slaHealth:'At-Risk', eta:'29 Jul 2026', ownerId:'u2', completedMilestones:6, quoteRef:'OP-QT-8790', incoterm:'FOB', origin:'Rotterdam, Netherlands', destination:'Tema, Ghana', pol:'Port of Rotterdam', pod:'Tema Port', etd:'05 Jul 2026', serviceType:'Full Container Load'},
+  {jobRef:'OP-SHP-10219', customer:'Julius Berger Nigeria', route:'Hamburg → Lagos', mode:'Ocean Import', status:'Documentation in Progress', slaHealth:'Breached', eta:'20 Jul 2026', ownerId:'u3', completedMilestones:1, quoteRef:'OP-QT-8744', incoterm:'CFR', origin:'Hamburg, Germany', destination:'Lagos, Nigeria', pol:'Port of Hamburg', pod:'Apapa Port, Lagos', etd:'01 Jul 2026', serviceType:'Break Bulk'},
+  {jobRef:'OP-SHP-10214', customer:'MTN Nigeria', route:'Shenzhen → Lagos', mode:'Air Import', status:'Booked', slaHealth:'Healthy', eta:'31 Jul 2026', ownerId:'u4', completedMilestones:2, quoteRef:'OP-QT-8701', incoterm:'FCA', origin:'Shenzhen, China', destination:'Lagos, Nigeria', pol:'Shenzhen Bao\'an Airport', pod:'Murtala Muhammed Airport', etd:'27 Jul 2026', serviceType:'Air Freight'},
+  {jobRef:'OP-SHP-10201', customer:'Dufil Prima Foods', route:'Lagos → Douala', mode:'Ocean Export', status:'Out for Delivery', slaHealth:'Healthy', eta:'26 Jul 2026', ownerId:'u5', completedMilestones:7, quoteRef:'OP-QT-8650', incoterm:'CIF', origin:'Lagos, Nigeria', destination:'Douala, Cameroon', pol:'Apapa Port, Lagos', pod:'Port of Douala', etd:'14 Jul 2026', serviceType:'Full Container Load'},
+  {jobRef:'OP-SHP-10188', customer:'Nigerian Breweries', route:'Antwerp → Lagos', mode:'Ocean Import', status:'Completed', slaHealth:'Healthy', eta:'10 Jul 2026', ownerId:'u6', completedMilestones:8, quoteRef:'OP-QT-8590', incoterm:'CIF', origin:'Antwerp, Belgium', destination:'Lagos, Nigeria', pol:'Port of Antwerp', pod:'Apapa Port, Lagos', etd:'20 Jun 2026', serviceType:'Full Container Load'},
+];
+
+const SHIPMENTS = {};
+SHIPMENT_LIST_BASE.forEach((base, i)=>{
+  const detail = buildShipmentDetail(base, i+3);
+  SHIPMENTS[base.jobRef] = detail;
+});
+
+/* ==========================================================================
+   App state & routing
+   ========================================================================== */
+const state = {
+  currentView: 'shipments',
+  currentShipmentRef: null,
+  currentTab: 'overview',
+  shipmentFilter: 'All',
+  pendingFiles: [],
+  editingContainerId: null,
+  activeMilestone: null,
+  activeDocUpdate: null,
+  activeDocDelete: null,
+};
+
+function el(id){ return document.getElementById(id); }
+function currentShipment(){ return SHIPMENTS[state.currentShipmentRef]; }
+
+function showToast(msg, type='success'){
+  const wrap = el('toast-wrap');
+  const t = document.createElement('div');
+  t.className = 'toast ' + type;
+  t.innerHTML = `<svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.4" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5" stroke-linecap="round" stroke-linejoin="round"></path></svg><span>${msg}</span>`;
+  wrap.appendChild(t);
+  setTimeout(()=>{ t.style.opacity='0'; t.style.transition='opacity .25s'; setTimeout(()=>t.remove(),260); }, 2600);
+}
+
+function navTo(view){
+  state.currentView = view;
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.toggle('active', n.dataset.nav===view));
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  el('view-'+view).classList.add('active');
+  renderBreadcrumbs();
+  window.scrollTo(0,0);
+}
+
+function openShipment(jobRef){
+  state.currentShipmentRef = jobRef;
+  state.currentTab = 'overview';
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  el('view-shipment-detail').classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.toggle('active', n.dataset.nav==='shipments'));
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.toggle('active', b.dataset.tab==='overview'));
+  document.querySelectorAll('.tab-pane').forEach(p=>p.style.display='none');
+  el('tab-overview').style.display='block';
+  renderShipmentDetail();
+  renderBreadcrumbs();
+  window.scrollTo(0,0);
+}
+
+function renderBreadcrumbs(){
+  const bc = el('breadcrumbs');
+  if(state.currentView==='dashboard'){
+    bc.innerHTML = `<span class="crumb">Dashboard</span>`;
+  } else if(state.currentView==='quotes'){
+    bc.innerHTML = `<span class="crumb">Quotes</span>`;
+  } else if(state.currentView==='shipments'){
+    bc.innerHTML = `<span class="crumb">Shipments</span>`;
+  } else if(state.currentView==='shipment-detail'){
+    const s = currentShipment();
+    bc.innerHTML = `<span class="crumb link" data-nav="shipments">Shipments</span><span class="sep">/</span><span class="crumb">${s.jobRef}</span>`;
+  }
+}
+document.addEventListener('click', (e)=>{
+  const crumb = e.target.closest('.crumb.link');
+  if(crumb){ navTo('shipments'); }
+});
+
+document.querySelectorAll('.nav-item').forEach(item=>{
+  item.addEventListener('click', (e)=>{
+    e.preventDefault();
+    navTo(item.dataset.nav);
+  });
+});
+
+/* ==========================================================================
+   Shipments list render
+   ========================================================================== */
+function renderShipmentFilters(){
+  const statuses = ['All', ...new Set(Object.values(SHIPMENTS).map(s=>s.status))];
+  el('shipment-filters').innerHTML = statuses.map(s=>
+    `<button class="filter-chip ${state.shipmentFilter===s?'active':''}" data-filter="${s}">${s}</button>`
+  ).join('');
+  el('shipment-filters').querySelectorAll('.filter-chip').forEach(btn=>{
+    btn.addEventListener('click', ()=>{ state.shipmentFilter = btn.dataset.filter; renderShipmentFilters(); renderShipmentsList(); });
+  });
+}
+
+function renderShipmentsList(){
+  const list = Object.values(SHIPMENTS).filter(s => state.shipmentFilter==='All' || s.status===state.shipmentFilter);
+  el('shipments-count-label').textContent = `${list.length} shipment${list.length!==1?'s':''}${state.shipmentFilter!=='All' ? ' · ' + state.shipmentFilter : ''}`;
+
+  el('shipments-tbody').innerHTML = list.map(s=>{
+    const sla = SLA_CONFIG[s.slaHealth];
+    return `
+    <tr class="clickable" data-jobref="${s.jobRef}">
+      <td><b style="color:var(--green-dark);font-family:var(--font-display);font-weight:600">${s.jobRef}</b></td>
+      <td>${s.customer}</td>
+      <td>${s.route}</td>
+      <td><span class="chip chip-neutral">${s.mode}</span></td>
+      <td><span class="chip ${STATUS_CHIP(s.status)}">${s.status}</span></td>
+      <td><span class="badge-sla ${sla.chip}"><span class="chip-dot" style="background:${sla.dot}"></span>${s.slaHealth}</span></td>
+      <td>${s.eta}</td>
+      <td>
+        <div style="display:flex;align-items:center;gap:8px">
+          <div class="avatar avatar-sm" style="${avatarFillStyle(s.owner.fill)}">${s.owner.initials}</div>
+          <span style="font-size:12.5px;color:var(--silver-dark)">${s.owner.name.split(' ')[0]}</span>
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+
+  el('shipments-tbody').querySelectorAll('tr.clickable').forEach(row=>{
+    row.addEventListener('click', ()=> openShipment(row.dataset.jobref));
+  });
+}
+
+/* ==========================================================================
+   Shipment Detail render
+   ========================================================================== */
+function renderShipmentDetail(){
+  renderShipHeader();
+  renderShipDetailFields();
+  renderContainers();
+  renderWorkstreams();
+  renderPhysicalTimeline();
+  renderDocuments();
+}
+
+function renderShipHeader(){
+  const s = currentShipment();
+  const sla = SLA_CONFIG[s.slaHealth];
+  const totalMilestones = Object.values(s.workstreams).flat().length;
+  const doneMilestones = Object.values(s.workstreams).flat().filter(m=>m.status==='Completed').length;
+  const pct = Math.round((doneMilestones/totalMilestones)*100);
+
+  el('ship-header').innerHTML = `
+    <div class="ship-header-top">
+      <div>
+        <div class="ship-header-id">
+          <h1>${s.jobRef}</h1>
+          <span class="chip ${STATUS_CHIP(s.status)}">${s.status}</span>
+          <span class="badge-sla ${sla.chip}"><span class="chip-dot" style="background:${sla.dot}"></span>${s.slaHealth}</span>
+        </div>
+        <div style="font-size:14px;color:var(--silver-dark);margin-top:8px">
+          <b style="color:var(--green-dark)">${s.customer}</b> &nbsp;·&nbsp; ${s.mode} &nbsp;•&nbsp; ${s.route}
+        </div>
+      </div>
+      <div class="ship-header-actions">
+        <button class="btn btn-outline btn-sm" id="btn-assign-owner">
+          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"></circle><path d="M4 21v-1a8 8 0 0116 0v1"></path></svg>
+          Assign Owner
+        </button>
+        <button class="btn btn-outline btn-sm" id="btn-update-status">
+          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 12l4 4L21 4" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+          Update Status
+        </button>
+        <button class="btn btn-solid btn-sm" id="btn-edit-shipment">
+          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"></path><path d="M18.5 2.5a2.1 2.1 0 013 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+          Edit Shipment
+        </button>
+      </div>
+    </div>
+
+    <div class="ship-header-meta">
+      <div class="meta-block"><div class="k">Shipment Owner</div><div class="v" style="display:flex;align-items:center;gap:8px">
+        <div class="avatar avatar-sm" style="${avatarFillStyle(s.owner.fill)}">${s.owner.initials}</div>${s.owner.name}
+      </div></div>
+      <div class="meta-block"><div class="k">ETD</div><div class="v">${s.etd}</div></div>
+      <div class="meta-block"><div class="k">ETA</div><div class="v">${s.eta}</div></div>
+      <div class="meta-block"><div class="k">Quote Reference</div><div class="v">${s.quoteRef}</div></div>
+    </div>
+
+    <div class="progress-pill-row">
+      <span style="font-family:var(--font-display);font-weight:600;font-size:13px;color:var(--green-dark);white-space:nowrap">Service Delivery Progress</span>
+      <div class="progress-bar-track"><span class="progress-bar-fill" style="width:${pct}%"></span></div>
+      <span style="font-size:13px;font-weight:700;color:var(--green-dark);white-space:nowrap">${doneMilestones}/${totalMilestones} Completed</span>
+    </div>
+  `;
+
+  el('btn-assign-owner').addEventListener('click', openAssignOwnerModal);
+  el('btn-update-status').addEventListener('click', openUpdateStatusModal);
+  el('btn-edit-shipment').addEventListener('click', openEditShipmentModal);
+}
+
+function renderShipDetailFields(){
+  const s = currentShipment();
+  const fields = [
+    ['Quote Reference', s.quoteRef],
+    ['Shipment Owner', s.owner.name],
+    ['Transport Mode', s.mode],
+    ['Shipment Type', s.mode.includes('Import') ? 'Import' : s.mode.includes('Export') ? 'Export' : 'Cross-trade'],
+    ['Service Type', s.serviceType],
+    ['Incoterm', s.incoterm],
+    ['Origin', s.origin],
+    ['Destination', s.destination],
+    ['Port of Loading', s.pol],
+    ['Port of Discharge', s.pod],
+    ['ETD', s.etd],
+    ['ETA', s.eta],
+  ];
+  el('ship-detail-fields').innerHTML = fields.map(([k,v])=>`
+    <div class="detail-field"><div class="k">${k}</div><div class="v">${v}</div></div>
+  `).join('');
+}
+
+function renderContainers(){
+  const s = currentShipment();
+  el('container-grid').innerHTML = s.containers.map(c=>`
+    <div class="container-card">
+      <div class="cnum">${c.number}
+        <button class="cedit" data-cid="${c.id}" title="Edit container">
+          <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"></path><path d="M18.5 2.5a2.1 2.1 0 013 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+        </button>
+      </div>
+      <div class="crow"><span class="k">Size</span><span>${c.size}</span></div>
+      <div class="crow"><span class="k">Type</span><span>${c.type}</span></div>
+      <div class="crow"><span class="k">Seal Number</span><span>${c.seal || '—'}</span></div>
+      <div class="crow"><span class="k">Weight</span><span>${c.weight || '—'}</span></div>
+    </div>
+  `).join('') || `<div class="section-sub" style="grid-column:1/-1">No containers added yet.</div>`;
+
+  el('container-grid').querySelectorAll('.cedit').forEach(btn=>{
+    btn.addEventListener('click', ()=> openContainerModal(btn.dataset.cid));
+  });
+}
+
+function renderWorkstreams(){
+  const s = currentShipment();
+  el('workstream-list').innerHTML = Object.entries(s.workstreams).map(([wsName, milestones])=>{
+    const done = milestones.filter(m=>m.status==='Completed').length;
+    return `
+    <div class="workstream-card card" style="margin-top:14px">
+      <div class="workstream-head" data-ws-toggle>
+        <div class="left">
+          <svg class="workstream-chevron" width="16" height="16" fill="none" stroke="#023819" stroke-width="2.2" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+          <h4 style="font-size:15px">${wsName}</h4>
+        </div>
+        <span class="wcount">${done}/${milestones.length} completed</span>
+      </div>
+      <div class="milestone-list">
+        ${milestones.map(m=>renderMilestoneRow(m)).join('')}
+      </div>
+    </div>`;
+  }).join('');
+
+  el('workstream-list').querySelectorAll('[data-ws-toggle]').forEach(head=>{
+    head.addEventListener('click', ()=> head.closest('.workstream-card').classList.toggle('collapsed'));
+  });
+  el('workstream-list').querySelectorAll('[data-complete-ms]').forEach(btn=>{
+    btn.addEventListener('click', (e)=>{ e.stopPropagation(); openMilestoneModal(btn.dataset.completeMs); });
+  });
+}
+
+function renderMilestoneRow(m){
+  const statusChip = m.status==='Completed' ? 'chip-success' : m.status==='In Progress' ? 'chip-warning' : 'chip-neutral';
+  return `
+  <div class="milestone-row">
+    <div>
+      <div class="m-name">${m.name}</div>
+    </div>
+    <div><span class="m-cell-label">Status</span><span class="chip ${statusChip}">${m.status}</span></div>
+    <div><span class="m-cell-label">SLA</span><span style="font-size:12.5px;color:var(--silver-dark)">${m.sla}</span></div>
+    <div><span class="m-cell-label">Completed By</span><span style="font-size:12.5px;color:var(--silver-dark)">${m.completedBy || '—'}</span></div>
+    <div><span class="m-cell-label">Completed At</span><span class="m-notes">${m.completedAt ? new Date(m.completedAt).toLocaleString('en-GB',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'}) : '—'}${m.notes ? '<br><span style=\"color:var(--silver-light)\">'+m.notes+'</span>' : ''}</span></div>
+    <div style="text-align:right">
+      ${m.status!=='Completed' ? `<button class="btn btn-outline btn-sm" data-complete-ms="${m.id}">Mark Complete</button>` : `<svg width="18" height="18" fill="none" stroke="#1F8A5B" stroke-width="2.4" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5" stroke-linecap="round" stroke-linejoin="round"></path></svg>`}
+    </div>
+  </div>`;
+}
+
+function renderPhysicalTimeline(){
+  const s = currentShipment();
+  el('physical-timeline').innerHTML = s.physicalTracking.map((ev,i)=>`
+    <div class="timeline-item ${ev.done?'':'pending'}">
+      <div class="rail">
+        <span class="timeline-dot"></span>
+        ${i < s.physicalTracking.length-1 ? '<span class="timeline-line"></span>' : ''}
+      </div>
+      <div class="timeline-content">
+        <div class="ttitle">${ev.label}</div>
+        <div class="tmeta">${ev.location}${ev.timestamp ? ' · ' + ev.timestamp : ' · Pending'}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function renderDocuments(){
+  const s = currentShipment();
+  el('doc-total-count').textContent = s.documents.length;
+  el('documents-tbody').innerHTML = s.documents.map(d=>`
+    <tr>
+      <td>
+        <div style="display:flex;align-items:center;gap:10px">
+          <svg width="16" height="16" fill="none" stroke="#023819" stroke-width="1.8" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"></path><path d="M14 2v6h6"></path></svg>
+          <b style="color:var(--green-dark);font-weight:600">${d.name}</b>
+        </div>
+      </td>
+      <td>${d.type || '<span style="color:var(--silver-light)">—</span>'}</td>
+      <td>${d.category ? `<span class="chip chip-neutral">${d.category}</span>` : '<span style="color:var(--silver-light)">—</span>'}</td>
+      <td>${d.uploadedBy}</td>
+      <td>${d.uploadedOn}</td>
+      <td>
+        <div class="doc-actions" style="justify-content:flex-end">
+          <button title="View" data-doc-view="${d.id}"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"></path><circle cx="12" cy="12" r="3"></circle></svg></button>
+          <button title="Download" data-doc-download="${d.id}"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 3v12M7 10l5 5 5-5M4 21h16" stroke-linecap="round" stroke-linejoin="round"></path></svg></button>
+          <button title="Update File" data-doc-update="${d.id}"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"></path><path d="M18.5 2.5a2.1 2.1 0 013 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg></button>
+          <button title="Delete" class="danger" data-doc-delete="${d.id}"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 6h18M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2m3 0v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6h14z" stroke-linecap="round" stroke-linejoin="round"></path></svg></button>
+        </div>
+      </td>
+    </tr>
+  `).join('') || `<tr><td colspan="6" style="text-align:center;color:var(--silver-light);padding:30px">No documents uploaded yet.</td></tr>`;
+
+  el('documents-tbody').querySelectorAll('[data-doc-view]').forEach(b=> b.addEventListener('click', ()=> viewDocument(b.dataset.docView)));
+  el('documents-tbody').querySelectorAll('[data-doc-download]').forEach(b=> b.addEventListener('click', ()=> downloadDocument(b.dataset.docDownload)));
+  el('documents-tbody').querySelectorAll('[data-doc-update]').forEach(b=> b.addEventListener('click', ()=> openUpdateFileModal(b.dataset.docUpdate)));
+  el('documents-tbody').querySelectorAll('[data-doc-delete]').forEach(b=> b.addEventListener('click', ()=> openDeleteDocModal(b.dataset.docDelete)));
+}
+
+/* ==========================================================================
+   Tabs
+   ========================================================================== */
+document.querySelectorAll('.tab-btn').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    state.currentTab = btn.dataset.tab;
+    document.querySelectorAll('.tab-btn').forEach(b=>b.classList.toggle('active', b===btn));
+    document.querySelectorAll('.tab-pane').forEach(p=>p.style.display='none');
+    el('tab-'+btn.dataset.tab).style.display='block';
+  });
+});
+
+/* ==========================================================================
+   Modal helpers
+   ========================================================================== */
+function openModal(id){ el(id).classList.add('open'); }
+function closeModal(id){ el(id).classList.remove('open'); }
+document.querySelectorAll('[data-close-modal]').forEach(btn=>{
+  btn.addEventListener('click', (e)=>{ closeModal(e.target.closest('.modal-overlay').id); });
+});
+document.querySelectorAll('.modal-overlay').forEach(ov=>{
+  ov.addEventListener('click', (e)=>{ if(e.target===ov) closeModal(ov.id); });
+});
+
+/* --- Assign Owner --- */
+function openAssignOwnerModal(){
+  const s = currentShipment();
+  el('input-assign-owner').innerHTML = TEAM.map(t=>`<option value="${t.id}" ${t.id===s.owner.id?'selected':''}>${t.name} — ${t.role}</option>`).join('');
+  openModal('modal-assign-owner');
+}
+el('save-assign-owner').addEventListener('click', ()=>{
+  const s = currentShipment();
+  const newOwnerId = el('input-assign-owner').value;
+  s.owner = teamMember(newOwnerId);
+  s.ownerId = newOwnerId;
+  renderShipHeader(); renderShipDetailFields();
+  closeModal('modal-assign-owner');
+  showToast('Shipment owner updated to ' + s.owner.name);
+});
+
+/* --- Update Status --- */
+function openUpdateStatusModal(){
+  const s = currentShipment();
+  el('input-update-status').value = s.status;
+  el('input-update-status-notes').value = '';
+  openModal('modal-update-status');
+}
+el('save-update-status').addEventListener('click', ()=>{
+  const s = currentShipment();
+  s.status = el('input-update-status').value;
+  renderShipHeader();
+  renderShipmentsList();
+  closeModal('modal-update-status');
+  showToast('Shipment status updated to "' + s.status + '"');
+});
+
+/* --- Edit Shipment --- */
+const EDIT_SHIPMENT_FIELDS = [
+  ['quoteRef','Quote Reference'],['mode','Transport Mode'],['serviceType','Service Type'],['incoterm','Incoterm'],
+  ['origin','Origin'],['destination','Destination'],['pol','Port of Loading'],['pod','Port of Discharge'],
+  ['etd','ETD'],['eta','ETA'],
+];
+function openEditShipmentModal(){
+  const s = currentShipment();
+  el('edit-shipment-form').innerHTML = EDIT_SHIPMENT_FIELDS.map(([key,label])=>`
+    <div class="form-field filled">
+      <label class="field-label">${label}</label>
+      <input class="field-control" data-edit-field="${key}" value="${s[key]}">
+    </div>
+  `).join('');
+  openModal('modal-edit-shipment');
+}
+el('save-edit-shipment').addEventListener('click', ()=>{
+  const s = currentShipment();
+  el('edit-shipment-form').querySelectorAll('[data-edit-field]').forEach(input=>{
+    s[input.dataset.editField] = input.value;
+  });
+  renderShipHeader(); renderShipDetailFields(); renderShipmentsList();
+  closeModal('modal-edit-shipment');
+  showToast('Shipment details saved');
+});
+
+/* --- Add / Edit Container --- */
+function openContainerModal(containerId){
+  state.editingContainerId = containerId || null;
+  const s = currentShipment();
+  const c = containerId ? s.containers.find(x=>x.id===containerId) : null;
+  el('container-modal-title').textContent = c ? 'Edit Container' : 'Add Container';
+  el('input-container-number').value = c ? c.number : '';
+  el('input-container-size').value = c ? c.size : '20ft';
+  el('input-container-type').value = c ? c.type : 'Dry';
+  el('input-container-seal').value = c ? c.seal : '';
+  el('input-container-weight').value = c ? c.weight : '';
+  openModal('modal-container');
+}
+el('btn-add-container').addEventListener('click', ()=> openContainerModal(null));
+el('save-container').addEventListener('click', ()=>{
+  const s = currentShipment();
+  const num = el('input-container-number').value.trim();
+  if(!num){ showToast('Container number is required', 'error'); return; }
+  const data = {
+    number:num,
+    size:el('input-container-size').value,
+    type:el('input-container-type').value,
+    seal:el('input-container-seal').value.trim(),
+    weight:el('input-container-weight').value.trim(),
+  };
+  if(state.editingContainerId){
+    const c = s.containers.find(x=>x.id===state.editingContainerId);
+    Object.assign(c, data);
+    showToast('Container updated');
+  } else {
+    s.containers.push({id: makeId('cnt'), ...data});
+    showToast('Container added');
+  }
+  renderContainers();
+  closeModal('modal-container');
+});
+
+/* --- Milestone completion --- */
+function openMilestoneModal(msId){
+  state.activeMilestone = msId;
+  const s = currentShipment();
+  let target = null, wsName = null;
+  Object.entries(s.workstreams).forEach(([name, list])=>{
+    const found = list.find(m=>m.id===msId);
+    if(found){ target = found; wsName = name; }
+  });
+  el('milestone-modal-sub').textContent = `${wsName} · ${target.name}`;
+  el('input-milestone-by').value = '';
+  const now = new Date();
+  now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+  el('input-milestone-at').value = now.toISOString().slice(0,16);
+  el('input-milestone-notes').value = '';
+  openModal('modal-milestone');
+}
+el('save-milestone').addEventListener('click', ()=>{
+  const by = el('input-milestone-by').value.trim();
+  if(!by){ showToast('Please enter who completed this milestone', 'error'); return; }
+  const s = currentShipment();
+  Object.values(s.workstreams).forEach(list=>{
+    const m = list.find(x=>x.id===state.activeMilestone);
+    if(m){
+      m.status = 'Completed';
+      m.completedBy = by;
+      m.completedAt = el('input-milestone-at').value;
+      m.notes = el('input-milestone-notes').value.trim();
+    }
+  });
+  renderWorkstreams(); renderShipHeader();
+  closeModal('modal-milestone');
+  showToast('Milestone marked complete');
+});
+
+/* ==========================================================================
+   Documents — upload / view / download / update / delete
+   ========================================================================== */
+const MAX_FILE_SIZE_MB = 25;
+
+function formatBytes(bytes){
+  if(bytes < 1024) return bytes + ' B';
+  if(bytes < 1024*1024) return (bytes/1024).toFixed(1) + ' KB';
+  return (bytes/(1024*1024)).toFixed(1) + ' MB';
+}
+
+el('btn-upload-docs').addEventListener('click', ()=>{
+  state.pendingFiles = [];
+  el('input-doc-type').value = '';
+  el('input-doc-category').value = '';
+  el('input-doc-description').value = '';
+  renderFilePillList();
+  openModal('modal-upload-docs');
+});
+
+const dropzone = el('dropzone');
+const fileInput = el('file-input');
+dropzone.addEventListener('click', ()=> fileInput.click());
+dropzone.addEventListener('dragover', (e)=>{ e.preventDefault(); dropzone.classList.add('dragover'); });
+dropzone.addEventListener('dragleave', ()=> dropzone.classList.remove('dragover'));
+dropzone.addEventListener('drop', (e)=>{
+  e.preventDefault(); dropzone.classList.remove('dragover');
+  addPendingFiles(e.dataTransfer.files);
+});
+fileInput.addEventListener('change', ()=>{ addPendingFiles(fileInput.files); fileInput.value=''; });
+
+function addPendingFiles(fileList){
+  Array.from(fileList).forEach(f=>{
+    if(f.size > MAX_FILE_SIZE_MB*1024*1024){
+      showToast(`"${f.name}" exceeds the ${MAX_FILE_SIZE_MB}MB limit`, 'error');
+      return;
+    }
+    state.pendingFiles.push(f);
+  });
+  renderFilePillList();
+}
+
+function renderFilePillList(){
+  el('file-pill-list').innerHTML = state.pendingFiles.map((f,i)=>`
+    <div class="file-pill">
+      <svg width="14" height="14" fill="none" stroke="#023819" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"></path><path d="M14 2v6h6"></path></svg>
+      <span class="fname">${f.name}</span>
+      <span class="fsize">${formatBytes(f.size)}</span>
+      <button class="frm" data-remove-file="${i}"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18" stroke-linecap="round"></path></svg></button>
+    </div>
+  `).join('');
+  el('file-pill-list').querySelectorAll('[data-remove-file]').forEach(btn=>{
+    btn.addEventListener('click', ()=>{ state.pendingFiles.splice(+btn.dataset.removeFile,1); renderFilePillList(); });
+  });
+  el('save-upload-docs').disabled = state.pendingFiles.length===0;
+}
+
+el('save-upload-docs').addEventListener('click', ()=>{
+  const s = currentShipment();
+  const type = el('input-doc-type').value;
+  const category = el('input-doc-category').value;
+  const today = new Date().toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'});
+  state.pendingFiles.forEach(f=>{
+    s.documents.push({
+      id: makeId('doc'),
+      name: f.name,
+      type: type,
+      category: category,
+      uploadedBy: 'Nkechi M.',
+      uploadedOn: today,
+      isMock:false,
+      fileUrl: URL.createObjectURL(f),
+      size: f.size,
+    });
+  });
+  const count = state.pendingFiles.length;
+  renderDocuments();
+  closeModal('modal-upload-docs');
+  showToast(`${count} document${count!==1?'s':''} uploaded`);
+});
+
+function findDoc(id){ return currentShipment().documents.find(d=>d.id===id); }
+
+function viewDocument(id){
+  const d = findDoc(id);
+  if(d.fileUrl){ window.open(d.fileUrl, '_blank'); }
+  else { showToast('Preview unavailable — this is a mock document with no attached file', 'error'); }
+}
+function downloadDocument(id){
+  const d = findDoc(id);
+  if(d.fileUrl){
+    const a = document.createElement('a'); a.href = d.fileUrl; a.download = d.name; a.click();
+  } else {
+    showToast('Download unavailable — this is a mock document with no attached file', 'error');
+  }
+}
+
+function openUpdateFileModal(id){
+  state.activeDocUpdate = id;
+  const d = findDoc(id);
+  el('update-file-sub').textContent = `Replacing file for "${d.name}"`;
+  el('update-file-name').textContent = 'Select a replacement file';
+  el('save-update-file').disabled = true;
+  el('save-update-file').dataset.newFile = '';
+  openModal('modal-update-file');
+}
+const dropzoneUpdate = el('dropzone-update');
+const fileInputUpdate = el('file-input-update');
+dropzoneUpdate.addEventListener('click', ()=> fileInputUpdate.click());
+dropzoneUpdate.addEventListener('dragover', (e)=>{ e.preventDefault(); dropzoneUpdate.classList.add('dragover'); });
+dropzoneUpdate.addEventListener('dragleave', ()=> dropzoneUpdate.classList.remove('dragover'));
+dropzoneUpdate.addEventListener('drop', (e)=>{ e.preventDefault(); dropzoneUpdate.classList.remove('dragover'); handleUpdateFile(e.dataTransfer.files[0]); });
+fileInputUpdate.addEventListener('change', ()=> handleUpdateFile(fileInputUpdate.files[0]));
+
+let pendingReplacementFile = null;
+function handleUpdateFile(file){
+  if(!file) return;
+  if(file.size > MAX_FILE_SIZE_MB*1024*1024){ showToast(`File exceeds the ${MAX_FILE_SIZE_MB}MB limit`, 'error'); return; }
+  pendingReplacementFile = file;
+  el('update-file-name').textContent = file.name;
+  el('save-update-file').disabled = false;
+}
+el('save-update-file').addEventListener('click', ()=>{
+  const d = findDoc(state.activeDocUpdate);
+  if(!pendingReplacementFile) return;
+  d.name = pendingReplacementFile.name;
+  d.fileUrl = URL.createObjectURL(pendingReplacementFile);
+  d.size = pendingReplacementFile.size;
+  d.uploadedOn = new Date().toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'});
+  d.uploadedBy = 'Nkechi M.';
+  pendingReplacementFile = null;
+  renderDocuments();
+  closeModal('modal-update-file');
+  showToast('File replaced successfully');
+});
+
+function openDeleteDocModal(id){
+  state.activeDocDelete = id;
+  el('delete-doc-name').textContent = findDoc(id).name;
+  openModal('modal-delete-doc');
+}
+el('confirm-delete-doc').addEventListener('click', ()=>{
+  const s = currentShipment();
+  s.documents = s.documents.filter(d=>d.id!==state.activeDocDelete);
+  renderDocuments();
+  closeModal('modal-delete-doc');
+  showToast('Document deleted');
+});
+
+/* ==========================================================================
+   Init
+   ========================================================================== */
+renderShipmentFilters();
+renderShipmentsList();
+renderBreadcrumbs();
+</script>
+</body>
+</html>
