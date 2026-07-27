@@ -160,6 +160,8 @@ input,select,textarea{font-family:var(--font-body)}
 
 .badge-sla{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:700;padding:6px 13px;border-radius:999px}
 .badge-sla .sla-icon{display:inline-flex;flex-shrink:0}
+.badge-sla.sm{padding:3px 9px;font-size:11px;gap:5px}
+.status-chip.sm{padding:3px 9px;font-size:11px;gap:5px}
 
 .avatar{display:grid;place-items:center;border-radius:10px;font-family:var(--font-display);font-weight:600;flex-shrink:0}
 .avatar-sm{width:32px;height:32px;font-size:11.5px;border-radius:8px}
@@ -218,6 +220,13 @@ select.field-control{appearance:none;background-image:url("data:image/svg+xml,%3
 textarea.field-control{resize:vertical;min-height:70px}
 .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:0 16px}
 .form-grid .full{grid-column:1 / -1}
+
+.searchable-field{position:relative}
+.ss-menu{position:absolute;left:0;right:0;top:calc(100% + 4px);background:var(--white);border:1px solid var(--border-tint);border-radius:var(--radius-md);box-shadow:var(--shadow-e3);max-height:220px;overflow:auto;z-index:60;display:none}
+.ss-menu.open{display:block}
+.ss-option{padding:9px 12px;font-size:13px;color:var(--green-dark);cursor:pointer}
+.ss-option:hover{background:var(--green-light-surface)}
+.ss-empty{padding:9px 12px;font-size:12.5px;color:var(--silver-light)}
 
 /* Empty / placeholder state */
 .placeholder-page{display:flex;align-items:center;justify-content:center;min-height:60vh}
@@ -295,8 +304,11 @@ textarea.field-control{resize:vertical;min-height:70px}
 .quote-link{color:var(--green-dark);font-weight:700;text-decoration:underline;text-decoration-color:rgba(2,56,25,.35);text-underline-offset:2px;cursor:pointer}
 .quote-link:hover{text-decoration-color:var(--green-dark)}
 
-.overview-layout{display:grid;grid-template-columns:1.5fr 1fr;gap:22px;align-items:stretch}
-@media (max-width:1100px){.overview-layout{grid-template-columns:1fr}}
+.overview-layout{display:grid;grid-template-columns:4fr 1fr;gap:22px;align-items:stretch}
+@media (max-width:1100px){
+  .overview-layout{grid-template-columns:1fr}
+  .overview-layout .shipment-team-card{display:none}
+}
 
 /* Shipment Team (read-only display) */
 .team-primary-row{display:flex;align-items:center;gap:12px}
@@ -550,7 +562,7 @@ textarea.field-control{resize:vertical;min-height:70px}
               <p class="section-sub" style="margin:0 0 18px">Core reference data for this job.</p>
               <div class="detail-fields-grid" id="ship-detail-fields"></div>
             </div>
-            <div class="card card-pad">
+            <div class="card card-pad shipment-team-card">
               <h3 class="section-title">Shipment Team</h3>
               <p class="section-sub">Who's assigned to this shipment.</p>
               <div id="shipment-team-display"></div>
@@ -586,7 +598,7 @@ textarea.field-control{resize:vertical;min-height:70px}
         <div class="tab-pane" id="tab-progress" style="display:none">
           <div class="progress-layout">
             <div class="card card-pad">
-              <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
                 <h3 class="section-title" style="margin-bottom:0">Service Delivery</h3>
                 <span class="chip chip-neutral" id="service-delivery-template-pill"></span>
               </div>
@@ -929,29 +941,45 @@ const SLA_CONFIG = {
 function slaIcon(health){ return health==='Healthy' ? ICON_CHECK : ICON_WARN; }
 
 const STATUS_CLASS = { Active:'status-active', Completed:'status-completed', Cancelled:'status-cancelled' };
-function renderStatusChip(status){
+function renderStatusChip(status, sizeClass=''){
   const cls = STATUS_CLASS[status] || 'status-active';
   let icon = `<span class="status-dot"></span>`;
   if(status==='Completed') icon = `<span class="status-icon">${ICON_CHECK}</span>`;
   else if(status==='Cancelled') icon = `<span class="status-icon">${ICON_X}</span>`;
-  return `<span class="status-chip ${cls}">${icon}${status}</span>`;
+  return `<span class="status-chip ${cls} ${sizeClass}">${icon}${status}</span>`;
 }
 
 function shipmentTypeOf(s){ return s.mode.includes('Import') ? 'Import' : s.mode.includes('Export') ? 'Export' : 'Cross-trade'; }
 function transportLabelOf(s){ return s.mode.includes('Ocean') ? 'Ocean Freight' : s.mode.includes('Air') ? 'Air Freight' : s.mode; }
+function templateLabelOf(s){ return s.mode.includes('Export') ? 'OneExport' : 'OneImport'; }
 
-const LOCODE_MAP = {
-  'Shanghai Yangshan Port': 'CNSHA',
-  'Apapa Port, Lagos': 'NGLOS',
-  'Port of Rotterdam': 'NLRTM',
-  'Tema Port': 'GHTEM',
-  'Port of Hamburg': 'DEHAM',
-  "Shenzhen Bao'an Airport": 'CNSZX',
-  'Murtala Muhammed Airport': 'NGLOS',
-  'Port of Douala': 'CMDLA',
-  'Port of Antwerp': 'BEANR',
-};
+const PORTS = [
+  {code:'CNSHA', name:'Shanghai Yangshan Port'},
+  {code:'NGLOS', name:'Apapa Port, Lagos'},
+  {code:'NLRTM', name:'Port of Rotterdam'},
+  {code:'GHTEM', name:'Tema Port'},
+  {code:'DEHAM', name:'Port of Hamburg'},
+  {code:'CNSZX', name:"Shenzhen Bao'an Airport"},
+  {code:'NGLOS', name:'Murtala Muhammed Airport'},
+  {code:'CMDLA', name:'Port of Douala'},
+  {code:'BEANR', name:'Port of Antwerp'},
+  {code:'SGSIN', name:'Port of Singapore'},
+  {code:'USNYC', name:'Port of New York'},
+  {code:'GBFXT', name:'Port of Felixstowe'},
+  {code:'ESVLC', name:'Port of Valencia'},
+  {code:'KRPUS', name:'Port of Busan'},
+  {code:'CNTAO', name:'Port of Qingdao'},
+  {code:'AEJEA', name:'Jebel Ali Port, Dubai'},
+];
+const LOCODE_MAP = Object.fromEntries(PORTS.map(p=>[p.name, p.code]));
 function locodeOf(portName){ return LOCODE_MAP[portName] || portName; }
+
+const LOCATIONS = [
+  'Shanghai, China','Lagos, Nigeria','Rotterdam, Netherlands','Tema, Ghana','Hamburg, Germany',
+  'Shenzhen, China','Douala, Cameroon','Antwerp, Belgium','Singapore','Dubai, UAE',
+  'Mombasa, Kenya','Durban, South Africa','New York, USA','Felixstowe, United Kingdom',
+  'Valencia, Spain','Tianjin, China','Busan, South Korea','Qingdao, China','Ningbo, China','Santos, Brazil',
+];
 
 const MONTH_MAP = {Jan:0,Feb:1,Mar:2,Apr:3,May:4,Jun:5,Jul:6,Aug:7,Sep:8,Oct:9,Nov:10,Dec:11};
 function parseDisplayDate(str){
@@ -960,6 +988,19 @@ function parseDisplayDate(str){
 }
 function formatDate(date){
   return date.toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'});
+}
+function displayDateToInputValue(str){
+  const date = parseDisplayDate(str);
+  const pad = n => String(n).padStart(2,'0');
+  return `${date.getFullYear()}-${pad(date.getMonth()+1)}-${pad(date.getDate())}`;
+}
+function inputDateToDisplay(val){
+  const [y,m,d] = val.split('-').map(Number);
+  return formatDate(new Date(y, m-1, d));
+}
+function formatPortDisplay(name){
+  const p = PORTS.find(x=>x.name===name);
+  return p ? `${p.code} — ${p.name}` : name;
 }
 function formatDateTime(date){
   return `${formatDate(date)} • ${date.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'})}`;
@@ -1136,12 +1177,12 @@ function buildShipmentDetail(base, seed){
 }
 
 const SHIPMENT_LIST_BASE = [
-  {jobRef:'ZELO000001', customer:'Dangote Industries', route:'Shanghai → Lagos', mode:'Ocean Import', status:'Active', slaHealth:'Healthy', eta:'02 Aug 2026', ownerId:'u1', supportingOwnerIds:['u5','u6'], completedMilestones:4, quoteRef:'OP-QT-8821', bl:'MEDUSH0123456', incoterm:'CIF', origin:'Shanghai, China', destination:'Lagos, Nigeria', pol:'Shanghai Yangshan Port', pod:'Apapa Port, Lagos', etd:'12 Jul 2026', serviceType:'Full Container Load'},
-  {jobRef:'ZELO000002', customer:'Nestlé West Africa', route:'Rotterdam → Tema', mode:'Ocean Import', status:'Active', slaHealth:'At-Risk', eta:'29 Jul 2026', ownerId:'u2', supportingOwnerIds:['u4'], completedMilestones:6, quoteRef:'OP-QT-8790', bl:'MSCURTM998211', incoterm:'FOB', origin:'Rotterdam, Netherlands', destination:'Tema, Ghana', pol:'Port of Rotterdam', pod:'Tema Port', etd:'05 Jul 2026', serviceType:'Full Container Load'},
+  {jobRef:'ZELO000001', customer:'Dangote Industries', route:'Shanghai → Lagos', mode:'Ocean Import', status:'Active', slaHealth:'Healthy', eta:'02 Aug 2026', ownerId:'u1', supportingOwnerIds:['u5','u6'], completedMilestones:4, quoteRef:'OP-QT-8821', bl:'MEDUSH0123456', incoterm:'CIF', origin:'Shanghai, China', destination:'Lagos, Nigeria', pol:'Shanghai Yangshan Port', pod:'Apapa Port, Lagos', etd:'12 Jul 2026', serviceType:'FCL'},
+  {jobRef:'ZELO000002', customer:'Nestlé West Africa', route:'Rotterdam → Tema', mode:'Ocean Import', status:'Active', slaHealth:'At-Risk', eta:'29 Jul 2026', ownerId:'u2', supportingOwnerIds:['u4'], completedMilestones:6, quoteRef:'OP-QT-8790', bl:'MSCURTM998211', incoterm:'FOB', origin:'Rotterdam, Netherlands', destination:'Tema, Ghana', pol:'Port of Rotterdam', pod:'Tema Port', etd:'05 Jul 2026', serviceType:'FCL'},
   {jobRef:'ZELO000003', customer:'Julius Berger Nigeria', route:'Hamburg → Lagos', mode:'Ocean Import', status:'Active', slaHealth:'Breached', eta:'20 Jul 2026', ownerId:'u3', supportingOwnerIds:[], completedMilestones:1, quoteRef:'OP-QT-8744', bl:'HLCUHAM774410', incoterm:'CFR', origin:'Hamburg, Germany', destination:'Lagos, Nigeria', pol:'Port of Hamburg', pod:'Apapa Port, Lagos', etd:'01 Jul 2026', serviceType:'Break Bulk'},
   {jobRef:'ZELO000004', customer:'MTN Nigeria', route:'Shenzhen → Lagos', mode:'Air Import', status:'Cancelled', slaHealth:'Healthy', eta:'31 Jul 2026', ownerId:'u4', supportingOwnerIds:['u1'], completedMilestones:2, quoteRef:'OP-QT-8701', bl:'MAWB-176-882130', incoterm:'FCA', origin:'Shenzhen, China', destination:'Lagos, Nigeria', pol:'Shenzhen Bao\'an Airport', pod:'Murtala Muhammed Airport', etd:'27 Jul 2026', serviceType:'Air Freight'},
-  {jobRef:'ZELO000005', customer:'Dufil Prima Foods', route:'Lagos → Douala', mode:'Ocean Export', status:'Active', slaHealth:'Healthy', eta:'26 Jul 2026', ownerId:'u5', supportingOwnerIds:['u2','u3'], completedMilestones:7, quoteRef:'OP-QT-8650', bl:'OOLU2384910X', incoterm:'CIF', origin:'Lagos, Nigeria', destination:'Douala, Cameroon', pol:'Apapa Port, Lagos', pod:'Port of Douala', etd:'14 Jul 2026', serviceType:'Full Container Load'},
-  {jobRef:'ZELO000006', customer:'Nigerian Breweries', route:'Antwerp → Lagos', mode:'Ocean Import', status:'Completed', slaHealth:'Healthy', eta:'10 Jul 2026', ownerId:'u6', supportingOwnerIds:[], completedMilestones:10, quoteRef:'OP-QT-8590', bl:'APLU5567234B', incoterm:'CIF', origin:'Antwerp, Belgium', destination:'Lagos, Nigeria', pol:'Port of Antwerp', pod:'Apapa Port, Lagos', etd:'20 Jun 2026', serviceType:'Full Container Load'},
+  {jobRef:'ZELO000005', customer:'Dufil Prima Foods', route:'Lagos → Douala', mode:'Ocean Export', status:'Active', slaHealth:'Healthy', eta:'26 Jul 2026', ownerId:'u5', supportingOwnerIds:['u2','u3'], completedMilestones:7, quoteRef:'OP-QT-8650', bl:'OOLU2384910X', incoterm:'CIF', origin:'Lagos, Nigeria', destination:'Douala, Cameroon', pol:'Apapa Port, Lagos', pod:'Port of Douala', etd:'14 Jul 2026', serviceType:'FCL'},
+  {jobRef:'ZELO000006', customer:'Nigerian Breweries', route:'Antwerp → Lagos', mode:'Ocean Import', status:'Completed', slaHealth:'Healthy', eta:'10 Jul 2026', ownerId:'u6', supportingOwnerIds:[], completedMilestones:10, quoteRef:'OP-QT-8590', bl:'APLU5567234B', incoterm:'CIF', origin:'Antwerp, Belgium', destination:'Lagos, Nigeria', pol:'Port of Antwerp', pod:'Apapa Port, Lagos', etd:'20 Jun 2026', serviceType:'FCL'},
 ];
 
 const SHIPMENTS = {};
@@ -1270,8 +1311,6 @@ function renderShipHeader(){
     <div class="ship-header-row1">
       <div class="ship-header-id">
         <h1>${s.jobRef}</h1>
-        ${renderStatusChip(s.status)}
-        <span class="badge-sla ${sla.chip}"><span class="sla-icon">${slaIcon(s.slaHealth)}</span>${s.slaHealth}</span>
       </div>
       <div class="dropdown">
         <button class="btn btn-solid dropdown-toggle" type="button">
@@ -1305,6 +1344,10 @@ function renderShipHeader(){
       <div class="strip-cell"><div class="k">POL</div><div class="v">${locodeOf(s.pol)}</div></div>
       <span class="strip-divider"></span>
       <div class="strip-cell"><div class="k">POD</div><div class="v">${locodeOf(s.pod)}</div></div>
+      <span class="strip-divider"></span>
+      <div class="strip-cell"><div class="k">Status</div><div class="v">${renderStatusChip(s.status, 'sm')}</div></div>
+      <span class="strip-divider"></span>
+      <div class="strip-cell"><div class="k">SLA</div><div class="v"><span class="badge-sla sm ${sla.chip}"><span class="sla-icon">${slaIcon(s.slaHealth)}</span>${s.slaHealth}</span></div></div>
     </div>
   `;
 }
@@ -1374,7 +1417,7 @@ function resolveTaskOwners(s, responsibility){
 
 function renderServiceDelivery(){
   const s = currentShipment();
-  el('service-delivery-template-pill').textContent = s.mode;
+  el('service-delivery-template-pill').textContent = templateLabelOf(s);
   el('service-delivery-tbody').innerHTML = s.milestones.map(m=>{
     const owners = resolveTaskOwners(s, m.responsibility);
     const isDone = m.status==='Completed';
@@ -1538,27 +1581,90 @@ el('save-update-status').addEventListener('click', ()=>{
 });
 
 /* --- Edit Shipment --- */
+const TRANSPORT_MODE_OPTIONS = ['Ocean Import','Ocean Export','Air Import','Air Export','Haulage'];
+const SERVICE_TYPE_OPTIONS = ['FCL','LCL','Break Bulk','Air Freight'];
+const INCOTERM_OPTIONS = ['EXW','FCA','FOB','CFR','CIF','DAP','DDP'];
+
 const EDIT_SHIPMENT_FIELDS = [
-  ['customer','Customer'],['quoteRef','Quote Reference'],['bl','Bill of Lading (B/L)'],['mode','Transport Mode'],['serviceType','Service Type'],['incoterm','Incoterm'],
-  ['origin','Origin'],['destination','Destination'],['pol','Port of Loading'],['pod','Port of Discharge'],
-  ['etd','ETD'],['eta','ETA'],
+  {key:'customer', label:'Customer', type:'text'},
+  {key:'quoteRef', label:'Quote Reference', type:'text'},
+  {key:'bl', label:'Bill of Lading (B/L)', type:'text'},
+  {key:'mode', label:'Transport Mode', type:'select', options:TRANSPORT_MODE_OPTIONS},
+  {key:'serviceType', label:'Service Type', type:'select', options:SERVICE_TYPE_OPTIONS},
+  {key:'incoterm', label:'Incoterm', type:'select', options:INCOTERM_OPTIONS},
+  {key:'origin', label:'Origin', type:'location'},
+  {key:'destination', label:'Destination', type:'location'},
+  {key:'pol', label:'Port of Loading', type:'port'},
+  {key:'pod', label:'Port of Discharge', type:'port'},
+  {key:'etd', label:'ETD', type:'date'},
+  {key:'eta', label:'ETA', type:'date'},
 ];
+
+function renderEditField(f, s){
+  const val = s[f.key];
+  if(f.type==='select'){
+    const opts = f.options.map(o=>`<option ${o===val?'selected':''}>${o}</option>`).join('');
+    return `<div class="form-field filled"><label class="field-label">${f.label}</label><select class="field-control" data-edit-field="${f.key}">${opts}</select></div>`;
+  }
+  if(f.type==='date'){
+    return `<div class="form-field filled"><label class="field-label">${f.label}</label><input type="date" class="field-control" data-edit-field="${f.key}" data-field-type="date" value="${displayDateToInputValue(val)}"></div>`;
+  }
+  if(f.type==='location' || f.type==='port'){
+    const displayVal = f.type==='port' ? formatPortDisplay(val) : val;
+    return `
+    <div class="form-field filled searchable-field" data-ss-mode="${f.type}">
+      <label class="field-label">${f.label}</label>
+      <input type="text" class="field-control ss-display" autocomplete="off" value="${displayVal}" placeholder="Search...">
+      <input type="hidden" data-edit-field="${f.key}" value="${val}">
+      <div class="ss-menu"></div>
+    </div>`;
+  }
+  return `<div class="form-field filled"><label class="field-label">${f.label}</label><input class="field-control" data-edit-field="${f.key}" value="${val}"></div>`;
+}
+
+function wireSearchableFields(){
+  el('edit-shipment-form').querySelectorAll('.searchable-field').forEach(field=>{
+    const mode = field.dataset.ssMode;
+    const display = field.querySelector('.ss-display');
+    const hidden = field.querySelector('[data-edit-field]');
+    const menu = field.querySelector('.ss-menu');
+    const options = mode==='port'
+      ? PORTS.map(p=>({value:p.name, label:`${p.code} — ${p.name}`, search:`${p.code} ${p.name}`.toLowerCase()}))
+      : LOCATIONS.map(loc=>({value:loc, label:loc, search:loc.toLowerCase()}));
+    function renderMenu(list){
+      menu.innerHTML = list.length ? list.map(o=>`<div class="ss-option" data-value="${o.value}">${o.label}</div>`).join('') : `<div class="ss-empty">No matches</div>`;
+      menu.classList.add('open');
+    }
+    display.addEventListener('focus', ()=> renderMenu(options.slice(0,8)));
+    display.addEventListener('input', ()=>{
+      const q = display.value.toLowerCase();
+      renderMenu(options.filter(o=>o.search.includes(q)).slice(0,8));
+    });
+    menu.addEventListener('mousedown', (e)=>{
+      const opt = e.target.closest('.ss-option');
+      if(!opt) return;
+      e.preventDefault();
+      hidden.value = opt.dataset.value;
+      display.value = mode==='port' ? formatPortDisplay(opt.dataset.value) : opt.dataset.value;
+      menu.classList.remove('open');
+    });
+    display.addEventListener('blur', ()=>{ setTimeout(()=>menu.classList.remove('open'), 120); });
+  });
+}
+
 function openEditShipmentModal(){
   const s = currentShipment();
-  el('edit-shipment-form').innerHTML = EDIT_SHIPMENT_FIELDS.map(([key,label])=>`
-    <div class="form-field filled">
-      <label class="field-label">${label}</label>
-      <input class="field-control" data-edit-field="${key}" value="${s[key]}">
-    </div>
-  `).join('');
+  el('edit-shipment-form').innerHTML = EDIT_SHIPMENT_FIELDS.map(f=>renderEditField(f, s)).join('');
+  wireSearchableFields();
   openModal('modal-edit-shipment');
 }
 el('save-edit-shipment').addEventListener('click', ()=>{
   const s = currentShipment();
   el('edit-shipment-form').querySelectorAll('[data-edit-field]').forEach(input=>{
-    s[input.dataset.editField] = input.value;
+    const key = input.dataset.editField;
+    s[key] = input.dataset.fieldType==='date' ? inputDateToDisplay(input.value) : input.value;
   });
-  renderShipHeader(); renderShipDetailFields(); renderShipmentsList();
+  renderShipHeader(); renderShipDetailFields(); renderShipmentsList(); renderServiceDelivery();
   closeModal('modal-edit-shipment');
   showToast('Shipment details saved');
 });
