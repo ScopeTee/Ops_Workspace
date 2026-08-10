@@ -393,26 +393,59 @@ textarea.field-control{resize:vertical;min-height:70px}
 .list-search svg{color:var(--silver-light);flex-shrink:0}
 .list-search input{border:none;outline:none;background:transparent;font-size:13.5px;width:100%;color:var(--silver-dark)}
 
-/* Communications */
-.comm-filter-group{display:flex;gap:4px;background:var(--green-chip-bg);padding:4px;border-radius:999px;flex-shrink:0}
-.comm-filter-btn{background:transparent;border:none;padding:7px 15px;border-radius:999px;font-family:var(--font-display);font-weight:600;font-size:12.5px;color:var(--silver-dark);cursor:pointer;transition:.12s}
-.comm-filter-btn.active{background:var(--white);color:var(--green-dark);box-shadow:var(--shadow-e1)}
-.comm-thread{margin-bottom:20px}
-.comm-thread:last-child{margin-bottom:0}
-.comm-msg{border:1px solid var(--border-tint);border-radius:var(--radius-lg);padding:16px 18px;margin-bottom:10px}
-.comm-msg:last-child{margin-bottom:0}
-.comm-msg-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:8px;flex-wrap:wrap}
+/* Communications — inbox layout */
 .comm-source-tag{display:inline-flex;align-items:center;gap:5px;font-size:10px;font-weight:700;padding:3px 8px;border-radius:5px;text-transform:uppercase;letter-spacing:.04em;flex-shrink:0}
 .comm-source-tag.email{background:var(--green-chip-bg);color:#4a5a3f}
 .comm-source-tag.whatsapp{background:var(--success-bg);color:var(--success-text)}
-.comm-sender{font-weight:700;color:var(--green-dark);font-size:13.5px}
-.comm-meta{font-size:11.5px;color:var(--silver-light)}
-.comm-subject{font-weight:600;color:var(--green-dark);font-size:13px;margin:2px 0 8px}
-.comm-recipients{font-size:11.5px;color:var(--silver-light);margin-bottom:8px}
-.comm-body{font-size:13px;color:var(--silver-dark);white-space:pre-wrap;line-height:1.6}
-.comm-attachments{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
-.comm-attachment-pill{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;color:var(--green-dark);background:var(--green-light-surface);padding:6px 10px;border-radius:var(--radius-sm)}
-.comm-empty{text-align:center;color:var(--silver-light);padding:40px;font-size:13.5px}
+
+.comm-filter-group{display:flex;gap:4px;background:var(--green-chip-bg);padding:4px;border-radius:999px}
+.comm-filter-btn{background:transparent;border:none;padding:7px 13px;border-radius:999px;font-family:var(--font-display);font-weight:600;font-size:12.5px;color:var(--silver-dark);cursor:pointer;transition:.12s}
+.comm-filter-btn.active{background:var(--white);color:var(--green-dark);box-shadow:var(--shadow-e1)}
+.cf-count{display:inline-flex;align-items:center;justify-content:center;min-width:16px;height:16px;padding:0 4px;border-radius:999px;background:rgba(2,56,25,.13);color:var(--green-dark);font-size:10px;font-weight:700;margin-left:4px}
+.comm-filter-btn.active .cf-count{background:var(--green-dark);color:var(--green-accent)}
+
+.comm-inbox{display:grid;grid-template-columns:290px 1fr;border:1px solid var(--border-tint);border-radius:var(--radius-lg);overflow:hidden;height:620px}
+.comm-list-pane{border-right:1px solid var(--border-tint);display:flex;flex-direction:column;min-height:0;background:var(--white)}
+.comm-list-head{padding:14px 14px 12px;border-bottom:1px solid var(--border-tint-soft);display:flex;flex-direction:column;gap:10px}
+.comm-search{display:flex;align-items:center;gap:8px;background:var(--green-light-surface);border-radius:var(--radius-md);padding:9px 11px}
+.comm-search svg{color:var(--silver-light);flex-shrink:0}
+.comm-search input{border:none;background:transparent;outline:none;font-size:12.5px;width:100%;color:var(--silver-dark)}
+.comm-list-scroll{flex:1;overflow-y:auto}
+.comm-list-item{display:flex;gap:10px;align-items:flex-start;padding:12px 14px;cursor:pointer;border-bottom:1px solid var(--border-tint-soft);transition:.12s}
+.comm-list-item:hover{background:var(--green-light-surface)}
+.comm-list-item.active{background:var(--green-light-surface);box-shadow:inset 3px 0 0 var(--green-accent)}
+.comm-list-item .clist-main{flex:1;min-width:0}
+.comm-list-item .clist-top{display:flex;align-items:baseline;justify-content:space-between;gap:6px}
+.comm-list-item .clist-name{font-weight:700;font-size:12.5px;color:var(--green-dark);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.comm-list-item .clist-time{font-size:10.5px;color:var(--silver-light);flex-shrink:0}
+.comm-list-item .clist-preview{display:flex;align-items:center;gap:4px;font-size:11.5px;color:var(--silver-light);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px}
+.comm-list-item .clist-preview svg{flex-shrink:0}
+.comm-unread-dot{width:8px;height:8px;border-radius:50%;background:var(--green-accent-hover);flex-shrink:0;margin-top:4px}
+.comm-list-empty{padding:44px 20px;text-align:center;color:var(--silver-light);font-size:13px}
+
+.comm-detail-pane{display:flex;flex-direction:column;min-height:0;background:var(--cream)}
+.comm-detail-head{display:flex;align-items:center;gap:12px;padding:14px 20px;border-bottom:1px solid var(--border-tint);background:var(--white);min-height:24px}
+.comm-detail-head .who b{display:block;font-size:14px;color:var(--green-dark)}
+.comm-detail-head .who span{font-size:12px;color:var(--silver-light)}
+.comm-detail-scroll{flex:1;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:16px}
+.comm-detail-empty{flex:1;display:flex;align-items:center;justify-content:center;color:var(--silver-light);font-size:13.5px}
+.comm-bubble-row{display:flex;gap:10px;max-width:80%}
+.comm-bubble-row.out{align-self:flex-end;flex-direction:row-reverse}
+.comm-bubble{background:var(--white);border:1px solid var(--border-tint);border-radius:var(--radius-lg);padding:12px 14px}
+.comm-bubble-row.out .comm-bubble{background:var(--green-light-surface);border-color:var(--green-light)}
+.comm-bubble .csubject{font-weight:700;color:var(--green-dark);font-size:13px;margin-bottom:6px}
+.comm-bubble .cbody{font-size:13px;color:var(--silver-dark);white-space:pre-wrap;line-height:1.6}
+.comm-bubble-meta{display:flex;align-items:center;gap:6px;font-size:10.5px;color:var(--silver-light);margin-top:6px}
+.comm-bubble-row.out .comm-bubble-meta{justify-content:flex-end}
+.comm-attach-card{display:flex;align-items:center;gap:8px;background:var(--green-light-surface);border-radius:var(--radius-sm);padding:7px 10px;margin-top:8px;font-size:12px;font-weight:600;color:var(--green-dark)}
+.comm-bubble-row.out .comm-attach-card{background:var(--white)}
+.comm-attach-card .asize{color:var(--silver-light);font-weight:500;margin-left:auto}
+.comm-readonly-note{display:flex;align-items:center;gap:8px;justify-content:center;padding:12px 20px;border-top:1px solid var(--border-tint);background:var(--white);font-size:11.5px;color:var(--silver-light);text-align:center}
+
+@media (max-width:900px){
+  .comm-inbox{grid-template-columns:1fr;height:auto}
+  .comm-list-pane{max-height:320px;border-right:none;border-bottom:1px solid var(--border-tint)}
+}
 .sim-result-box{border-radius:var(--radius-md);padding:14px 16px;font-size:13px;margin-top:4px;line-height:1.6}
 .sim-result-box.success{background:var(--success-bg);color:var(--success-text)}
 .sim-result-box.error{background:var(--error-bg);color:var(--error-text)}
@@ -686,18 +719,28 @@ textarea.field-control{resize:vertical;min-height:70px}
         <!-- Tab: Communications -->
         <div class="tab-pane" id="tab-communications" style="display:none">
           <div class="card card-pad">
-            <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:18px;flex-wrap:wrap;gap:12px">
-              <div>
-                <h3 class="section-title">Communications</h3>
-                <p class="section-sub" style="margin:0">Emails and WhatsApp messages matched to this shipment via ZELO ID or B/L Number.</p>
+            <h3 class="section-title" style="margin-bottom:2px">Communications</h3>
+            <p class="section-sub" style="margin:0 0 16px">Emails and WhatsApp messages matched to this shipment via ZELO ID or B/L Number.</p>
+            <div class="comm-inbox">
+              <div class="comm-list-pane">
+                <div class="comm-list-head">
+                  <div class="comm-filter-group" id="comm-filter-group"></div>
+                  <div class="comm-search">
+                    <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="M21 21l-4-4" stroke-linecap="round"></path></svg>
+                    <input type="text" id="comm-search-input" placeholder="Search messages...">
+                  </div>
+                </div>
+                <div class="comm-list-scroll" id="comm-list-scroll"></div>
               </div>
-              <div class="comm-filter-group" id="comm-filter-group">
-                <button class="comm-filter-btn" data-comm-filter="all">All</button>
-                <button class="comm-filter-btn" data-comm-filter="email">Email</button>
-                <button class="comm-filter-btn" data-comm-filter="whatsapp">WhatsApp</button>
+              <div class="comm-detail-pane">
+                <div class="comm-detail-head" id="comm-detail-head"></div>
+                <div class="comm-detail-scroll" id="comm-detail-scroll"></div>
+                <div class="comm-readonly-note" id="comm-readonly-note" style="display:none">
+                  <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="4" y="10" width="16" height="10" rx="2"></rect><path d="M8 10V7a4 4 0 018 0v3"></path></svg>
+                  Read-only — this platform doesn't support replying. Continue this conversation in Outlook or WhatsApp.
+                </div>
               </div>
             </div>
-            <div id="comm-thread-list"></div>
           </div>
         </div>
 
@@ -1504,6 +1547,9 @@ const state = {
   activeDocUpdate: null,
   activeDocDelete: null,
   commFilter: 'all',
+  commSearch: '',
+  selectedCommThread: null,
+  readThreads: new Set(),
 };
 const ownerModalState = { checked: new Set(), primary: null, responsibilities: {}, openRespUid: null };
 
@@ -1531,6 +1577,8 @@ function navTo(view){
 function openShipment(jobRef){
   state.currentShipmentRef = jobRef;
   state.commFilter = 'all';
+  state.commSearch = '';
+  state.selectedCommThread = null;
   state.currentView = 'shipment-detail';
   document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
   el('view-shipment-detail').classList.add('active');
@@ -1823,48 +1871,151 @@ function groupIntoThreads(comms){
   return order.map(key=>byThread[key].slice().sort((a,b)=>a.timestamp-b.timestamp));
 }
 
-function renderCommMessage(c){
-  const attachHtml = (c.attachments&&c.attachments.length)
-    ? `<div class="comm-attachments">${c.attachments.map(a=>`<span class="comm-attachment-pill">${ICON_PAPERCLIP}${escapeHtml(a.name)}</span>`).join('')}</div>`
-    : '';
-  const subjectHtml = c.source==='OUTLOOK' && c.subject ? `<div class="comm-subject">${escapeHtml(c.subject)}</div>` : '';
-  const groupHtml = c.source==='WATI' && c.groupName ? `<div class="comm-meta">Group: ${escapeHtml(c.groupName)}</div>` : '';
-  const recipientsHtml = (c.recipients && c.recipients.length) ? `<div class="comm-recipients">To: ${escapeHtml(c.recipients.join(', '))}</div>` : '';
-  return `
-  <div class="comm-msg">
-    <div class="comm-msg-head">
-      <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
-        <span class="comm-source-tag ${commTypeClass(c.source)}">${commTypeIcon(c.source)}${commTypeLabel(c.source)}</span>
-        <span class="comm-sender">${escapeHtml(c.sender)}</span>
+function hashStr(str){
+  let h = 0;
+  for(let i=0;i<str.length;i++) h = (h*31 + str.charCodeAt(i)) | 0;
+  return Math.abs(h);
+}
+function contactInitials(name){
+  const parts = String(name).replace(/[()]/g,'').trim().split(/\s+/).filter(Boolean);
+  if(!parts.length) return '?';
+  if(parts.length===1) return parts[0].slice(0,2).toUpperCase();
+  return (parts[0][0]+parts[1][0]).toUpperCase();
+}
+function contactFill(name){
+  const fills = ['dark','light','gold'];
+  return fills[hashStr(String(name)) % fills.length];
+}
+function isOutgoingComm(c){
+  if(c.source==='OUTLOOK') return normalizeEmail(c.sender).endsWith('@oneport365.com');
+  return TEAM.some(t=>t.name===c.sender);
+}
+function timeAgo(date){
+  const diffMs = Date.now() - date.getTime();
+  const mins = Math.floor(diffMs/60000);
+  if(mins < 1) return 'Just now';
+  if(mins < 60) return `${mins}m ago`;
+  const hours = Math.floor(mins/60);
+  if(hours < 24) return `${hours}h ago`;
+  const days = Math.floor(hours/24);
+  if(days < 7) return `${days}d ago`;
+  return formatDate(date);
+}
+function threadKey(thread){ return thread[0].sourceThreadId || thread[0].id; }
+function threadContact(thread){
+  const first = thread[0];
+  const name = first.groupName || first.sender;
+  let sub;
+  if(first.source==='OUTLOOK'){
+    sub = (first.recipients && first.recipients.length) ? `To: ${first.recipients.join(', ')}` : 'Email';
+  } else {
+    sub = first.groupName ? 'WhatsApp Group' : (first.phone || 'WhatsApp');
+  }
+  return { name, sub };
+}
+function threadPreview(thread){
+  const last = thread[thread.length-1];
+  return last.subject || last.content;
+}
+
+function updateCommFilterCounts(all, email, wa){
+  const btn = (key, label, count) => `<button class="comm-filter-btn ${state.commFilter===key?'active':''}" data-comm-filter="${key}">${label} <span class="cf-count">${count}</span></button>`;
+  el('comm-filter-group').innerHTML = btn('all','All',all) + btn('email','Email',email) + btn('whatsapp','WhatsApp',wa);
+}
+
+function renderCommList(threads){
+  if(!threads.length){
+    el('comm-list-scroll').innerHTML = `<div class="comm-list-empty">No communications matched to this shipment yet.</div>`;
+    return;
+  }
+  el('comm-list-scroll').innerHTML = threads.map(thread=>{
+    const key = threadKey(thread);
+    const contact = threadContact(thread);
+    const last = thread[thread.length-1];
+    const unread = !state.readThreads.has(key);
+    const active = state.selectedCommThread === key;
+    return `
+    <div class="comm-list-item ${active?'active':''}" data-comm-thread="${key}">
+      <div class="avatar avatar-sm" style="${avatarFillStyle(contactFill(contact.name))}">${contactInitials(contact.name)}</div>
+      <div class="clist-main">
+        <div class="clist-top">
+          <span class="clist-name">${escapeHtml(contact.name)}</span>
+          <span class="clist-time">${timeAgo(last.timestamp)}</span>
+        </div>
+        <div class="clist-preview">${commTypeIcon(last.source)}<span style="overflow:hidden;text-overflow:ellipsis">${escapeHtml(threadPreview(thread))}</span></div>
       </div>
-      <span class="comm-meta">${formatDateTime(c.timestamp)}</span>
+      ${unread ? '<span class="comm-unread-dot"></span>' : ''}
+    </div>`;
+  }).join('');
+}
+
+function renderCommBubble(c){
+  const outgoing = isOutgoingComm(c);
+  const attachHtml = (c.attachments&&c.attachments.length) ? c.attachments.map(a=>`
+    <div class="comm-attach-card">${ICON_PAPERCLIP}<span>${escapeHtml(a.name)}</span><span class="asize">${formatBytes(a.sizeBytes)}</span></div>
+  `).join('') : '';
+  const subjectHtml = c.source==='OUTLOOK' && c.subject ? `<div class="csubject">${escapeHtml(c.subject)}</div>` : '';
+  return `
+  <div class="comm-bubble-row ${outgoing?'out':''}">
+    <div class="avatar avatar-sm" style="${avatarFillStyle(contactFill(c.sender))}">${contactInitials(c.sender)}</div>
+    <div>
+      <div class="comm-bubble">
+        ${subjectHtml}
+        <div class="cbody">${escapeHtml(c.content)}</div>
+        ${attachHtml}
+      </div>
+      <div class="comm-bubble-meta">${commTypeIcon(c.source)}${commTypeLabel(c.source)} · ${escapeHtml(c.sender)} · ${formatDateTime(c.timestamp)}</div>
     </div>
-    ${groupHtml}
-    ${recipientsHtml}
-    ${subjectHtml}
-    <div class="comm-body">${escapeHtml(c.content)}</div>
-    ${attachHtml}
   </div>`;
 }
 
-function renderThread(thread){
-  return `<div class="comm-thread">${thread.map(renderCommMessage).join('')}</div>`;
+function renderCommDetail(threads){
+  const key = state.selectedCommThread;
+  const thread = threads.find(t=>threadKey(t)===key);
+  if(!thread){
+    el('comm-detail-head').innerHTML = '';
+    el('comm-detail-scroll').innerHTML = `<div class="comm-detail-empty">Select a conversation to view messages.</div>`;
+    el('comm-readonly-note').style.display = 'none';
+    return;
+  }
+  const contact = threadContact(thread);
+  const last = thread[thread.length-1];
+  el('comm-detail-head').innerHTML = `
+    <div class="avatar avatar-md" style="${avatarFillStyle(contactFill(contact.name))}">${contactInitials(contact.name)}</div>
+    <div class="who">
+      <b>${escapeHtml(contact.name)}</b>
+      <span>${escapeHtml(contact.sub)} · Last message ${timeAgo(last.timestamp)}</span>
+    </div>`;
+  el('comm-detail-scroll').innerHTML = thread.map(renderCommBubble).join('');
+  el('comm-detail-scroll').scrollTop = el('comm-detail-scroll').scrollHeight;
+  el('comm-readonly-note').style.display = 'flex';
 }
 
 function renderCommunications(){
   const s = currentShipment();
-  const filter = state.commFilter;
-  document.querySelectorAll('#comm-filter-group .comm-filter-btn').forEach(b=>b.classList.toggle('active', b.dataset.commFilter===filter));
+  const allComms = (s.communications||[]).slice().sort((a,b)=>a.timestamp-b.timestamp);
+  updateCommFilterCounts(allComms.length, allComms.filter(c=>c.source==='OUTLOOK').length, allComms.filter(c=>c.source==='WATI').length);
 
-  let comms = (s.communications||[]).slice().sort((a,b)=>a.timestamp-b.timestamp);
-  if(filter==='email') comms = comms.filter(c=>c.source==='OUTLOOK');
-  else if(filter==='whatsapp') comms = comms.filter(c=>c.source==='WATI');
+  let comms = allComms;
+  if(state.commFilter==='email') comms = comms.filter(c=>c.source==='OUTLOOK');
+  else if(state.commFilter==='whatsapp') comms = comms.filter(c=>c.source==='WATI');
 
-  if(!comms.length){
-    el('comm-thread-list').innerHTML = `<div class="comm-empty">No communications matched to this shipment yet.</div>`;
-    return;
+  const q = (state.commSearch||'').trim().toLowerCase();
+  let threads = groupIntoThreads(comms);
+  if(q){
+    threads = threads.filter(thread=>{
+      const contact = threadContact(thread);
+      const hay = [contact.name, contact.sub, ...thread.map(m=>m.content), ...thread.map(m=>m.subject||'')].join(' ').toLowerCase();
+      return hay.includes(q);
+    });
   }
-  el('comm-thread-list').innerHTML = groupIntoThreads(comms).map(renderThread).join('');
+  threads.sort((a,b)=> b[b.length-1].timestamp - a[a.length-1].timestamp);
+
+  const keys = threads.map(threadKey);
+  if(!keys.includes(state.selectedCommThread)) state.selectedCommThread = keys[0] || null;
+
+  renderCommList(threads);
+  renderCommDetail(threads);
 }
 
 /* ==========================================================================
@@ -2435,6 +2586,15 @@ document.body.addEventListener('click', (e)=>{
   const commFilterBtn = t.closest('[data-comm-filter]');
   if(commFilterBtn){ state.commFilter = commFilterBtn.dataset.commFilter; renderCommunications(); return; }
 
+  const commThreadItem = t.closest('[data-comm-thread]');
+  if(commThreadItem){
+    const key = commThreadItem.dataset.commThread;
+    state.selectedCommThread = key;
+    state.readThreads.add(key);
+    renderCommunications();
+    return;
+  }
+
   if(t.closest('#btn-simulate-comm')){ openSimulateModal(); return; }
 
   if(t.closest('#btn-upload-docs')){ openUploadDocsModal(); return; }
@@ -2451,6 +2611,11 @@ document.body.addEventListener('click', (e)=>{
 el('shipment-search').addEventListener('input', (e)=>{
   state.searchQuery = e.target.value;
   renderShipmentsList();
+});
+
+el('comm-search-input').addEventListener('input', (e)=>{
+  state.commSearch = e.target.value;
+  renderCommunications();
 });
 
 /* ==========================================================================
