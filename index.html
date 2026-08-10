@@ -949,11 +949,12 @@ textarea.field-control{resize:vertical;min-height:70px}
     <div class="modal-head">
       <div>
         <h3>Simulate Incoming Communication</h3>
-        <p>Draft a test email or WhatsApp message and run it through the same deterministic ZELO ID / B/L Number matcher used for real Outlook and WATI ingestion.</p>
+        <p>Draft a test email or WhatsApp message and run it through the same trigger policy and deterministic ZELO ID / B/L Number matcher used for real Outlook and WATI ingestion.</p>
       </div>
       <button class="modal-close" data-close-modal><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18" stroke-linecap="round"></path></svg></button>
     </div>
     <div class="modal-body">
+      <div class="field-hint" id="sim-watchlist-hint" style="margin-bottom:16px"></div>
       <div class="form-grid">
         <div class="form-field filled">
           <label class="field-label">Source</label>
@@ -973,6 +974,10 @@ textarea.field-control{resize:vertical;min-height:70px}
         <div class="form-field full" id="sim-group-field" style="display:none">
           <label class="field-label">WhatsApp Group Name (optional)</label>
           <input class="field-control" id="sim-group" placeholder="e.g. Ops Team — Customer X">
+        </div>
+        <div class="form-field full" id="sim-phone-field" style="display:none">
+          <label class="field-label">Phone Number (used for trigger matching)</label>
+          <input class="field-control" id="sim-phone" placeholder="e.g. +2348020001122">
         </div>
         <div class="form-field full">
           <label class="field-label">Recipients (comma-separated, optional)</label>
@@ -1310,7 +1315,7 @@ const COMMUNICATIONS_MOCK = [
     timestamp:new Date(2026,6,13,9,20), sourceMessageId:'MSG-OUT-10021', sourceThreadId:'THREAD-OUT-771',
     attachments:[{name:'Vessel_Departure_Confirmation.pdf', sizeBytes:184320}]},
 
-  {id:'c2', source:'WATI', sender:'Chinedu Okafor', groupName:'OnePort Ops — Dangote Team', recipients:['Ops Desk'],
+  {id:'c2', source:'WATI', sender:'Chinedu Okafor', groupName:'OnePort Ops — Dangote Team', recipients:['Ops Desk'], phone:'+2348020001122',
     content:'Good morning, kindly confirm ETA for ZELO000001. Customer is asking for an update.',
     timestamp:new Date(2026,6,15,11,5), sourceMessageId:'WATI-55210', sourceThreadId:'WATI-CONV-4471',
     attachments:[]},
@@ -1332,7 +1337,7 @@ const COMMUNICATIONS_MOCK = [
     timestamp:new Date(2026,6,21,16,5), sourceMessageId:'MSG-OUT-10122', sourceThreadId:'THREAD-OUT-845',
     attachments:[{name:'Customs_Status_Update.pdf', sizeBytes:152064}]},
 
-  {id:'c6', source:'WATI', sender:'Amaka (MTN Nigeria)', groupName:'MTN Nigeria — Air Freight Updates', recipients:['Titi Aluko','James Adewale'],
+  {id:'c6', source:'WATI', sender:'Amaka (MTN Nigeria)', groupName:'MTN Nigeria — Air Freight Updates', recipients:['Titi Aluko','James Adewale'], phone:'+2348020001122',
     content:'Hi team, noting that ZELO000004 has been cancelled on our end per our last call. Please confirm no further action is needed.',
     timestamp:new Date(2026,6,22,13,30), sourceMessageId:'WATI-55402', sourceThreadId:'WATI-CONV-4520',
     attachments:[]},
@@ -1349,7 +1354,7 @@ const COMMUNICATIONS_MOCK = [
     timestamp:new Date(2026,6,24,12,15), sourceMessageId:'MSG-OUT-10167', sourceThreadId:'THREAD-OUT-878',
     attachments:[{name:'Conflicting_Reference_Docs.pdf', sizeBytes:63488}]},
 
-  {id:'c9', source:'WATI', sender:'Sarah Adeyemi', recipients:['Ops Group'],
+  {id:'c9', source:'WATI', sender:'Sarah Adeyemi', recipients:['Ops Group'], phone:'+2348020001122',
     content:'Good morning everyone, hope you all have a great week ahead!',
     timestamp:new Date(2026,6,25,9,0), sourceMessageId:'WATI-55430', sourceThreadId:'WATI-CONV-4531',
     attachments:[]},
@@ -1360,16 +1365,66 @@ const COMMUNICATIONS_MOCK = [
     timestamp:new Date(2026,6,26,15,45), sourceMessageId:'MSG-OUT-10190', sourceThreadId:'THREAD-OUT-902',
     attachments:[{name:'Packing_List_Export.xlsx', sizeBytes:45056},{name:'Certificate_of_Origin_Export.pdf', sizeBytes:71680}]},
 
-  {id:'c11', source:'WATI', sender:'Ada Nwosu', recipients:['Finance Desk'],
+  {id:'c11', source:'WATI', sender:'Ada Nwosu', recipients:['Finance Desk'], phone:'+2348020001122',
     content:'Hi, can we get confirmation that the final invoice for ZELO000006 has been settled?',
     timestamp:new Date(2026,5,25,10,0), sourceMessageId:'WATI-55011', sourceThreadId:'WATI-CONV-4200',
     attachments:[]},
 
-  {id:'c12', source:'WATI', sender:'Nigerian Breweries Finance', recipients:['Ada Nwosu'],
+  {id:'c12', source:'WATI', sender:'Nigerian Breweries Finance', recipients:['Ada Nwosu'], phone:'+2348020001122',
     content:'Confirmed — payment for ZELO000006 was settled this morning. Thank you.',
     timestamp:new Date(2026,5,25,14,30), sourceMessageId:'WATI-55015', sourceThreadId:'WATI-CONV-4200',
     attachments:[]},
+
+  // Deliberately NOT on the watch-list (external sender + external distribution list) —
+  // demonstrates the trigger policy blocking ingestion even though a valid ZELO ID is present.
+  {id:'c13', source:'OUTLOOK', sender:'newsletter@shippingweekly.com', recipients:['distribution@shippingweekly-subscribers.com'],
+    subject:'Industry News feat. ZELO000001',
+    content:'This week in shipping news, we highlight ZELO000001 as an example of efficient customs clearance...',
+    timestamp:new Date(2026,6,27,8,0), sourceMessageId:'MSG-OUT-10210', sourceThreadId:'THREAD-OUT-915',
+    attachments:[]},
 ];
+
+/* ==========================================================================
+   Customer Engagement Trigger Policy — internal ingestion watch-list.
+   A communication is only pulled into the pipeline at all if it was sent or
+   received by a watched email (or a member of its distribution list) or a
+   watched phone number. This runs BEFORE shipment matching and is entirely
+   separate from it — sender/recipient identity still never decides WHICH
+   shipment a communication belongs to (that stays ZELO ID / B/L Number only).
+   ========================================================================== */
+const EMAIL_WATCHLIST = [
+  {address:'ops@oneport365.com', label:'Ops Distribution List', members:['sarah.adeyemi@oneport365.com','michael.ibe@oneport365.com','ada.nwosu@oneport365.com','chidi.eze@oneport365.com','titi.aluko@oneport365.com','james.adewale@oneport365.com']},
+  {address:'finance@oneport365.com', label:'Finance Distribution List', members:['ada.nwosu@oneport365.com']},
+];
+const PHONE_WATCHLIST = [
+  {number:'+2348020001122', label:'OnePort Ops WhatsApp Business Line'},
+  {number:'+2348032219087', label:'Dufil Prima Foods — Primary Contact'},
+];
+
+function normalizeEmail(e){ return (e||'').trim().toLowerCase(); }
+function normalizePhone(p){ return (p||'').replace(/[^\d+]/g,''); }
+
+function isWatchedEmail(address){
+  const norm = normalizeEmail(address);
+  if(!norm) return false;
+  return EMAIL_WATCHLIST.some(rule => normalizeEmail(rule.address)===norm || rule.members.some(m=>normalizeEmail(m)===norm));
+}
+function isWatchedPhone(number){
+  const norm = normalizePhone(number);
+  if(!norm) return false;
+  return PHONE_WATCHLIST.some(rule => normalizePhone(rule.number)===norm);
+}
+
+// "Sent or received" — checked against sender AND recipients, either direction.
+function matchesTriggerPolicy(comm){
+  if(comm.source==='OUTLOOK'){
+    return [comm.sender, ...(comm.recipients||[])].some(isWatchedEmail);
+  }
+  if(comm.source==='WATI'){
+    return [comm.phone, comm.sender, ...(comm.recipients||[])].filter(Boolean).some(isWatchedPhone);
+  }
+  return false;
+}
 
 // Deterministic, rules-based extraction — no LLM/AI inference. ZELO regex + exact B/L
 // lookup against the shipment DB (the only available validation layer, per spec §20).
@@ -1405,7 +1460,13 @@ function resolveShipmentMatches(comm){
 }
 
 function ingestCommunication(comm){
+  if(!matchesTriggerPolicy(comm)){
+    console.info(`[Communications] Not ingested — ${comm.id} sender/recipients are not on the watched email/number list (customer engagement trigger policy).`);
+    comm.matchedShipments = [];
+    return { triggered:false, matches:[], conflict:false, zeloMatches:[], blMatches:[], invalidZelo:[] };
+  }
   const result = resolveShipmentMatches(comm);
+  result.triggered = true;
   comm.matchedShipments = result.matches;
   result.matches.forEach(jobRef=>{
     const s = SHIPMENTS[jobRef];
@@ -2185,23 +2246,32 @@ el('confirm-delete-doc').addEventListener('click', ()=>{
 /* ==========================================================================
    Simulate Incoming Communication — manual test harness for the matcher
    ========================================================================== */
+function renderWatchlistHint(){
+  const emailBits = EMAIL_WATCHLIST.map(r=>`${r.address}${r.members.length ? ' (+ '+r.members.length+' DL members)' : ''}`).join(', ');
+  const phoneBits = PHONE_WATCHLIST.map(r=>`${r.number} — ${r.label}`).join(', ');
+  el('sim-watchlist-hint').innerHTML = `<b>Active watch-list</b> (customer engagement trigger policy) — only messages sent or received by these are ingested at all.<br>Emails: ${emailBits}<br>Numbers: ${phoneBits}`;
+}
 function openSimulateModal(){
   el('sim-source').value = 'OUTLOOK';
   el('sim-sender').value = '';
   el('sim-subject').value = '';
   el('sim-group').value = '';
+  el('sim-phone').value = '';
   el('sim-recipients').value = '';
   el('sim-content').value = '';
   el('sim-attachments').value = '';
   el('sim-subject-field').style.display = '';
   el('sim-group-field').style.display = 'none';
+  el('sim-phone-field').style.display = 'none';
   el('sim-result').style.display = 'none';
+  renderWatchlistHint();
   openModal('modal-simulate-comm');
 }
 el('sim-source').addEventListener('change', ()=>{
   const isEmail = el('sim-source').value === 'OUTLOOK';
   el('sim-subject-field').style.display = isEmail ? '' : 'none';
   el('sim-group-field').style.display = isEmail ? 'none' : '';
+  el('sim-phone-field').style.display = isEmail ? 'none' : '';
 });
 function renderSimResult(html, isError){
   const box = el('sim-result');
@@ -2217,6 +2287,7 @@ el('save-simulate-comm').addEventListener('click', ()=>{
   const recipients = el('sim-recipients').value.split(',').map(r=>r.trim()).filter(Boolean);
   const subject = source==='OUTLOOK' ? el('sim-subject').value.trim() : '';
   const groupName = source==='WATI' ? el('sim-group').value.trim() : '';
+  const phone = source==='WATI' ? el('sim-phone').value.trim() : '';
   const attachments = el('sim-attachments').value.split(',').map(a=>a.trim()).filter(Boolean)
     .map(name=>({name, sizeBytes: 40000 + name.length*500}));
 
@@ -2225,6 +2296,7 @@ el('save-simulate-comm').addEventListener('click', ()=>{
     source, sender, recipients,
     subject: subject || undefined,
     groupName: groupName || undefined,
+    phone: phone || undefined,
     content,
     timestamp: new Date(),
     sourceMessageId: makeId('MSG-SIM'),
@@ -2235,7 +2307,10 @@ el('save-simulate-comm').addEventListener('click', ()=>{
   const result = ingestCommunication(comm);
   COMMUNICATIONS_MOCK.push(comm);
 
-  if(result.matches.length){
+  if(!result.triggered){
+    renderSimResult(`<b>Not ingested.</b> Sender/recipients aren't on the watched email/DL or phone number list, so this communication never entered the pipeline — per the customer engagement trigger policy, ZELO/B/L matching was never attempted. Check the browser console for the log.`, true);
+    showToast('Not on watch-list — communication not ingested', 'error');
+  } else if(result.matches.length){
     renderSimResult(`<b>Matched to:</b> ${result.matches.join(', ')} — now visible in ${result.matches.length>1?'each shipment\'s':'the shipment\'s'} Communications tab${attachments.length ? ' and Documents tab' : ''}.`, false);
     showToast(`Communication matched to ${result.matches.join(', ')}`);
   } else if(result.conflict){
