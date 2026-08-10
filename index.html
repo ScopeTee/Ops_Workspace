@@ -1470,6 +1470,7 @@ function navTo(view){
 function openShipment(jobRef){
   state.currentShipmentRef = jobRef;
   state.commFilter = 'all';
+  state.currentView = 'shipment-detail';
   document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
   el('view-shipment-detail').classList.add('active');
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.toggle('active', n.dataset.nav==='shipments'));
