@@ -413,6 +413,9 @@ textarea.field-control{resize:vertical;min-height:70px}
 .comm-attachments{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
 .comm-attachment-pill{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;color:var(--green-dark);background:var(--green-light-surface);padding:6px 10px;border-radius:var(--radius-sm)}
 .comm-empty{text-align:center;color:var(--silver-light);padding:40px;font-size:13.5px}
+.sim-result-box{border-radius:var(--radius-md);padding:14px 16px;font-size:13px;margin-top:4px;line-height:1.6}
+.sim-result-box.success{background:var(--success-bg);color:var(--success-text)}
+.sim-result-box.error{background:var(--error-bg);color:var(--error-text)}
 
 @media (max-width:900px){
   .form-grid{grid-template-columns:1fr}
@@ -464,6 +467,10 @@ textarea.field-control{resize:vertical;min-height:70px}
   <div class="main">
     <header class="topbar">
       <div class="breadcrumbs" id="breadcrumbs"></div>
+      <button class="btn btn-outline btn-sm" id="btn-simulate-comm" style="margin-left:auto">
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 3h6M10 3v5.5L4.5 18a2 2 0 001.7 3h11.6a2 2 0 001.7-3L14 8.5V3" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+        Simulate Communication
+      </button>
     </header>
 
     <main class="content">
@@ -936,6 +943,59 @@ textarea.field-control{resize:vertical;min-height:70px}
   </div>
 </div>
 
+<!-- Simulate Incoming Communication (test harness for the deterministic matcher) -->
+<div class="modal-overlay" id="modal-simulate-comm">
+  <div class="modal modal-wide">
+    <div class="modal-head">
+      <div>
+        <h3>Simulate Incoming Communication</h3>
+        <p>Draft a test email or WhatsApp message and run it through the same deterministic ZELO ID / B/L Number matcher used for real Outlook and WATI ingestion.</p>
+      </div>
+      <button class="modal-close" data-close-modal><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18" stroke-linecap="round"></path></svg></button>
+    </div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="form-field filled">
+          <label class="field-label">Source</label>
+          <select class="field-control" id="sim-source">
+            <option value="OUTLOOK">Outlook (Email)</option>
+            <option value="WATI">WATI (WhatsApp)</option>
+          </select>
+        </div>
+        <div class="form-field">
+          <label class="field-label">Sender</label>
+          <input class="field-control" id="sim-sender" placeholder="e.g. ops@carrier.com or +234 803 000 0000">
+        </div>
+        <div class="form-field full" id="sim-subject-field">
+          <label class="field-label">Subject</label>
+          <input class="field-control" id="sim-subject" placeholder="e.g. RE: ZELO000002 Vessel Update">
+        </div>
+        <div class="form-field full" id="sim-group-field" style="display:none">
+          <label class="field-label">WhatsApp Group Name (optional)</label>
+          <input class="field-control" id="sim-group" placeholder="e.g. Ops Team — Customer X">
+        </div>
+        <div class="form-field full">
+          <label class="field-label">Recipients (comma-separated, optional)</label>
+          <input class="field-control" id="sim-recipients" placeholder="e.g. ops@oneport365.com, finance@oneport365.com">
+        </div>
+        <div class="form-field full">
+          <label class="field-label">Message Content</label>
+          <textarea class="field-control" id="sim-content" rows="5" placeholder="Type the message body — include a ZELOxxxxxx ID or a shipment's Bill of Lading number to test matching..."></textarea>
+        </div>
+        <div class="form-field full">
+          <label class="field-label">Attachment file name(s) (comma-separated, optional)</label>
+          <input class="field-control" id="sim-attachments" placeholder="e.g. Booking_Confirmation.pdf">
+        </div>
+      </div>
+      <div class="sim-result-box" id="sim-result" style="display:none"></div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-outline" data-close-modal>Close</button>
+      <button class="btn btn-accent" id="save-simulate-comm">Ingest &amp; Match</button>
+    </div>
+  </div>
+</div>
+
 <div id="toast-wrap"></div>
 
 <script>
@@ -1321,6 +1381,8 @@ function extractBlMatches(text){
   return Object.values(SHIPMENTS).filter(s=>s.bl && text.includes(s.bl)).map(s=>s.jobRef);
 }
 
+// Returns { matches, conflict, zeloMatches, blMatches, invalidZelo } — never guesses,
+// never uses AI. See spec §6 (deterministic matching) and §19 (error handling).
 function resolveShipmentMatches(comm){
   const text = [comm.subject||'', comm.content||''].join(' ');
   const zeloIds = extractZeloIds(text);
@@ -1329,22 +1391,23 @@ function resolveShipmentMatches(comm){
   if(invalidZelo.length){
     console.warn(`[Communications] Unresolved ZELO reference(s) in ${comm.id}:`, invalidZelo);
   }
-  const zeloMatches = new Set(validZelo);
-  const blMatches = new Set(extractBlMatches(text));
+  const zeloMatches = [...new Set(validZelo)];
+  const blMatches = [...new Set(extractBlMatches(text))];
 
-  if(zeloMatches.size && blMatches.size){
+  if(zeloMatches.length && blMatches.length){
     const combined = new Set([...zeloMatches, ...blMatches]);
     if(combined.size > 1){
-      console.warn(`[Communications] Conflicting shipment references in ${comm.id}: ZELO→[${[...zeloMatches]}] vs B/L→[${[...blMatches]}]. Not associating — logged for review.`);
-      return [];
+      console.warn(`[Communications] Conflicting shipment references in ${comm.id}: ZELO→[${zeloMatches}] vs B/L→[${blMatches}]. Not associating — logged for review.`);
+      return { matches: [], conflict: true, zeloMatches, blMatches, invalidZelo };
     }
   }
-  return [...new Set([...zeloMatches, ...blMatches])];
+  return { matches: [...new Set([...zeloMatches, ...blMatches])], conflict: false, zeloMatches, blMatches, invalidZelo };
 }
 
-COMMUNICATIONS_MOCK.forEach(comm=>{
-  comm.matchedShipments = resolveShipmentMatches(comm);
-  comm.matchedShipments.forEach(jobRef=>{
+function ingestCommunication(comm){
+  const result = resolveShipmentMatches(comm);
+  comm.matchedShipments = result.matches;
+  result.matches.forEach(jobRef=>{
     const s = SHIPMENTS[jobRef];
     s.communications.push(comm);
     (comm.attachments||[]).forEach(att=>{
@@ -1362,7 +1425,10 @@ COMMUNICATIONS_MOCK.forEach(comm=>{
       });
     });
   });
-});
+  return result;
+}
+
+COMMUNICATIONS_MOCK.forEach(ingestCommunication);
 
 /* ==========================================================================
    App state & routing
@@ -2116,6 +2182,76 @@ el('confirm-delete-doc').addEventListener('click', ()=>{
 });
 
 /* ==========================================================================
+   Simulate Incoming Communication — manual test harness for the matcher
+   ========================================================================== */
+function openSimulateModal(){
+  el('sim-source').value = 'OUTLOOK';
+  el('sim-sender').value = '';
+  el('sim-subject').value = '';
+  el('sim-group').value = '';
+  el('sim-recipients').value = '';
+  el('sim-content').value = '';
+  el('sim-attachments').value = '';
+  el('sim-subject-field').style.display = '';
+  el('sim-group-field').style.display = 'none';
+  el('sim-result').style.display = 'none';
+  openModal('modal-simulate-comm');
+}
+el('sim-source').addEventListener('change', ()=>{
+  const isEmail = el('sim-source').value === 'OUTLOOK';
+  el('sim-subject-field').style.display = isEmail ? '' : 'none';
+  el('sim-group-field').style.display = isEmail ? 'none' : '';
+});
+function renderSimResult(html, isError){
+  const box = el('sim-result');
+  box.className = 'sim-result-box ' + (isError ? 'error' : 'success');
+  box.style.display = 'block';
+  box.innerHTML = html;
+}
+el('save-simulate-comm').addEventListener('click', ()=>{
+  const source = el('sim-source').value;
+  const sender = el('sim-sender').value.trim();
+  const content = el('sim-content').value.trim();
+  if(!sender || !content){ showToast('Sender and message content are required', 'error'); return; }
+  const recipients = el('sim-recipients').value.split(',').map(r=>r.trim()).filter(Boolean);
+  const subject = source==='OUTLOOK' ? el('sim-subject').value.trim() : '';
+  const groupName = source==='WATI' ? el('sim-group').value.trim() : '';
+  const attachments = el('sim-attachments').value.split(',').map(a=>a.trim()).filter(Boolean)
+    .map(name=>({name, sizeBytes: 40000 + name.length*500}));
+
+  const comm = {
+    id: makeId('sim'),
+    source, sender, recipients,
+    subject: subject || undefined,
+    groupName: groupName || undefined,
+    content,
+    timestamp: new Date(),
+    sourceMessageId: makeId('MSG-SIM'),
+    sourceThreadId: makeId('THREAD-SIM'),
+    attachments,
+  };
+
+  const result = ingestCommunication(comm);
+  COMMUNICATIONS_MOCK.push(comm);
+
+  if(result.matches.length){
+    renderSimResult(`<b>Matched to:</b> ${result.matches.join(', ')} — now visible in ${result.matches.length>1?'each shipment\'s':'the shipment\'s'} Communications tab${attachments.length ? ' and Documents tab' : ''}.`, false);
+    showToast(`Communication matched to ${result.matches.join(', ')}`);
+  } else if(result.conflict){
+    renderSimResult(`<b>Conflicting references detected</b> — the ZELO ID and B/L Number in this message point to different shipments (ZELO → ${result.zeloMatches.join(', ')||'—'}, B/L → ${result.blMatches.join(', ')||'—'}). Per the matching rules, no association was made. Check the browser console for the logged conflict.`, true);
+    showToast('Conflict detected — not associated', 'error');
+  } else {
+    renderSimResult(`<b>No shipment reference recognized.</b> This communication was not stored against any shipment — there is no unmatched-communications queue in this MVP.`, true);
+    showToast('No shipment reference recognized', 'error');
+  }
+
+  if(state.currentView==='shipment-detail' && result.matches.includes(state.currentShipmentRef)){
+    renderCommunications();
+    renderDocuments();
+  }
+});
+
+/* ==========================================================================
    Global delegated click handling
    (covers all elements that get recreated by innerHTML re-renders)
    ========================================================================== */
@@ -2222,6 +2358,8 @@ document.body.addEventListener('click', (e)=>{
 
   const commFilterBtn = t.closest('[data-comm-filter]');
   if(commFilterBtn){ state.commFilter = commFilterBtn.dataset.commFilter; renderCommunications(); return; }
+
+  if(t.closest('#btn-simulate-comm')){ openSimulateModal(); return; }
 
   if(t.closest('#btn-upload-docs')){ openUploadDocsModal(); return; }
   const docView = t.closest('[data-doc-view]');
