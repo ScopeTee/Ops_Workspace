@@ -359,6 +359,9 @@ textarea.field-control{resize:vertical;min-height:70px}
 .tag-terminal{background:var(--green-chip-bg);color:#4a5a3f}
 .tag-vessel{background:var(--green-light);color:var(--green-dark)}
 .tag-haulage{background:var(--gold-bg);color:var(--gold-text)}
+.tag-airport{background:var(--green-chip-bg);color:#4a5a3f}
+.tag-flight{background:var(--green-light);color:var(--green-dark)}
+.tag-customs{background:var(--success-bg);color:var(--success-text)}
 .timeline-content .ttitle{font-weight:700;color:var(--green-dark);font-size:13.5px}
 .timeline-item.pending .timeline-content .ttitle{color:var(--silver-light);font-weight:600}
 .timeline-content .tmeta{font-size:12px;color:var(--silver-light);margin-top:3px}
@@ -393,8 +396,23 @@ textarea.field-control{resize:vertical;min-height:70px}
 .list-search svg{color:var(--silver-light);flex-shrink:0}
 .list-search input{border:none;outline:none;background:transparent;font-size:13.5px;width:100%;color:var(--silver-dark)}
 
+/* Create Shipment — service type picker */
+.service-type-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.service-type-card{display:flex;flex-direction:column;align-items:flex-start;gap:10px;text-align:left;background:var(--white);border:1.5px solid var(--border-tint);border-radius:var(--radius-lg);padding:18px;cursor:pointer;transition:.14s;width:100%}
+.service-type-card:hover{border-color:var(--green-accent-hover)}
+.service-type-card.active{border-color:var(--green-dark);background:var(--green-light-surface);box-shadow:0 0 0 3px rgba(191,251,79,.25)}
+.service-type-card .stc-icon{width:44px;height:44px;border-radius:12px;background:var(--green-light-surface);display:grid;place-items:center;color:var(--green-dark);flex-shrink:0}
+.service-type-card.active .stc-icon{background:var(--green-accent)}
+.service-type-card .stc-icon svg{width:20px;height:20px}
+.service-type-card .stc-label{font-family:var(--font-display);font-weight:600;font-size:14.5px;color:var(--green-dark)}
+.service-type-card .stc-blurb{font-size:12px;color:var(--silver-light);line-height:1.4}
+.form-section-label{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--silver-light);border-top:1px solid var(--border-tint);padding-top:14px;margin-bottom:2px}
+.owner-chip-toggle{border:1.5px solid var(--border-tint);background:var(--white);color:var(--silver-dark)}
+.owner-chip-toggle.active{background:var(--green-accent);border-color:var(--green-accent);color:var(--green-dark)}
+
 @media (max-width:900px){
   .form-grid{grid-template-columns:1fr}
+  .service-type-grid{grid-template-columns:1fr}
 }
 </style>
 </head>
@@ -503,7 +521,7 @@ textarea.field-control{resize:vertical;min-height:70px}
 
         <div class="list-search">
           <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="M21 21l-4-4" stroke-linecap="round"></path></svg>
-          <input type="text" id="shipment-search" placeholder="Search by Shipment Number or Shipment Owner...">
+          <input type="text" id="shipment-search" placeholder="Search by Shipment Number, Customer, or Owner...">
         </div>
 
         <div class="card">
@@ -513,9 +531,8 @@ textarea.field-control{resize:vertical;min-height:70px}
                 <tr>
                   <th>Shipment Number</th>
                   <th>Customer</th>
-                  <th>POL</th>
-                  <th>POD</th>
-                  <th>Transport Mode</th>
+                  <th>Service Type</th>
+                  <th>Route</th>
                   <th>Shipment Status</th>
                   <th>SLA Status</th>
                   <th>Owner</th>
@@ -569,29 +586,7 @@ textarea.field-control{resize:vertical;min-height:70px}
             </div>
           </div>
 
-          <div class="card card-pad">
-            <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:18px;flex-wrap:wrap;gap:12px">
-              <div>
-                <h3 class="section-title">
-                  <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 8l-9-5-9 5 9 5 9-5zM3 8v8l9 5 9-5V8M12 13v8"></path></svg>
-                  Containers
-                </h3>
-                <p class="section-sub" style="margin:0">Equipment assigned to this shipment.</p>
-              </div>
-              <button class="btn btn-accent btn-sm" id="btn-add-container">
-                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" stroke-linecap="round"></path></svg>
-                Add Container
-              </button>
-            </div>
-            <div class="table-wrap">
-              <table class="data-table">
-                <thead>
-                  <tr><th>Container Number</th><th>Size</th><th>Type</th><th>Seal Number</th><th>Weight</th><th style="text-align:right">Actions</th></tr>
-                </thead>
-                <tbody id="container-tbody"></tbody>
-              </table>
-            </div>
-          </div>
+          <div class="card card-pad" id="cargo-card"></div>
         </div>
 
         <!-- Tab: Progress -->
@@ -892,6 +887,42 @@ textarea.field-control{resize:vertical;min-height:70px}
   </div>
 </div>
 
+<!-- Create Shipment (manual, 2-step) -->
+<div class="modal-overlay" id="modal-create-shipment">
+  <div class="modal modal-wide">
+    <div class="modal-head">
+      <div>
+        <h3 id="create-modal-title">New Shipment — Choose Service Type</h3>
+        <p id="create-modal-sub">Select the type of service this shipment requires.</p>
+      </div>
+      <button class="modal-close" data-close-modal><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18" stroke-linecap="round"></path></svg></button>
+    </div>
+    <div class="modal-body">
+      <div id="create-step-1">
+        <div class="service-type-grid" id="create-category-grid"></div>
+      </div>
+      <div id="create-step-2" style="display:none">
+        <div class="chip chip-neutral" id="create-step2-category-badge" style="margin-bottom:16px"></div>
+        <div class="form-grid" id="create-common-fields"></div>
+        <div class="form-section-label">Service Details</div>
+        <div class="form-grid" id="create-category-fields"></div>
+        <div class="form-section-label">Shipment Team</div>
+        <div class="form-grid">
+          <div class="form-field filled">
+            <label class="field-label">Primary Owner</label>
+            <select class="field-control" id="create-owner-primary"></select>
+          </div>
+          <div class="form-field full">
+            <div style="font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--silver-light);font-weight:700;margin-bottom:8px">Supporting Owners (optional)</div>
+            <div id="create-owner-supporting" style="display:flex;flex-wrap:wrap;gap:8px"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-foot" id="create-modal-foot"></div>
+  </div>
+</div>
+
 <div id="toast-wrap"></div>
 
 <script>
@@ -905,10 +936,18 @@ const ICON_BUILDING = `<svg width="12" height="12" fill="none" stroke="currentCo
 const ICON_PERSON = `<svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"></circle><path d="M4 21v-1a8 8 0 0116 0v1"></path></svg>`;
 const ICON_CROWN_FILLED = `<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M3 18h18l-1.6-9.5-4.9 4-2.5-7.3-2.5 7.3-4.9-4L3 18z"></path><rect x="3" y="19" width="18" height="2" rx="1"></rect></svg>`;
 const ICON_CROWN_OUTLINE = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 18h18l-1.6-9.5-4.9 4-2.5-7.3-2.5 7.3-4.9-4L3 18z" stroke-linejoin="round"></path><path d="M3 20h18" stroke-linecap="round"></path></svg>`;
+const ICON_SHIP = `<svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 8l-9-5-9 5 9 5 9-5zM3 8v8l9 5 9-5V8M12 13v8"></path></svg>`;
+const ICON_PLANE = `<svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z" stroke-linecap="round" stroke-linejoin="round"></path></svg>`;
+const ICON_TRUCK = `<svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 16V6a1 1 0 011-1h9v11M3 16h10m0-11h3l4 4v7h-2M3 16a2 2 0 104 0 2 2 0 00-4 0zm10 0a2 2 0 104 0 2 2 0 00-4 0z" stroke-linecap="round" stroke-linejoin="round"></path></svg>`;
+const ICON_STAMP = `<svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 2h6v6l3 3v3H6v-3l3-3V2z" stroke-linejoin="round"></path><path d="M4 20h16M8 20v-3h8v3" stroke-linecap="round" stroke-linejoin="round"></path></svg>`;
+const ICON_PLUS = `<svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" stroke-linecap="round"></path></svg>`;
 const SOURCE_ICON = {
   Terminal: `<svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 21h18M5 21V9l7-6 7 6v12M9 21v-6h6v6"></path></svg>`,
   Vessel: `<svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 17l1.2-5h13.6L20 17M6 12V7h3V5h6v2h3v5M3 21c1.3 0 1.3-1.3 2.6-1.3S7.9 21 9.2 21s1.3-1.3 2.6-1.3S14.1 21 15.4 21s1.3-1.3 2.6-1.3S20.3 21 21.6 21" stroke-linecap="round" stroke-linejoin="round"></path></svg>`,
   Haulage: `<svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 16V6a1 1 0 011-1h9v11M3 16h10m0-11h3l4 4v7h-2M3 16a2 2 0 104 0 2 2 0 00-4 0zm10 0a2 2 0 104 0 2 2 0 00-4 0z" stroke-linecap="round" stroke-linejoin="round"></path></svg>`,
+  Airport: `<svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 21h18M5 21V9l7-6 7 6v12M9 21v-6h6v6"></path></svg>`,
+  Flight: `<svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z" stroke-linecap="round" stroke-linejoin="round"></path></svg>`,
+  Customs: `<svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 2h6v6l3 3v3H6v-3l3-3V2z" stroke-linejoin="round"></path><path d="M4 20h16M8 20v-3h8v3" stroke-linecap="round" stroke-linejoin="round"></path></svg>`,
 };
 
 /* ==========================================================================
@@ -949,9 +988,26 @@ function renderStatusChip(status, sizeClass=''){
   return `<span class="status-chip ${cls} ${sizeClass}">${icon}${status}</span>`;
 }
 
-function shipmentTypeOf(s){ return s.mode.includes('Import') ? 'Import' : s.mode.includes('Export') ? 'Export' : 'Cross-trade'; }
-function transportLabelOf(s){ return s.mode.includes('Ocean') ? 'Ocean Freight' : s.mode.includes('Air') ? 'Air Freight' : s.mode; }
-function templateLabelOf(s){ return s.mode.includes('Export') ? 'OneExport' : 'OneImport'; }
+const SERVICE_CATEGORIES = [
+  {key:'OCEAN', label:'Ocean Freight', icon:ICON_SHIP, blurb:'FCL, LCL & Break Bulk sea freight'},
+  {key:'AIR', label:'Air Freight', icon:ICON_PLANE, blurb:'Airway bill-based air cargo'},
+  {key:'HAULAGE', label:'Haulage', icon:ICON_TRUCK, blurb:'Inland trucking & last-mile delivery'},
+  {key:'BROKERAGE', label:'Customs Brokerage', icon:ICON_STAMP, blurb:'Customs clearance & declaration services'},
+];
+function categoryOf(key){ return SERVICE_CATEGORIES.find(c=>c.key===key) || SERVICE_CATEGORIES[0]; }
+function shipmentTypeOf(s){ return s.direction; }
+function transportLabelOf(s){ return categoryOf(s.category).label; }
+function templateLabelOf(s){
+  if(s.category==='OCEAN') return s.direction==='Export' ? 'OneExport' : 'OneImport';
+  if(s.category==='AIR') return s.direction==='Export' ? 'OneAir Export' : 'OneAir Import';
+  if(s.category==='HAULAGE') return 'OneHaulage';
+  return 'OneClear';
+}
+function dateLabelsOf(category){
+  if(category==='HAULAGE') return {start:'Pickup Date', end:'Delivery Date'};
+  if(category==='BROKERAGE') return {start:'Submission Date', end:'Target Clearance Date'};
+  return {start:'ETD', end:'ETA'};
+}
 
 const PORTS = [
   {code:'CNSHA', name:'Shanghai Yangshan Port'},
@@ -959,8 +1015,6 @@ const PORTS = [
   {code:'NLRTM', name:'Port of Rotterdam'},
   {code:'GHTEM', name:'Tema Port'},
   {code:'DEHAM', name:'Port of Hamburg'},
-  {code:'CNSZX', name:"Shenzhen Bao'an Airport"},
-  {code:'NGLOS', name:'Murtala Muhammed Airport'},
   {code:'CMDLA', name:'Port of Douala'},
   {code:'BEANR', name:'Port of Antwerp'},
   {code:'SGSIN', name:'Port of Singapore'},
@@ -979,7 +1033,30 @@ const LOCATIONS = [
   'Shenzhen, China','Douala, Cameroon','Antwerp, Belgium','Singapore','Dubai, UAE',
   'Mombasa, Kenya','Durban, South Africa','New York, USA','Felixstowe, United Kingdom',
   'Valencia, Spain','Tianjin, China','Busan, South Korea','Qingdao, China','Ningbo, China','Santos, Brazil',
+  'Kano, Nigeria','Port Harcourt, Nigeria','Ibadan, Nigeria','Abuja, Nigeria',
 ];
+
+const AIRPORTS = [
+  {code:'LOS', name:'Murtala Muhammed International Airport, Lagos'},
+  {code:'ABV', name:'Nnamdi Azikiwe International Airport, Abuja'},
+  {code:'SZX', name:'Shenzhen Bao\'an International Airport'},
+  {code:'PVG', name:'Shanghai Pudong International Airport'},
+  {code:'PEK', name:'Beijing Capital International Airport'},
+  {code:'DXB', name:'Dubai International Airport'},
+  {code:'LHR', name:'London Heathrow Airport'},
+  {code:'FRA', name:'Frankfurt Airport'},
+  {code:'AMS', name:'Amsterdam Schiphol Airport'},
+  {code:'JFK', name:'John F. Kennedy International Airport, New York'},
+  {code:'CAI', name:'Cairo International Airport'},
+  {code:'JNB', name:'O.R. Tambo International Airport, Johannesburg'},
+  {code:'ACC', name:'Kotoka International Airport, Accra'},
+];
+const AIRPORT_CODE_MAP = Object.fromEntries(AIRPORTS.map(a=>[a.name, a.code]));
+function airportCodeOf(name){ return AIRPORT_CODE_MAP[name] || name; }
+function formatAirportDisplay(name){
+  const a = AIRPORTS.find(x=>x.name===name);
+  return a ? `${a.code} — ${a.name}` : name;
+}
 
 const MONTH_MAP = {Jan:0,Feb:1,Mar:2,Apr:3,May:4,Jun:5,Jul:6,Aug:7,Sep:8,Oct:9,Nov:10,Dec:11};
 function parseDisplayDate(str){
@@ -1048,17 +1125,82 @@ const OCEAN_IMPORT_TEMPLATE = [
   {name:'Post Delivery Docs', responsibility:'Documentation Officer'},
   {name:'Document Release', responsibility:'CX Officer'},
 ];
-
-const PHYSICAL_TRACKING_TEMPLATE = [
-  {label:'Container Gated In · Origin Terminal', loc:'Shanghai Yangshan Port', source:'Terminal'},
-  {label:'Vessel Departed', loc:'Shanghai Yangshan Port', source:'Vessel'},
-  {label:'In Transit · Ocean Voyage', loc:'Indian Ocean', source:'Vessel'},
-  {label:'Transshipment', loc:'Port Klang, Malaysia', source:'Terminal'},
-  {label:'Vessel Arrived', loc:'Apapa Port, Lagos', source:'Vessel'},
-  {label:'Container Gated Out', loc:'Apapa Port, Lagos', source:'Terminal'},
-  {label:'Inland Haulage to Consignee', loc:'Lagos, Nigeria', source:'Haulage'},
+const AIR_EXPORT_TEMPLATE = [
+  {name:'Booking Confirmation', responsibility:'Operations Officer'},
+  {name:'Cargo Received at Origin', responsibility:'Transport Coordinator'},
+  {name:'Screening & Documentation', responsibility:'Documentation Officer'},
+  {name:'MAWB Issuance', responsibility:'Documentation Officer'},
+  {name:'Export Customs Clearance', responsibility:'Clearing Officer'},
+  {name:'Flight Departure', responsibility:'Operations Manager'},
+  {name:'Flight Arrival Confirmation', responsibility:'Operations Manager'},
+  {name:'Document Release', responsibility:'CX Officer'},
 ];
-const SOURCE_TAG_CLASS = {Terminal:'tag-terminal', Vessel:'tag-vessel', Haulage:'tag-haulage'};
+const AIR_IMPORT_TEMPLATE = [
+  {name:'Pre-Alert Receipt', responsibility:'CX Officer'},
+  {name:'Flight Arrival Confirmation', responsibility:'Operations Manager'},
+  {name:'Cargo Received at Destination', responsibility:'Transport Coordinator'},
+  {name:'Import Customs Clearance', responsibility:'Clearing Officer'},
+  {name:'Duty Payment', responsibility:'Finance Officer'},
+  {name:'Delivery', responsibility:'Transport Coordinator'},
+  {name:'Document Release', responsibility:'CX Officer'},
+];
+const HAULAGE_TEMPLATE = [
+  {name:'Pickup Scheduled', responsibility:'Operations Officer'},
+  {name:'Vehicle Assigned', responsibility:'Transport Coordinator'},
+  {name:'Cargo Loaded', responsibility:'Transport Coordinator'},
+  {name:'In Transit', responsibility:'Transport Coordinator'},
+  {name:'Delivered', responsibility:'Transport Coordinator'},
+  {name:'Proof of Delivery Signed', responsibility:'CX Officer'},
+];
+const BROKERAGE_TEMPLATE = [
+  {name:'Documents Received', responsibility:'Documentation Officer'},
+  {name:'Form M / PAAR Validation', responsibility:'Documentation Officer'},
+  {name:'Declaration Lodged (SGD)', responsibility:'Clearing Officer'},
+  {name:'Customs Assessment', responsibility:'Clearing Officer'},
+  {name:'Duty Payment', responsibility:'Finance Officer'},
+  {name:'Examination / Inspection', responsibility:'QA Officer'},
+  {name:'Release Order Issued', responsibility:'Clearing Officer'},
+];
+function milestoneTemplateOf(s){
+  if(s.category==='OCEAN') return s.direction==='Export' ? OCEAN_EXPORT_TEMPLATE : OCEAN_IMPORT_TEMPLATE;
+  if(s.category==='AIR') return s.direction==='Export' ? AIR_EXPORT_TEMPLATE : AIR_IMPORT_TEMPLATE;
+  if(s.category==='HAULAGE') return HAULAGE_TEMPLATE;
+  return BROKERAGE_TEMPLATE;
+}
+
+// Physical tracking events, derived from the shipment's own locations — category-specific,
+// and intentionally empty for Customs Brokerage (a paperwork service, not a physical movement).
+function buildTrackingTemplateFor(s){
+  if(s.category==='OCEAN'){
+    return [
+      {label:'Container Gated In · Origin Terminal', loc:s.ocean.pol, source:'Terminal'},
+      {label:'Vessel Departed', loc:s.ocean.pol, source:'Vessel'},
+      {label:'In Transit · Ocean Voyage', loc:'International Waters', source:'Vessel'},
+      {label:'Vessel Arrived', loc:s.ocean.pod, source:'Vessel'},
+      {label:'Container Gated Out', loc:s.ocean.pod, source:'Terminal'},
+      {label:'Inland Haulage to Consignee', loc:s.destination, source:'Haulage'},
+    ];
+  }
+  if(s.category==='AIR'){
+    return [
+      {label:'Cargo Received · Origin Warehouse', loc:s.air.originAirport, source:'Airport'},
+      {label:'Flight Departed', loc:s.air.originAirport, source:'Flight'},
+      {label:'Flight Arrived', loc:s.air.destAirport, source:'Flight'},
+      {label:'Customs Clearance', loc:s.air.destAirport, source:'Customs'},
+      {label:'Delivered to Consignee', loc:s.destination, source:'Haulage'},
+    ];
+  }
+  if(s.category==='HAULAGE'){
+    return [
+      {label:'Vehicle Dispatched', loc:s.haulage.pickupLocation, source:'Haulage'},
+      {label:'In Transit', loc:'En Route', source:'Haulage'},
+      {label:'Arrived at Destination', loc:s.haulage.deliveryLocation, source:'Haulage'},
+      {label:'Proof of Delivery Signed', loc:s.haulage.deliveryLocation, source:'Haulage'},
+    ];
+  }
+  return [];
+}
+const SOURCE_TAG_CLASS = {Terminal:'tag-terminal', Vessel:'tag-vessel', Haulage:'tag-haulage', Airport:'tag-airport', Flight:'tag-flight', Customs:'tag-customs'};
 
 function makeId(prefix){ return prefix + '-' + Math.random().toString(36).slice(2,8); }
 
@@ -1088,7 +1230,7 @@ function buildShipmentDetail(base, seed){
   const shipTeamIds = [base.ownerId, ...(base.supportingOwnerIds||[])];
   const responsibilities = assignResponsibilities(shipTeamIds, seed);
 
-  const containerCount = 2 + (seed % 3);
+  const containerCount = base.category==='OCEAN' ? 2 + (seed % 3) : 0;
   const containers = [];
   for(let i=0;i<containerCount;i++){
     containers.push({
@@ -1101,7 +1243,7 @@ function buildShipmentDetail(base, seed){
     });
   }
 
-  const template = base.mode.includes('Export') ? OCEAN_EXPORT_TEMPLATE : OCEAN_IMPORT_TEMPLATE;
+  const template = milestoneTemplateOf(base);
   const etdDate = parseDisplayDate(base.etd);
   const etaDate = parseDisplayDate(base.eta);
   const span = etaDate.getTime() - etdDate.getTime();
@@ -1135,8 +1277,9 @@ function buildShipmentDetail(base, seed){
     };
   });
 
-  const trackedCount = Math.min(PHYSICAL_TRACKING_TEMPLATE.length, 2 + (seed % 5));
-  const physicalTracking = PHYSICAL_TRACKING_TEMPLATE.map((t,i)=>({
+  const trackingTemplate = buildTrackingTemplateFor(base);
+  const trackedCount = trackingTemplate.length ? Math.min(trackingTemplate.length, 2 + (seed % 5)) : 0;
+  const physicalTracking = trackingTemplate.map((t,i)=>({
     label: t.label,
     location: t.loc,
     source: t.source,
@@ -1177,12 +1320,22 @@ function buildShipmentDetail(base, seed){
 }
 
 const SHIPMENT_LIST_BASE = [
-  {jobRef:'ZELO000001', customer:'Dangote Industries', route:'Shanghai → Lagos', mode:'Ocean Import', status:'Active', slaHealth:'Healthy', eta:'02 Aug 2026', ownerId:'u1', supportingOwnerIds:['u5','u6'], completedMilestones:4, quoteRef:'OP-QT-8821', bl:'MEDUSH0123456', incoterm:'CIF', origin:'Shanghai, China', destination:'Lagos, Nigeria', pol:'Shanghai Yangshan Port', pod:'Apapa Port, Lagos', etd:'12 Jul 2026', serviceType:'FCL'},
-  {jobRef:'ZELO000002', customer:'Nestlé West Africa', route:'Rotterdam → Tema', mode:'Ocean Import', status:'Active', slaHealth:'At-Risk', eta:'29 Jul 2026', ownerId:'u2', supportingOwnerIds:['u4'], completedMilestones:6, quoteRef:'OP-QT-8790', bl:'MSCURTM998211', incoterm:'FOB', origin:'Rotterdam, Netherlands', destination:'Tema, Ghana', pol:'Port of Rotterdam', pod:'Tema Port', etd:'05 Jul 2026', serviceType:'FCL'},
-  {jobRef:'ZELO000003', customer:'Julius Berger Nigeria', route:'Hamburg → Lagos', mode:'Ocean Import', status:'Active', slaHealth:'Breached', eta:'20 Jul 2026', ownerId:'u3', supportingOwnerIds:[], completedMilestones:1, quoteRef:'OP-QT-8744', bl:'HLCUHAM774410', incoterm:'CFR', origin:'Hamburg, Germany', destination:'Lagos, Nigeria', pol:'Port of Hamburg', pod:'Apapa Port, Lagos', etd:'01 Jul 2026', serviceType:'Break Bulk'},
-  {jobRef:'ZELO000004', customer:'MTN Nigeria', route:'Shenzhen → Lagos', mode:'Air Import', status:'Cancelled', slaHealth:'Healthy', eta:'31 Jul 2026', ownerId:'u4', supportingOwnerIds:['u1'], completedMilestones:2, quoteRef:'OP-QT-8701', bl:'MAWB-176-882130', incoterm:'FCA', origin:'Shenzhen, China', destination:'Lagos, Nigeria', pol:'Shenzhen Bao\'an Airport', pod:'Murtala Muhammed Airport', etd:'27 Jul 2026', serviceType:'Air Freight'},
-  {jobRef:'ZELO000005', customer:'Dufil Prima Foods', route:'Lagos → Douala', mode:'Ocean Export', status:'Active', slaHealth:'Healthy', eta:'26 Jul 2026', ownerId:'u5', supportingOwnerIds:['u2','u3'], completedMilestones:7, quoteRef:'OP-QT-8650', bl:'OOLU2384910X', incoterm:'CIF', origin:'Lagos, Nigeria', destination:'Douala, Cameroon', pol:'Apapa Port, Lagos', pod:'Port of Douala', etd:'14 Jul 2026', serviceType:'FCL'},
-  {jobRef:'ZELO000006', customer:'Nigerian Breweries', route:'Antwerp → Lagos', mode:'Ocean Import', status:'Completed', slaHealth:'Healthy', eta:'10 Jul 2026', ownerId:'u6', supportingOwnerIds:[], completedMilestones:10, quoteRef:'OP-QT-8590', bl:'APLU5567234B', incoterm:'CIF', origin:'Antwerp, Belgium', destination:'Lagos, Nigeria', pol:'Port of Antwerp', pod:'Apapa Port, Lagos', etd:'20 Jun 2026', serviceType:'FCL'},
+  {jobRef:'ZELO000001', category:'OCEAN', direction:'Import', customer:'Dangote Industries', origin:'Shanghai, China', destination:'Lagos, Nigeria', route:'Shanghai, China → Lagos, Nigeria', status:'Active', slaHealth:'Healthy', eta:'02 Aug 2026', ownerId:'u1', supportingOwnerIds:['u5','u6'], completedMilestones:4, quoteRef:'OP-QT-8821', incoterm:'CIF', etd:'12 Jul 2026',
+    ocean:{pol:'Shanghai Yangshan Port', pod:'Apapa Port, Lagos', freightType:'FCL', vessel:'MSC Diana', voyage:'FE2201', carrier:'MSC', bl:'MEDUSH0123456'}},
+  {jobRef:'ZELO000002', category:'OCEAN', direction:'Import', customer:'Nestlé West Africa', origin:'Rotterdam, Netherlands', destination:'Tema, Ghana', route:'Rotterdam, Netherlands → Tema, Ghana', status:'Active', slaHealth:'At-Risk', eta:'29 Jul 2026', ownerId:'u2', supportingOwnerIds:['u4'], completedMilestones:6, quoteRef:'OP-QT-8790', incoterm:'FOB', etd:'05 Jul 2026',
+    ocean:{pol:'Port of Rotterdam', pod:'Tema Port', freightType:'FCL', vessel:'MSC Rotterdam', voyage:'WA1187', carrier:'MSC', bl:'MSCURTM998211'}},
+  {jobRef:'ZELO000003', category:'OCEAN', direction:'Import', customer:'Julius Berger Nigeria', origin:'Hamburg, Germany', destination:'Lagos, Nigeria', route:'Hamburg, Germany → Lagos, Nigeria', status:'Active', slaHealth:'Breached', eta:'20 Jul 2026', ownerId:'u3', supportingOwnerIds:[], completedMilestones:1, quoteRef:'OP-QT-8744', incoterm:'CFR', etd:'01 Jul 2026',
+    ocean:{pol:'Port of Hamburg', pod:'Apapa Port, Lagos', freightType:'Break Bulk', vessel:'Hapag Bremen', voyage:'', carrier:'Hapag-Lloyd', bl:'HLCUHAM774410'}},
+  {jobRef:'ZELO000004', category:'AIR', direction:'Import', customer:'MTN Nigeria', origin:'Shenzhen, China', destination:'Lagos, Nigeria', route:'Shenzhen, China → Lagos, Nigeria', status:'Cancelled', slaHealth:'Healthy', eta:'31 Jul 2026', ownerId:'u4', supportingOwnerIds:['u1'], completedMilestones:2, quoteRef:'OP-QT-8701', incoterm:'FCA', etd:'27 Jul 2026',
+    air:{originAirport:'Shenzhen Bao\'an International Airport', destAirport:'Murtala Muhammed International Airport, Lagos', airline:'Emirates SkyCargo', flightNo:'EK9825', mawb:'176-8821304', hawb:'HAWB-55291', chargeableWeight:'1,240', pieces:'48', grossWeight:'1,180', cargoDescription:'Telecom network equipment'}},
+  {jobRef:'ZELO000005', category:'OCEAN', direction:'Export', customer:'Dufil Prima Foods', origin:'Lagos, Nigeria', destination:'Douala, Cameroon', route:'Lagos, Nigeria → Douala, Cameroon', status:'Active', slaHealth:'Healthy', eta:'26 Jul 2026', ownerId:'u5', supportingOwnerIds:['u2','u3'], completedMilestones:7, quoteRef:'OP-QT-8650', incoterm:'CIF', etd:'14 Jul 2026',
+    ocean:{pol:'Apapa Port, Lagos', pod:'Port of Douala', freightType:'FCL', vessel:'OOCL Africa', voyage:'AF0456', carrier:'OOCL', bl:'OOLU2384910X'}},
+  {jobRef:'ZELO000006', category:'OCEAN', direction:'Import', customer:'Nigerian Breweries', origin:'Antwerp, Belgium', destination:'Lagos, Nigeria', route:'Antwerp, Belgium → Lagos, Nigeria', status:'Completed', slaHealth:'Healthy', eta:'10 Jul 2026', ownerId:'u6', supportingOwnerIds:[], completedMilestones:10, quoteRef:'OP-QT-8590', incoterm:'CIF', etd:'20 Jun 2026',
+    ocean:{pol:'Port of Antwerp', pod:'Apapa Port, Lagos', freightType:'FCL', vessel:'APL Antwerp', voyage:'EU0912', carrier:'APL', bl:'APLU5567234B'}},
+  {jobRef:'ZELO000007', category:'HAULAGE', direction:'Domestic', customer:'Flour Mills of Nigeria', origin:'Lagos, Nigeria', destination:'Kano, Nigeria', route:'Lagos, Nigeria → Kano, Nigeria', status:'Active', slaHealth:'At-Risk', eta:'21 Jul 2026', ownerId:'u3', supportingOwnerIds:['u4'], completedMilestones:3, quoteRef:'OP-QT-8905', incoterm:'', etd:'18 Jul 2026',
+    haulage:{pickupLocation:'Apapa Port Warehouse, Lagos', deliveryLocation:'Bompai Industrial Estate, Kano', haulageType:'Container Haulage', truckNumber:'LND-224-KJA', driverName:'Emeka Obi', driverPhone:'+234 802 556 3311', waybill:'WB-77291'}},
+  {jobRef:'ZELO000008', category:'BROKERAGE', direction:'Import', customer:'Unilever Nigeria', origin:'Rotterdam, Netherlands', destination:'Lagos, Nigeria', route:'Rotterdam, Netherlands → Lagos, Nigeria', status:'Active', slaHealth:'Healthy', eta:'22 Jul 2026', ownerId:'u4', supportingOwnerIds:['u6'], completedMilestones:4, quoteRef:'OP-QT-8912', incoterm:'DDP', etd:'08 Jul 2026',
+    brokerage:{customsOffice:'Apapa Port, Lagos', declarationNumber:'SGD-2026-771203', hsCode:'3401.11, 3402.90', formM:'MF20260456781', paar:'PAAR-88231', clearingAgent:'Titi Aluko', dutyPayable:'₦4,820,000'}},
 ];
 
 const SHIPMENTS = {};
@@ -1229,6 +1382,7 @@ function navTo(view){
 
 function openShipment(jobRef){
   state.currentShipmentRef = jobRef;
+  state.currentView = 'shipment-detail';
   document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
   el('view-shipment-detail').classList.add('active');
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.toggle('active', n.dataset.nav==='shipments'));
@@ -1264,20 +1418,20 @@ function renderShipmentsList(){
   const list = Object.values(SHIPMENTS).filter(s=>{
     if(!q) return true;
     const names = ownersOf(s).all.map(o=>o.name.toLowerCase()).join(' ');
-    return s.jobRef.toLowerCase().includes(q) || names.includes(q);
+    return s.jobRef.toLowerCase().includes(q) || names.includes(q) || s.customer.toLowerCase().includes(q);
   });
   el('shipments-count-label').textContent = `${list.length} shipment${list.length!==1?'s':''}${q ? ' matching "'+state.searchQuery.trim()+'"' : ''}`;
 
   el('shipments-tbody').innerHTML = list.map(s=>{
     const sla = SLA_CONFIG[s.slaHealth];
     const primary = s.owners.primary;
+    const cat = categoryOf(s.category);
     return `
     <tr class="clickable" data-jobref="${s.jobRef}">
       <td><b style="color:var(--green-dark);font-family:var(--font-display);font-weight:600">${s.jobRef}</b></td>
       <td>${s.customer}</td>
-      <td>${locodeOf(s.pol)}</td>
-      <td>${locodeOf(s.pod)}</td>
-      <td><span class="chip chip-neutral">${transportLabelOf(s)}</span></td>
+      <td><span class="chip chip-neutral">${cat.icon}${cat.label}</span></td>
+      <td>${s.route}</td>
       <td>${renderStatusChip(s.status)}</td>
       <td><span class="badge-sla ${sla.chip}"><span class="sla-icon">${slaIcon(s.slaHealth)}</span>${s.slaHealth}</span></td>
       <td>
@@ -1287,7 +1441,7 @@ function renderShipmentsList(){
         </div>
       </td>
     </tr>`;
-  }).join('') || `<tr><td colspan="8" style="text-align:center;color:var(--silver-light);padding:40px">No shipments match your search.</td></tr>`;
+  }).join('') || `<tr><td colspan="7" style="text-align:center;color:var(--silver-light);padding:40px">No shipments match your search.</td></tr>`;
 }
 
 /* ==========================================================================
@@ -1297,15 +1451,24 @@ function renderShipmentDetail(){
   renderShipHeader();
   renderShipDetailFields();
   renderShipmentTeamDisplay();
-  renderContainers();
+  renderCargoSection();
   renderServiceDelivery();
   renderShipmentTracking();
   renderDocuments();
 }
 
+function headerStripDynamicCells(s){
+  if(s.category==='OCEAN') return [['POL', locodeOf(s.ocean.pol)], ['POD', locodeOf(s.ocean.pod)]];
+  if(s.category==='AIR') return [['Origin Airport', airportCodeOf(s.air.originAirport)], ['Destination Airport', airportCodeOf(s.air.destAirport)]];
+  if(s.category==='HAULAGE') return [['Pickup', s.haulage.pickupLocation], ['Delivery', s.haulage.deliveryLocation]];
+  return [['Customs Office', locodeOf(s.brokerage.customsOffice)], ['Declaration No.', s.brokerage.declarationNumber || '—']];
+}
+
 function renderShipHeader(){
   const s = currentShipment();
   const sla = SLA_CONFIG[s.slaHealth];
+  const cat = categoryOf(s.category);
+  const dyn = headerStripDynamicCells(s);
 
   el('ship-header').innerHTML = `
     <div class="ship-header-row1">
@@ -1339,11 +1502,11 @@ function renderShipHeader(){
         <div class="v">${s.customer}</div>
       </div>
       <span class="strip-divider"></span>
-      <div class="strip-cell"><div class="k">Transport Mode</div><div class="v">${transportLabelOf(s)}</div></div>
+      <div class="strip-cell"><div class="k">Service Type</div><div class="v">${cat.label}</div></div>
       <span class="strip-divider"></span>
-      <div class="strip-cell"><div class="k">POL</div><div class="v">${locodeOf(s.pol)}</div></div>
+      <div class="strip-cell"><div class="k">${dyn[0][0]}</div><div class="v">${dyn[0][1]}</div></div>
       <span class="strip-divider"></span>
-      <div class="strip-cell"><div class="k">POD</div><div class="v">${locodeOf(s.pod)}</div></div>
+      <div class="strip-cell"><div class="k">${dyn[1][0]}</div><div class="v">${dyn[1][1]}</div></div>
       <span class="strip-divider"></span>
       <div class="strip-cell"><div class="k">Status</div><div class="v">${renderStatusChip(s.status, 'sm')}</div></div>
       <span class="strip-divider"></span>
@@ -1352,22 +1515,67 @@ function renderShipHeader(){
   `;
 }
 
+function categorySpecificDetailRows(s){
+  if(s.category==='OCEAN'){
+    const o = s.ocean;
+    return [
+      ['Freight Type', o.freightType],
+      ['Port of Loading', `${locodeOf(o.pol)}<div class="v-sub">${o.pol}</div>`],
+      ['Port of Discharge', `${locodeOf(o.pod)}<div class="v-sub">${o.pod}</div>`],
+      ['Vessel / Voyage', (o.vessel||'—') + (o.voyage ? ' · ' + o.voyage : '')],
+      ['Carrier', o.carrier || '—'],
+      ['Bill of Lading (B/L)', o.bl || '—'],
+    ];
+  }
+  if(s.category==='AIR'){
+    const a = s.air;
+    return [
+      ['Origin Airport', `${airportCodeOf(a.originAirport)}<div class="v-sub">${a.originAirport}</div>`],
+      ['Destination Airport', `${airportCodeOf(a.destAirport)}<div class="v-sub">${a.destAirport}</div>`],
+      ['Airline', a.airline || '—'],
+      ['Flight Number', a.flightNo || '—'],
+      ['MAWB', a.mawb || '—'],
+      ['HAWB', a.hawb || '—'],
+      ['Chargeable Weight', a.chargeableWeight ? a.chargeableWeight + ' kg' : '—'],
+    ];
+  }
+  if(s.category==='HAULAGE'){
+    const h = s.haulage;
+    return [
+      ['Haulage Type', h.haulageType],
+      ['Pickup Location', h.pickupLocation],
+      ['Delivery Location', h.deliveryLocation],
+      ['Truck / Vehicle Number', h.truckNumber || '—'],
+      ['Driver', h.driverName ? h.driverName + (h.driverPhone ? ' · ' + h.driverPhone : '') : '—'],
+      ['Waybill Number', h.waybill || '—'],
+    ];
+  }
+  const b = s.brokerage;
+  return [
+    ['Customs Office', `${locodeOf(b.customsOffice)}<div class="v-sub">${b.customsOffice}</div>`],
+    ['Declaration Number (SGD)', b.declarationNumber || '—'],
+    ['HS Code(s)', b.hsCode || '—'],
+    ['Form M', b.formM || '—'],
+    ['PAAR', b.paar || '—'],
+    ['Clearing Agent', b.clearingAgent || '—'],
+    ['Duty Payable', b.dutyPayable || '—'],
+  ];
+}
+
 function renderShipDetailFields(){
   const s = currentShipment();
+  const cat = categoryOf(s.category);
+  const dl = dateLabelsOf(s.category);
   const fields = [
     [`${ICON_BUILDING}<span>Customer</span>`, s.customer],
     ['Quote Reference', `<a href="#" class="quote-link" data-quote-link>${s.quoteRef}</a>`],
-    ['Bill of Lading (B/L)', s.bl],
-    ['Transport Mode', s.mode],
-    ['Shipment Type', shipmentTypeOf(s)],
-    ['Service Type', s.serviceType],
-    ['Incoterm', s.incoterm],
+    ['Service Type', `${cat.label} · ${s.direction}`],
+    ['Incoterm', s.incoterm || '—'],
     ['Origin', s.origin],
     ['Destination', s.destination],
-    ['Port of Loading', `${locodeOf(s.pol)}<div class="v-sub">${s.pol}</div>`],
-    ['Port of Discharge', `${locodeOf(s.pod)}<div class="v-sub">${s.pod}</div>`],
-    ['ETD', s.etd],
-    ['ETA', s.eta],
+    ...categorySpecificDetailRows(s),
+    [dl.start, s.etd],
+    [dl.end, s.eta],
   ];
   el('ship-detail-fields').innerHTML = fields.map(([k,v])=>{
     const label = k.includes('<svg') ? `<div class="k-row">${k}</div>` : `<div class="k">${k}</div>`;
@@ -1410,6 +1618,62 @@ function renderContainers(){
   `).join('') || `<tr><td colspan="6" style="text-align:center;color:var(--silver-light);padding:30px">No containers added yet.</td></tr>`;
 }
 
+// Overview tab, second card — swaps content entirely based on service category.
+function renderCargoSection(){
+  const s = currentShipment();
+  if(s.category==='OCEAN'){
+    el('cargo-card').innerHTML = `
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:18px;flex-wrap:wrap;gap:12px">
+        <div>
+          <h3 class="section-title">${ICON_SHIP}Containers</h3>
+          <p class="section-sub" style="margin:0">Equipment assigned to this shipment.</p>
+        </div>
+        <button class="btn btn-accent btn-sm" id="btn-add-container">${ICON_PLUS}Add Container</button>
+      </div>
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead><tr><th>Container Number</th><th>Size</th><th>Type</th><th>Seal Number</th><th>Weight</th><th style="text-align:right">Actions</th></tr></thead>
+          <tbody id="container-tbody"></tbody>
+        </table>
+      </div>`;
+    renderContainers();
+    return;
+  }
+  let title, sub, rows;
+  if(s.category==='AIR'){
+    title = `${ICON_PLANE}Cargo Details`;
+    sub = 'Piece count and weight for this air shipment.';
+    rows = [
+      ['Pieces', s.air.pieces || '—'],
+      ['Gross Weight', s.air.grossWeight ? s.air.grossWeight + ' kg' : '—'],
+      ['Chargeable Weight', s.air.chargeableWeight ? s.air.chargeableWeight + ' kg' : '—'],
+      ['Cargo Description', s.air.cargoDescription || '—'],
+    ];
+  } else if(s.category==='HAULAGE'){
+    title = `${ICON_TRUCK}Consignment &amp; Vehicle Details`;
+    sub = 'Vehicle and cargo details for this haulage job.';
+    rows = [
+      ['Haulage Type', s.haulage.haulageType],
+      ['Truck / Vehicle Number', s.haulage.truckNumber || '—'],
+      ['Driver', s.haulage.driverName || '—'],
+      ['Driver Phone', s.haulage.driverPhone || '—'],
+    ];
+  } else {
+    title = `${ICON_STAMP}Declaration Details`;
+    sub = 'Customs clearance reference data for this job.';
+    rows = [
+      ['Declaration Number (SGD)', s.brokerage.declarationNumber || '—'],
+      ['HS Code(s)', s.brokerage.hsCode || '—'],
+      ['Clearing Agent', s.brokerage.clearingAgent || '—'],
+      ['Duty Payable', s.brokerage.dutyPayable || '—'],
+    ];
+  }
+  el('cargo-card').innerHTML = `
+    <h3 class="section-title">${title}</h3>
+    <p class="section-sub">${sub}</p>
+    <div class="detail-fields-grid">${rows.map(([k,v])=>`<div class="detail-field"><div class="k">${k}</div><div class="v">${v}</div></div>`).join('')}</div>`;
+}
+
 function resolveTaskOwners(s, responsibility){
   const resp = s.owners.responsibilities || {};
   return Object.keys(resp).filter(uid => (resp[uid]||[]).includes(responsibility)).map(teamMember);
@@ -1446,6 +1710,10 @@ function renderServiceDelivery(){
 
 function renderShipmentTracking(){
   const s = currentShipment();
+  if(!s.physicalTracking.length){
+    el('physical-timeline').innerHTML = `<p style="font-size:13px;color:var(--silver-light);text-align:center;padding:24px 4px;line-height:1.6">Physical tracking isn't applicable for Customs Brokerage services — see the Service Delivery milestones for clearance progress instead.</p>`;
+    return;
+  }
   el('physical-timeline').innerHTML = s.physicalTracking.map((ev,i)=>`
     <div class="timeline-item ${ev.done?'':'pending'}">
       <div class="rail">
@@ -1580,56 +1848,106 @@ el('save-update-status').addEventListener('click', ()=>{
   showToast('Shipment status updated to "' + s.status + '"');
 });
 
-/* --- Edit Shipment --- */
-const TRANSPORT_MODE_OPTIONS = ['Ocean Import','Ocean Export','Air Import','Air Export','Haulage'];
-const SERVICE_TYPE_OPTIONS = ['FCL','LCL','Break Bulk','Air Freight'];
+/* --- Edit Shipment / Create Shipment shared field system --- */
+const DIRECTION_OPTIONS = ['Import','Export','Domestic'];
 const INCOTERM_OPTIONS = ['EXW','FCA','FOB','CFR','CIF','DAP','DDP'];
 
-const EDIT_SHIPMENT_FIELDS = [
-  {key:'customer', label:'Customer', type:'text'},
-  {key:'quoteRef', label:'Quote Reference', type:'text'},
-  {key:'bl', label:'Bill of Lading (B/L)', type:'text'},
-  {key:'mode', label:'Transport Mode', type:'select', options:TRANSPORT_MODE_OPTIONS},
-  {key:'serviceType', label:'Service Type', type:'select', options:SERVICE_TYPE_OPTIONS},
-  {key:'incoterm', label:'Incoterm', type:'select', options:INCOTERM_OPTIONS},
-  {key:'origin', label:'Origin', type:'location'},
-  {key:'destination', label:'Destination', type:'location'},
-  {key:'pol', label:'Port of Loading', type:'port'},
-  {key:'pod', label:'Port of Discharge', type:'port'},
-  {key:'etd', label:'ETD', type:'date'},
-  {key:'eta', label:'ETA', type:'date'},
-];
+function getPath(obj, path){ return path.split('.').reduce((o,k)=> (o && o[k]!==undefined) ? o[k] : '', obj); }
+function setPath(obj, path, value){
+  const parts = path.split('.');
+  let cur = obj;
+  for(let i=0;i<parts.length-1;i++){ if(!cur[parts[i]]) cur[parts[i]] = {}; cur = cur[parts[i]]; }
+  cur[parts[parts.length-1]] = value;
+}
 
-function renderEditField(f, s){
-  const val = s[f.key];
+function commonFieldDefs(category){
+  const dl = dateLabelsOf(category);
+  return [
+    {key:'customer', label:'Customer', type:'text'},
+    {key:'direction', label:'Direction', type:'select', options:DIRECTION_OPTIONS},
+    {key:'quoteRef', label:'Quote Reference (optional)', type:'text'},
+    {key:'incoterm', label:'Incoterm (optional)', type:'select', options:['', ...INCOTERM_OPTIONS]},
+    {key:'origin', label:'Origin', type:'location'},
+    {key:'destination', label:'Destination', type:'location'},
+    {key:'etd', label:dl.start, type:'date'},
+    {key:'eta', label:dl.end, type:'date'},
+  ];
+}
+const CATEGORY_FIELD_DEFS = {
+  OCEAN: [
+    {key:'ocean.pol', label:'Port of Loading', type:'port'},
+    {key:'ocean.pod', label:'Port of Discharge', type:'port'},
+    {key:'ocean.freightType', label:'Freight Type', type:'select', options:['FCL','LCL','Break Bulk']},
+    {key:'ocean.vessel', label:'Vessel Name (optional)', type:'text'},
+    {key:'ocean.voyage', label:'Voyage Number (optional)', type:'text'},
+    {key:'ocean.carrier', label:'Carrier / Shipping Line (optional)', type:'text'},
+    {key:'ocean.bl', label:'Bill of Lading Number (optional)', type:'text'},
+  ],
+  AIR: [
+    {key:'air.originAirport', label:'Origin Airport', type:'airport'},
+    {key:'air.destAirport', label:'Destination Airport', type:'airport'},
+    {key:'air.airline', label:'Airline / Carrier (optional)', type:'text'},
+    {key:'air.flightNo', label:'Flight Number (optional)', type:'text'},
+    {key:'air.mawb', label:'Master Airway Bill — MAWB (optional)', type:'text'},
+    {key:'air.hawb', label:'House Airway Bill — HAWB (optional)', type:'text'},
+    {key:'air.chargeableWeight', label:'Chargeable Weight, kg (optional)', type:'text'},
+    {key:'air.pieces', label:'Pieces (optional)', type:'text'},
+    {key:'air.grossWeight', label:'Gross Weight, kg (optional)', type:'text'},
+    {key:'air.cargoDescription', label:'Cargo Description (optional)', type:'text'},
+  ],
+  HAULAGE: [
+    {key:'haulage.pickupLocation', label:'Pickup Location', type:'text'},
+    {key:'haulage.deliveryLocation', label:'Delivery Location', type:'text'},
+    {key:'haulage.haulageType', label:'Haulage Type', type:'select', options:['Container Haulage','Bulk Haulage','Flatbed','General Cargo']},
+    {key:'haulage.truckNumber', label:'Truck / Vehicle Number (optional)', type:'text'},
+    {key:'haulage.driverName', label:'Driver Name (optional)', type:'text'},
+    {key:'haulage.driverPhone', label:'Driver Phone (optional)', type:'text'},
+    {key:'haulage.waybill', label:'Waybill Number (optional)', type:'text'},
+  ],
+  BROKERAGE: [
+    {key:'brokerage.customsOffice', label:'Customs Office / Port of Entry', type:'port'},
+    {key:'brokerage.declarationNumber', label:'Declaration Number — SGD (optional)', type:'text'},
+    {key:'brokerage.hsCode', label:'HS Code(s) (optional)', type:'text'},
+    {key:'brokerage.formM', label:'Form M Number (optional)', type:'text'},
+    {key:'brokerage.paar', label:'PAAR Number (optional)', type:'text'},
+    {key:'brokerage.clearingAgent', label:'Clearing Agent (optional)', type:'text'},
+    {key:'brokerage.dutyPayable', label:'Customs Value / Duty Payable (optional)', type:'text'},
+  ],
+};
+
+function renderDynField(f, obj){
+  const val = getPath(obj, f.key);
   if(f.type==='select'){
     const opts = f.options.map(o=>`<option ${o===val?'selected':''}>${o}</option>`).join('');
-    return `<div class="form-field filled"><label class="field-label">${f.label}</label><select class="field-control" data-edit-field="${f.key}">${opts}</select></div>`;
+    return `<div class="form-field filled"><label class="field-label">${f.label}</label><select class="field-control" data-field="${f.key}">${opts}</select></div>`;
   }
   if(f.type==='date'){
-    return `<div class="form-field filled"><label class="field-label">${f.label}</label><input type="date" class="field-control" data-edit-field="${f.key}" data-field-type="date" value="${displayDateToInputValue(val)}"></div>`;
+    const dv = val ? displayDateToInputValue(val) : '';
+    return `<div class="form-field filled"><label class="field-label">${f.label}</label><input type="date" class="field-control" data-field="${f.key}" data-field-type="date" value="${dv}"></div>`;
   }
-  if(f.type==='location' || f.type==='port'){
-    const displayVal = f.type==='port' ? formatPortDisplay(val) : val;
+  if(f.type==='location' || f.type==='port' || f.type==='airport'){
+    const displayVal = f.type==='port' ? formatPortDisplay(val) : f.type==='airport' ? formatAirportDisplay(val) : val;
     return `
     <div class="form-field filled searchable-field" data-ss-mode="${f.type}">
       <label class="field-label">${f.label}</label>
-      <input type="text" class="field-control ss-display" autocomplete="off" value="${displayVal}" placeholder="Search...">
-      <input type="hidden" data-edit-field="${f.key}" value="${val}">
+      <input type="text" class="field-control ss-display" autocomplete="off" value="${displayVal||''}" placeholder="Search...">
+      <input type="hidden" data-field="${f.key}" value="${val||''}">
       <div class="ss-menu"></div>
     </div>`;
   }
-  return `<div class="form-field filled"><label class="field-label">${f.label}</label><input class="field-control" data-edit-field="${f.key}" value="${val}"></div>`;
+  return `<div class="form-field filled"><label class="field-label">${f.label}</label><input class="field-control" data-field="${f.key}" value="${val||''}"></div>`;
 }
 
-function wireSearchableFields(){
-  el('edit-shipment-form').querySelectorAll('.searchable-field').forEach(field=>{
+function wireSearchableFieldsIn(container){
+  container.querySelectorAll('.searchable-field').forEach(field=>{
     const mode = field.dataset.ssMode;
     const display = field.querySelector('.ss-display');
-    const hidden = field.querySelector('[data-edit-field]');
+    const hidden = field.querySelector('[data-field]');
     const menu = field.querySelector('.ss-menu');
     const options = mode==='port'
       ? PORTS.map(p=>({value:p.name, label:`${p.code} — ${p.name}`, search:`${p.code} ${p.name}`.toLowerCase()}))
+      : mode==='airport'
+      ? AIRPORTS.map(a=>({value:a.name, label:`${a.code} — ${a.name}`, search:`${a.code} ${a.name}`.toLowerCase()}))
       : LOCATIONS.map(loc=>({value:loc, label:loc, search:loc.toLowerCase()}));
     function renderMenu(list){
       menu.innerHTML = list.length ? list.map(o=>`<div class="ss-option" data-value="${o.value}">${o.label}</div>`).join('') : `<div class="ss-empty">No matches</div>`;
@@ -1639,34 +1957,187 @@ function wireSearchableFields(){
     display.addEventListener('input', ()=>{
       const q = display.value.toLowerCase();
       renderMenu(options.filter(o=>o.search.includes(q)).slice(0,8));
+      hidden.value = display.value;
     });
     menu.addEventListener('mousedown', (e)=>{
       const opt = e.target.closest('.ss-option');
       if(!opt) return;
       e.preventDefault();
       hidden.value = opt.dataset.value;
-      display.value = mode==='port' ? formatPortDisplay(opt.dataset.value) : opt.dataset.value;
+      display.value = mode==='port' ? formatPortDisplay(opt.dataset.value) : mode==='airport' ? formatAirportDisplay(opt.dataset.value) : opt.dataset.value;
       menu.classList.remove('open');
     });
     display.addEventListener('blur', ()=>{ setTimeout(()=>menu.classList.remove('open'), 120); });
   });
 }
 
+function readDynFieldsFrom(container, target){
+  container.querySelectorAll('[data-field]').forEach(input=>{
+    const key = input.dataset.field;
+    const value = input.dataset.fieldType==='date' ? (input.value ? inputDateToDisplay(input.value) : '') : input.value;
+    setPath(target, key, value);
+  });
+}
+
+/* --- Edit Shipment --- */
 function openEditShipmentModal(){
   const s = currentShipment();
-  el('edit-shipment-form').innerHTML = EDIT_SHIPMENT_FIELDS.map(f=>renderEditField(f, s)).join('');
-  wireSearchableFields();
+  const cat = categoryOf(s.category);
+  const form = el('edit-shipment-form');
+  form.innerHTML =
+    `<div class="form-field full" style="margin-bottom:2px"><span class="chip chip-neutral">${cat.icon}${cat.label} · ${s.direction}</span></div>` +
+    commonFieldDefs(s.category).map(f=>renderDynField(f, s)).join('') +
+    `<div class="form-field full form-section-label">${cat.label} Details</div>` +
+    CATEGORY_FIELD_DEFS[s.category].map(f=>renderDynField(f, s)).join('');
+  wireSearchableFieldsIn(form);
   openModal('modal-edit-shipment');
 }
 el('save-edit-shipment').addEventListener('click', ()=>{
   const s = currentShipment();
-  el('edit-shipment-form').querySelectorAll('[data-edit-field]').forEach(input=>{
-    const key = input.dataset.editField;
-    s[key] = input.dataset.fieldType==='date' ? inputDateToDisplay(input.value) : input.value;
-  });
-  renderShipHeader(); renderShipDetailFields(); renderShipmentsList(); renderServiceDelivery();
+  readDynFieldsFrom(el('edit-shipment-form'), s);
+  s.route = `${s.origin} → ${s.destination}`;
+  renderShipHeader(); renderShipDetailFields(); renderCargoSection(); renderShipmentsList(); renderServiceDelivery(); renderShipmentTracking();
   closeModal('modal-edit-shipment');
   showToast('Shipment details saved');
+});
+
+/* --- Create Shipment (manual, 2-step wizard) --- */
+const createShipmentState = { category: null, draft: null };
+
+function emptyDraftFor(category){
+  const draft = {
+    customer:'', direction:'Import', quoteRef:'', incoterm:'', origin:'', destination:'',
+    etd:'', eta:'', ownerId: TEAM[0].id, supportingOwnerIds: [],
+  };
+  if(category==='OCEAN') draft.ocean = {pol:'', pod:'', freightType:'FCL', vessel:'', voyage:'', carrier:'', bl:''};
+  if(category==='AIR') draft.air = {originAirport:'', destAirport:'', airline:'', flightNo:'', mawb:'', hawb:'', chargeableWeight:'', pieces:'', grossWeight:'', cargoDescription:''};
+  if(category==='HAULAGE') draft.haulage = {pickupLocation:'', deliveryLocation:'', haulageType:'Container Haulage', truckNumber:'', driverName:'', driverPhone:'', waybill:''};
+  if(category==='BROKERAGE') draft.brokerage = {customsOffice:'', declarationNumber:'', hsCode:'', formM:'', paar:'', clearingAgent:'', dutyPayable:''};
+  return draft;
+}
+
+function nextJobRef(){
+  const nums = Object.keys(SHIPMENTS).map(r=>parseInt(r.replace('ZELO',''),10)).filter(n=>!isNaN(n));
+  const next = (nums.length ? Math.max(...nums) : 0) + 1;
+  return 'ZELO' + String(next).padStart(6,'0');
+}
+
+function renderCreateCategoryGrid(){
+  el('create-category-grid').innerHTML = SERVICE_CATEGORIES.map(cat=>{
+    const active = createShipmentState.category === cat.key;
+    return `
+    <button type="button" class="service-type-card ${active?'active':''}" data-create-category="${cat.key}">
+      <span class="stc-icon">${cat.icon}</span>
+      <span class="stc-label">${cat.label}</span>
+      <span class="stc-blurb">${cat.blurb}</span>
+    </button>`;
+  }).join('');
+}
+function renderCreateFooterStep1(){
+  el('create-modal-foot').innerHTML = `
+    <button class="btn btn-outline" data-close-modal>Cancel</button>
+    <button class="btn btn-accent" id="create-step1-continue" ${createShipmentState.category ? '' : 'disabled'}>Continue</button>`;
+}
+function renderCreateFooterStep2(){
+  el('create-modal-foot').innerHTML = `
+    <button class="btn btn-outline" id="create-step2-back">Back</button>
+    <button class="btn btn-accent" id="create-shipment-submit">Create Shipment</button>`;
+}
+function renderCreateOwnerFields(){
+  el('create-owner-primary').innerHTML = TEAM.map(t=>`<option value="${t.id}">${t.name} — ${t.role}</option>`).join('');
+  el('create-owner-primary').value = createShipmentState.draft.ownerId;
+  el('create-owner-supporting').innerHTML = TEAM.filter(t=>t.id!==createShipmentState.draft.ownerId).map(t=>{
+    const active = createShipmentState.draft.supportingOwnerIds.includes(t.id);
+    return `<button type="button" class="chip owner-chip-toggle ${active?'active':''}" data-create-supporting="${t.id}">${t.name.split(' ')[0]}</button>`;
+  }).join('');
+}
+function renderCreateStep2(){
+  const cat = categoryOf(createShipmentState.category);
+  el('create-step2-category-badge').innerHTML = `${cat.icon}${cat.label}`;
+  el('create-common-fields').innerHTML = commonFieldDefs(createShipmentState.category).map(f=>renderDynField(f, createShipmentState.draft)).join('');
+  el('create-category-fields').innerHTML = CATEGORY_FIELD_DEFS[createShipmentState.category].map(f=>renderDynField(f, createShipmentState.draft)).join('');
+  renderCreateOwnerFields();
+  wireSearchableFieldsIn(el('create-step-2'));
+}
+
+function openCreateShipmentModal(){
+  createShipmentState.category = null;
+  createShipmentState.draft = null;
+  el('create-modal-title').textContent = 'New Shipment — Choose Service Type';
+  el('create-modal-sub').textContent = 'Select the type of service this shipment requires.';
+  el('create-step-1').style.display = 'block';
+  el('create-step-2').style.display = 'none';
+  renderCreateCategoryGrid();
+  renderCreateFooterStep1();
+  openModal('modal-create-shipment');
+}
+
+function validateCreateDraft(){
+  const d = createShipmentState.draft;
+  const cat = createShipmentState.category;
+  const dl = dateLabelsOf(cat);
+  if(!d.customer.trim()) return 'Customer is required';
+  if(!d.origin.trim()) return 'Origin is required';
+  if(!d.destination.trim()) return 'Destination is required';
+  if(!d.etd) return `${dl.start} is required`;
+  if(!d.eta) return `${dl.end} is required`;
+  if(cat==='OCEAN' && (!d.ocean.pol || !d.ocean.pod)) return 'Port of Loading and Port of Discharge are required';
+  if(cat==='AIR' && (!d.air.originAirport || !d.air.destAirport)) return 'Origin and Destination Airport are required';
+  if(cat==='HAULAGE' && (!d.haulage.pickupLocation.trim() || !d.haulage.deliveryLocation.trim())) return 'Pickup and Delivery Location are required';
+  if(cat==='BROKERAGE' && !d.brokerage.customsOffice) return 'Customs Office is required';
+  return null;
+}
+
+function buildManualShipmentDetail(draft, category, jobRef){
+  const primary = teamMember(draft.ownerId);
+  const supporting = draft.supportingOwnerIds.map(teamMember);
+  const shipTeamIds = [draft.ownerId, ...draft.supportingOwnerIds];
+  const seed = Object.keys(SHIPMENTS).length + 3;
+  const responsibilities = assignResponsibilities(shipTeamIds, seed);
+
+  const base = {
+    jobRef, category, direction: draft.direction, customer: draft.customer.trim(),
+    origin: draft.origin.trim(), destination: draft.destination.trim(),
+    route: `${draft.origin.trim()} → ${draft.destination.trim()}`,
+    status: 'Active', slaHealth: 'Healthy',
+    ownerId: draft.ownerId, supportingOwnerIds: draft.supportingOwnerIds,
+    completedMilestones: 0, quoteRef: draft.quoteRef.trim() || '—',
+    incoterm: draft.incoterm || '', etd: draft.etd, eta: draft.eta,
+  };
+  if(category==='OCEAN') base.ocean = {...draft.ocean};
+  if(category==='AIR') base.air = {...draft.air};
+  if(category==='HAULAGE') base.haulage = {...draft.haulage};
+  if(category==='BROKERAGE') base.brokerage = {...draft.brokerage};
+
+  const template = milestoneTemplateOf(base);
+  const etdDate = parseDisplayDate(base.etd);
+  const etaDate = parseDisplayDate(base.eta);
+  const span = etaDate.getTime() - etdDate.getTime();
+  const milestones = template.map((t,i)=>{
+    const frac = template.length>1 ? i/(template.length-1) : 0;
+    const dueDate = new Date(etdDate.getTime() + Math.max(span,0)*frac);
+    dueDate.setHours(9 + ((i*3)%8), (i%2)*30, 0, 0);
+    return {id:makeId('ms'), name:t.name, responsibility:t.responsibility, status:'Not Started', dueDate, completedBy:'', completedAt:null, completedSlaHealth:null, comment:''};
+  });
+
+  const trackingTemplate = buildTrackingTemplateFor(base);
+  const physicalTracking = trackingTemplate.map(t=>({label:t.label, location:t.loc, source:t.source, timestamp:null, done:false}));
+
+  return {
+    ...base,
+    owners: {primary, supporting, responsibilities},
+    containers: [],
+    milestones,
+    physicalTracking,
+    documents: [],
+  };
+}
+
+el('create-owner-primary').addEventListener('change', ()=>{
+  if(!createShipmentState.draft) return;
+  createShipmentState.draft.ownerId = el('create-owner-primary').value;
+  createShipmentState.draft.supportingOwnerIds = createShipmentState.draft.supportingOwnerIds.filter(id=>id!==createShipmentState.draft.ownerId);
+  renderCreateOwnerFields();
 });
 
 /* --- Add / Edit Container --- */
@@ -1923,7 +2394,59 @@ document.body.addEventListener('click', (e)=>{
   if(t.classList && t.classList.contains('modal-overlay')){ closeModal(t.id); return; }
 
   const addShipment = t.closest('[data-add-shipment]');
-  if(addShipment){ showToast('Shipment creation isn\'t wired up in this prototype yet'); return; }
+  if(addShipment){
+    if(addShipment.dataset.addShipment==='manual') openCreateShipmentModal();
+    else showToast('Creating from a Quote isn\'t wired up in this prototype yet');
+    return;
+  }
+
+  const createCatCard = t.closest('[data-create-category]');
+  if(createCatCard){
+    createShipmentState.category = createCatCard.dataset.createCategory;
+    renderCreateCategoryGrid();
+    renderCreateFooterStep1();
+    return;
+  }
+  if(t.closest('#create-step1-continue')){
+    createShipmentState.draft = emptyDraftFor(createShipmentState.category);
+    el('create-modal-title').textContent = 'New Shipment — Details';
+    el('create-modal-sub').textContent = `Fill out the ${categoryOf(createShipmentState.category).label.toLowerCase()} details for this job.`;
+    el('create-step-1').style.display = 'none';
+    el('create-step-2').style.display = 'block';
+    renderCreateStep2();
+    renderCreateFooterStep2();
+    return;
+  }
+  if(t.closest('#create-step2-back')){
+    el('create-modal-title').textContent = 'New Shipment — Choose Service Type';
+    el('create-modal-sub').textContent = 'Select the type of service this shipment requires.';
+    el('create-step-1').style.display = 'block';
+    el('create-step-2').style.display = 'none';
+    renderCreateFooterStep1();
+    return;
+  }
+  const createSupportBtn = t.closest('[data-create-supporting]');
+  if(createSupportBtn){
+    const id = createSupportBtn.dataset.createSupporting;
+    const arr = createShipmentState.draft.supportingOwnerIds;
+    const idx = arr.indexOf(id);
+    if(idx>=0) arr.splice(idx,1); else arr.push(id);
+    renderCreateOwnerFields();
+    return;
+  }
+  if(t.closest('#create-shipment-submit')){
+    readDynFieldsFrom(el('create-step-2'), createShipmentState.draft);
+    const err = validateCreateDraft();
+    if(err){ showToast(err, 'error'); return; }
+    const jobRef = nextJobRef();
+    const detail = buildManualShipmentDetail(createShipmentState.draft, createShipmentState.category, jobRef);
+    SHIPMENTS[jobRef] = detail;
+    closeModal('modal-create-shipment');
+    renderShipmentsList();
+    showToast(`Shipment ${jobRef} created`);
+    openShipment(jobRef);
+    return;
+  }
 
   if(t.closest('#btn-add-container')){ openContainerModal(null); return; }
   const cEdit = t.closest('[data-cid]');
