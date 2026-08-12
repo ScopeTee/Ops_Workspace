@@ -410,6 +410,44 @@ textarea.field-control{resize:vertical;min-height:70px}
 .owner-chip-toggle{border:1.5px solid var(--border-tint);background:var(--white);color:var(--silver-dark)}
 .owner-chip-toggle.active{background:var(--green-accent);border-color:var(--green-accent);color:var(--green-dark)}
 
+/* Ocean / Air bespoke creation forms */
+.create-banner{background:var(--green-dark);color:var(--cream);border-radius:var(--radius-md);padding:11px 14px;font-size:12.5px;font-weight:600;display:flex;align-items:center;gap:8px;margin-bottom:18px}
+.create-banner a{color:var(--green-accent)}
+.freight-card{background:var(--green-light-surface);border-radius:var(--radius-lg);padding:18px;margin-bottom:20px}
+.freight-card-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px;gap:12px;flex-wrap:wrap}
+.freight-card-head h4{font-family:var(--font-display);font-weight:600;font-size:15px;color:var(--green-dark);margin:0 0 2px}
+.freight-card-head p{font-size:12px;color:var(--silver-light);margin:0}
+.freight-route-row{display:flex;align-items:center;gap:12px}
+.freight-route-row .form-field{flex:1;margin-bottom:0}
+.route-arrow{width:30px;height:30px;border-radius:50%;background:var(--green-light);color:var(--green-dark);display:grid;place-items:center;flex-shrink:0}
+.direction-select{border:1.5px solid var(--green-dark);border-radius:var(--radius-md);padding:8px 30px 8px 12px;font-family:var(--font-display);font-weight:600;font-size:12.5px;color:var(--green-dark);background-color:var(--white)}
+
+.delivery-type-tabs{display:flex;gap:22px;border-bottom:1px solid var(--border-tint);margin-bottom:18px;flex-wrap:wrap}
+.delivery-type-tab{background:transparent;border:none;padding:10px 2px;font-family:var(--font-display);font-weight:600;font-size:13px;color:var(--silver-light);cursor:pointer;border-bottom:2.5px solid transparent}
+.delivery-type-tab.active{color:var(--green-dark);border-bottom-color:var(--green-dark)}
+
+.toggle-pair{display:flex;gap:22px;align-items:center;padding-top:4px;flex-wrap:wrap}
+.toggle-option{display:inline-flex;align-items:center;gap:7px;cursor:pointer;font-size:13px;color:var(--silver-dark);background:transparent;border:none;padding:2px 0;font-family:var(--font-body)}
+.toggle-option .radio-dot{width:16px;height:16px;border-radius:50%;border:1.5px solid rgba(2,56,25,.3);display:inline-flex;align-items:center;justify-content:center;flex-shrink:0}
+.toggle-option.selected{color:var(--green-dark);font-weight:700}
+.toggle-option.selected .radio-dot{border-color:var(--green-dark)}
+.toggle-option.selected .radio-dot::after{content:'';width:8px;height:8px;border-radius:50%;background:var(--green-dark)}
+
+.repeatable-card{border:1px solid var(--border-tint);border-radius:var(--radius-lg);margin-bottom:16px;overflow:hidden}
+.repeatable-card-head{display:flex;justify-content:space-between;align-items:center;background:var(--green-light-surface);padding:12px 16px;font-weight:700;color:var(--green-dark);font-size:13.5px}
+.repeatable-card-body{padding:16px}
+.remove-icon-btn{background:transparent;border:none;color:var(--error);cursor:pointer;padding:4px;flex-shrink:0;display:inline-flex}
+
+.add-block-btn{display:flex;align-items:center;justify-content:center;gap:6px;width:100%;background:var(--green-light-surface);border:1px dashed var(--green-accent-hover);color:var(--green-dark);font-family:var(--font-display);font-weight:600;font-size:12.5px;padding:11px;border-radius:var(--radius-md);cursor:pointer;margin-bottom:16px}
+.add-block-btn:hover{background:var(--green-light)}
+
+.phone-input-group{display:flex;gap:8px}
+.phone-input-group select{flex:0 0 104px;padding-right:32px}
+.phone-input-group input{flex:1}
+
+.field-control[readonly]{background:var(--green-chip-bg);color:var(--silver-dark)}
+.add-service-menu-wrap{position:relative}
+
 @media (max-width:900px){
   .form-grid{grid-template-columns:1fr}
   .service-type-grid{grid-template-columns:1fr}
@@ -904,8 +942,10 @@ textarea.field-control{resize:vertical;min-height:70px}
       <div id="create-step-2" style="display:none">
         <div class="chip chip-neutral" id="create-step2-category-badge" style="margin-bottom:16px"></div>
         <div class="form-grid" id="create-common-fields"></div>
-        <div class="form-section-label">Service Details</div>
-        <div class="form-grid" id="create-category-fields"></div>
+        <div id="create-category-fields-section">
+          <div class="form-section-label">Service Details</div>
+          <div class="form-grid" id="create-category-fields"></div>
+        </div>
         <div class="form-section-label">Shipment Team</div>
         <div class="form-grid">
           <div class="form-field filled">
@@ -941,6 +981,7 @@ const ICON_PLANE = `<svg width="16" height="16" fill="none" stroke="currentColor
 const ICON_TRUCK = `<svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 16V6a1 1 0 011-1h9v11M3 16h10m0-11h3l4 4v7h-2M3 16a2 2 0 104 0 2 2 0 00-4 0zm10 0a2 2 0 104 0 2 2 0 00-4 0z" stroke-linecap="round" stroke-linejoin="round"></path></svg>`;
 const ICON_STAMP = `<svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 2h6v6l3 3v3H6v-3l3-3V2z" stroke-linejoin="round"></path><path d="M4 20h16M8 20v-3h8v3" stroke-linecap="round" stroke-linejoin="round"></path></svg>`;
 const ICON_PLUS = `<svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" stroke-linecap="round"></path></svg>`;
+const ICON_ARROW = `<svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6" stroke-linecap="round" stroke-linejoin="round"></path></svg>`;
 const SOURCE_ICON = {
   Terminal: `<svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 21h18M5 21V9l7-6 7 6v12M9 21v-6h6v6"></path></svg>`,
   Vessel: `<svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 17l1.2-5h13.6L20 17M6 12V7h3V5h6v2h3v5M3 21c1.3 0 1.3-1.3 2.6-1.3S7.9 21 9.2 21s1.3-1.3 2.6-1.3S14.1 21 15.4 21s1.3-1.3 2.6-1.3S20.3 21 21.6 21" stroke-linecap="round" stroke-linejoin="round"></path></svg>`,
@@ -1057,6 +1098,17 @@ function formatAirportDisplay(name){
   const a = AIRPORTS.find(x=>x.name===name);
   return a ? `${a.code} — ${a.name}` : name;
 }
+
+// Reference data for the Ocean / Air creation forms
+let CUSTOMERS = ['Dangote Industries','Nestlé West Africa','Julius Berger Nigeria','MTN Nigeria','Dufil Prima Foods','Nigerian Breweries','Flour Mills of Nigeria','Unilever Nigeria','Guinness Nigeria','BUA Group'];
+const OFFICES = ['Lagos HQ','Apapa Branch','Port Harcourt Branch','Kano Branch','Abuja Branch'];
+const COMMODITY_TYPES = ['General Cargo','Electronics','Machinery & Equipment','Textiles & Apparel','Food & Beverages','Chemicals','Pharmaceuticals','Automotive Parts','Construction Materials','Consumer Goods'];
+const COMMODITY_CATEGORIES = ['Non-Hazardous','Hazardous','Perishable','Fragile','High Value','Oversized / Break Bulk'];
+const CURRENCIES = ['NGN','USD','EUR','GBP'];
+const PACKAGE_PICKUP_MEDIUMS = ['Self Drop-off','Pickup Requested','Courier Service'];
+const DIMENSION_UNITS = ['cm','in','m'];
+const DIAL_CODES = ['+234','+1','+44','+86','+971'];
+const PALLET_COUNTS = ['One','Two','Three','Four','Five','More than five'];
 
 const MONTH_MAP = {Jan:0,Feb:1,Mar:2,Apr:3,May:4,Jun:5,Jul:6,Aug:7,Sep:8,Oct:9,Nov:10,Dec:11};
 function parseDisplayDate(str){
@@ -1525,6 +1577,10 @@ function categorySpecificDetailRows(s){
       ['Vessel / Voyage', (o.vessel||'—') + (o.voyage ? ' · ' + o.voyage : '')],
       ['Carrier', o.carrier || '—'],
       ['Bill of Lading (B/L)', o.bl || '—'],
+      ['Office/Branch', o.officeBranch || '—'],
+      ['Total Value of Goods', o.totalValue ? `${o.currency} ${o.totalValue}` : '—'],
+      ['Hazardous Cargo', o.hazardous ? '<span class="chip chip-error">Hazardous</span>' : '<span class="chip chip-neutral">Non-Hazardous</span>'],
+      ['Attention', o.attention || '—'],
     ];
   }
   if(s.category==='AIR'){
@@ -1532,11 +1588,15 @@ function categorySpecificDetailRows(s){
     return [
       ['Origin Airport', `${airportCodeOf(a.originAirport)}<div class="v-sub">${a.originAirport}</div>`],
       ['Destination Airport', `${airportCodeOf(a.destAirport)}<div class="v-sub">${a.destAirport}</div>`],
+      ['Delivery Type', a.deliveryType || '—'],
       ['Airline', a.airline || '—'],
       ['Flight Number', a.flightNo || '—'],
       ['MAWB', a.mawb || '—'],
       ['HAWB', a.hawb || '—'],
       ['Chargeable Weight', a.chargeableWeight ? a.chargeableWeight + ' kg' : '—'],
+      ['Office/Branch', a.officeBranch || '—'],
+      ['Package Pickup Medium', a.packagePickupMedium || '—'],
+      ['Sender', a.senderName ? `${a.senderName}<div class="v-sub">${[a.senderEmail, a.senderPhone && (a.senderDialCode+' '+a.senderPhone)].filter(Boolean).join(' · ')}</div>` : '—'],
     ];
   }
   if(s.category==='HAULAGE'){
@@ -1618,10 +1678,37 @@ function renderContainers(){
   `).join('') || `<tr><td colspan="6" style="text-align:center;color:var(--silver-light);padding:30px">No containers added yet.</td></tr>`;
 }
 
+// Read-only summary of any Additional Services (Haulage / Customs Brokerage add-ons)
+// attached at booking time — distinct from the standalone Haulage/Brokerage service
+// categories, which are their own shipments with their own full field set.
+function renderAdditionalServicesSummaryHtml(s){
+  const as = s.additionalServices;
+  if(!as || (!as.haulage && !as.brokerage)) return '';
+  let html = `<div class="form-section-label" style="margin-top:20px">Additional Services</div><div class="detail-fields-grid" style="margin-top:14px">`;
+  if(as.haulage){
+    const h = as.haulage;
+    html += `<div class="detail-field"><div class="k">Haulage</div><div class="v">${h.scope}${h.tracker?' · Tracker':''}${h.escort?' · Escort':''}</div></div>`;
+  }
+  if(as.brokerage && as.brokerage.enabled){
+    html += `<div class="detail-field"><div class="k">Customs Brokerage</div><div class="v">Customs Brokerage &amp; Terminal</div></div>`;
+  }
+  html += `</div>`;
+  return html;
+}
+
 // Overview tab, second card — swaps content entirely based on service category.
 function renderCargoSection(){
   const s = currentShipment();
   if(s.category==='OCEAN'){
+    const specs = s.ocean.containerSpecs || [];
+    const specsTable = specs.length ? `
+      <div class="form-section-label" style="border-top:none;padding-top:0;margin-bottom:10px">Booking Plan</div>
+      <div class="table-wrap" style="margin-bottom:22px">
+        <table class="data-table">
+          <thead><tr><th>Commodity</th><th>Category</th><th>Count</th><th>Weight (Tons)</th><th>Size</th><th>Type</th></tr></thead>
+          <tbody>${specs.map(sp=>`<tr><td>${sp.commodityDescription || sp.commodityType || '—'}</td><td>${sp.commodityCategory||'—'}</td><td>${sp.count||'—'}</td><td>${sp.weight||'—'}</td><td>${sp.size}</td><td>${sp.type}</td></tr>`).join('')}</tbody>
+        </table>
+      </div>` : '';
     el('cargo-card').innerHTML = `
       <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:18px;flex-wrap:wrap;gap:12px">
         <div>
@@ -1630,12 +1717,14 @@ function renderCargoSection(){
         </div>
         <button class="btn btn-accent btn-sm" id="btn-add-container">${ICON_PLUS}Add Container</button>
       </div>
+      ${specsTable}
       <div class="table-wrap">
         <table class="data-table">
           <thead><tr><th>Container Number</th><th>Size</th><th>Type</th><th>Seal Number</th><th>Weight</th><th style="text-align:right">Actions</th></tr></thead>
           <tbody id="container-tbody"></tbody>
         </table>
-      </div>`;
+      </div>
+      ${renderAdditionalServicesSummaryHtml(s)}`;
     renderContainers();
     return;
   }
@@ -1671,7 +1760,8 @@ function renderCargoSection(){
   el('cargo-card').innerHTML = `
     <h3 class="section-title">${title}</h3>
     <p class="section-sub">${sub}</p>
-    <div class="detail-fields-grid">${rows.map(([k,v])=>`<div class="detail-field"><div class="k">${k}</div><div class="v">${v}</div></div>`).join('')}</div>`;
+    <div class="detail-fields-grid">${rows.map(([k,v])=>`<div class="detail-field"><div class="k">${k}</div><div class="v">${v}</div></div>`).join('')}</div>
+    ${renderAdditionalServicesSummaryHtml(s)}`;
 }
 
 function resolveTaskOwners(s, responsibility){
@@ -1974,7 +2064,9 @@ function wireSearchableFieldsIn(container){
 function readDynFieldsFrom(container, target){
   container.querySelectorAll('[data-field]').forEach(input=>{
     const key = input.dataset.field;
-    const value = input.dataset.fieldType==='date' ? (input.value ? inputDateToDisplay(input.value) : '') : input.value;
+    let value;
+    if(input.type==='checkbox') value = input.checked;
+    else value = input.dataset.fieldType==='date' ? (input.value ? inputDateToDisplay(input.value) : '') : input.value;
     setPath(target, key, value);
   });
 }
@@ -2004,16 +2096,45 @@ el('save-edit-shipment').addEventListener('click', ()=>{
 /* --- Create Shipment (manual, 2-step wizard) --- */
 const createShipmentState = { category: null, draft: null };
 
+function emptyContainerSpec(){
+  return {hsCode:'', commodityType:'', commodityCategory:'', commodityDescription:'', count:'', weight:'', size:'20ft', type:'Dry'};
+}
 function emptyDraftFor(category){
   const draft = {
-    customer:'', direction:'Import', quoteRef:'', incoterm:'', origin:'', destination:'',
+    customer:'', direction: category==='HAULAGE' ? 'Domestic' : 'Import', quoteRef:'', incoterm:'', origin:'', destination:'',
     etd:'', eta:'', ownerId: TEAM[0].id, supportingOwnerIds: [],
+    additionalServices: { haulage: null, brokerage: null },
   };
-  if(category==='OCEAN') draft.ocean = {pol:'', pod:'', freightType:'FCL', vessel:'', voyage:'', carrier:'', bl:''};
-  if(category==='AIR') draft.air = {originAirport:'', destAirport:'', airline:'', flightNo:'', mawb:'', hawb:'', chargeableWeight:'', pieces:'', grossWeight:'', cargoDescription:''};
+  if(category==='OCEAN') draft.ocean = {
+    pol:'', pod:'', freightType:'FCL', vessel:'', voyage:'', carrier:'', bl:'',
+    officeBranch:'', pickupDate:'', currency:'NGN', totalValue:'', attention:'',
+    hazardous:false, uniformContainers:false,
+    containerSpecs: [emptyContainerSpec()],
+  };
+  if(category==='AIR') draft.air = {
+    originAirport:'', destAirport:'', airline:'', flightNo:'', mawb:'', hawb:'',
+    deliveryType:'Port to Port', officeBranch:'', attention:'', totalWeight:'', packagePickupMedium:'', formM:'', bankersAcceptance:'',
+    senderName:'', senderEmail:'', senderDialCode:'+234', senderPhone:'',
+    numberOfPallets:'One', uniformPallets:true,
+    hsCode:'', commodityType:'', commodityCategory:'', commodityDescription:'',
+    dimensionUnit:'cm', length:'', width:'', height:'',
+    comment:'',
+  };
   if(category==='HAULAGE') draft.haulage = {pickupLocation:'', deliveryLocation:'', haulageType:'Container Haulage', truckNumber:'', driverName:'', driverPhone:'', waybill:''};
   if(category==='BROKERAGE') draft.brokerage = {customsOffice:'', declarationNumber:'', hsCode:'', formM:'', paar:'', clearingAgent:'', dutyPayable:''};
   return draft;
+}
+function emptyHaulageAddon(){
+  return {scope:'At Origin', pickupLocation:'', portOfLoading:'', stuffingDate:'', portOfDischarge:'', deliveryLocation:'', destuffingDate:'', tracker:false, escort:false};
+}
+function emptyBrokerageAddon(){
+  return {enabled:true};
+}
+function volumetricWeightOf(air){
+  const toCm = {cm:1, in:2.54, m:100}[air.dimensionUnit] || 1;
+  const l = parseFloat(air.length), w = parseFloat(air.width), h = parseFloat(air.height);
+  if(!l || !w || !h) return '';
+  return ((l*toCm) * (w*toCm) * (h*toCm) / 6000).toFixed(2);
 }
 
 function nextJobRef(){
@@ -2051,11 +2172,283 @@ function renderCreateOwnerFields(){
     return `<button type="button" class="chip owner-chip-toggle ${active?'active':''}" data-create-supporting="${t.id}">${t.name.split(' ')[0]}</button>`;
   }).join('');
 }
+// Re-syncs whatever's currently typed into the visible form back into the draft
+// (so free-typed values survive), applies a targeted mutation, then re-renders
+// Step 2 — needed because toggles/add-remove controls trigger a structural
+// re-render of a form that also has plain uncontrolled text/select inputs.
+function reflowCreateStep2(mutate){
+  readDynFieldsFrom(el('create-step-2'), createShipmentState.draft);
+  mutate(createShipmentState.draft);
+  renderCreateStep2();
+}
+
+function renderCustomerFieldHtml(value){
+  return `
+  <div class="customer-field-wrap" style="margin-bottom:18px">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+      <span style="font-size:11px;color:var(--silver-light);font-weight:600;text-transform:uppercase;letter-spacing:.02em">Customer Name</span>
+      <a href="#" data-add-customer style="font-size:11.5px;color:var(--green-dark);font-weight:700;text-decoration:none;cursor:pointer">+ Add New Customer</a>
+    </div>
+    <select class="field-control" data-field="customer">
+      <option value="">Select option...</option>
+      ${CUSTOMERS.map(c=>`<option ${c===value?'selected':''}>${c}</option>`).join('')}
+    </select>
+  </div>`;
+}
+
+const CONTAINER_ORDINALS = ['First','Second','Third','Fourth','Fifth','Sixth','Seventh','Eighth'];
+function renderContainerSpecBlock(spec, idx, total){
+  const base = `ocean.containerSpecs.${idx}`;
+  const ordinal = CONTAINER_ORDINALS[idx] || `${idx+1}th`;
+  return `
+  <div class="repeatable-card">
+    <div class="repeatable-card-head">
+      <span>${ordinal} container details</span>
+      ${total>1 ? `<button type="button" class="remove-icon-btn" data-remove-container-spec="${idx}" title="Remove">${ICON_X}</button>` : ''}
+    </div>
+    <div class="repeatable-card-body">
+      <p class="section-sub" style="margin:0 0 14px">Please provide your container details</p>
+      <div class="form-grid">
+        <div class="form-field filled"><label class="field-label">Commodity HS Code (Optional)</label><input class="field-control" data-field="${base}.hsCode" value="${spec.hsCode}" placeholder="Enter commodity HS code"></div>
+        <div class="form-field filled"><label class="field-label">Commodity Type</label><select class="field-control" data-field="${base}.commodityType"><option value="">Enter commodity type</option>${COMMODITY_TYPES.map(c=>`<option ${c===spec.commodityType?'selected':''}>${c}</option>`).join('')}</select></div>
+        <div class="form-field filled"><label class="field-label">Commodity Category</label><select class="field-control" data-field="${base}.commodityCategory"><option value="">Enter commodity category</option>${COMMODITY_CATEGORIES.map(c=>`<option ${c===spec.commodityCategory?'selected':''}>${c}</option>`).join('')}</select></div>
+        <div class="form-field filled"><label class="field-label">Commodity Description</label><input class="field-control" data-field="${base}.commodityDescription" value="${spec.commodityDescription}" placeholder="Enter commodity description"></div>
+        <div class="form-field filled"><label class="field-label">Container Count</label><input class="field-control" data-field="${base}.count" value="${spec.count}" placeholder="Enter container count"></div>
+        <div class="form-field filled"><label class="field-label">Container Weight (Tons)</label><input class="field-control" data-field="${base}.weight" value="${spec.weight}" placeholder="Enter container weight"></div>
+        <div class="form-field filled"><label class="field-label">Container Size</label><select class="field-control" data-field="${base}.size">${['20ft','40ft','40ft HC','45ft HC'].map(s=>`<option ${s===spec.size?'selected':''}>${s}</option>`).join('')}</select></div>
+        <div class="form-field filled"><label class="field-label">Container Type</label><select class="field-control" data-field="${base}.type">${['Dry','Reefer','Open Top','Flat Rack','Tank'].map(s=>`<option ${s===spec.type?'selected':''}>${s}</option>`).join('')}</select></div>
+      </div>
+    </div>
+  </div>`;
+}
+function renderContainerSpecsSection(draft){
+  const specs = draft.ocean.containerSpecs;
+  let html = specs.map((s,i)=>renderContainerSpecBlock(s, i, specs.length)).join('');
+  if(!draft.ocean.uniformContainers){
+    html += `<button type="button" class="add-block-btn" data-add-container-spec>${ICON_PLUS} Add Container</button>`;
+  }
+  return html;
+}
+
+const ADDITIONAL_SERVICES = [{key:'haulage', label:'Haulage'}, {key:'brokerage', label:'Custom Brokerage'}];
+function renderHaulageAddonCard(addon){
+  const showOrigin = addon.scope==='At Origin' || addon.scope==='At Both Locations';
+  const showDest = addon.scope==='At Destination' || addon.scope==='At Both Locations';
+  return `
+  <div class="repeatable-card">
+    <div class="repeatable-card-head">
+      <span>— Haulage</span>
+      <button type="button" class="remove-icon-btn" data-remove-service="haulage" title="Remove">${ICON_X}</button>
+    </div>
+    <div class="repeatable-card-body">
+      <div class="freight-card-head" style="margin-bottom:14px">
+        <div><h4 style="font-size:13.5px">Haulage details</h4><p>Please provide the required information</p></div>
+        <select class="direction-select" data-field="additionalServices.haulage.scope">
+          ${['At Origin','At Destination','At Both Locations'].map(o=>`<option ${o===addon.scope?'selected':''}>${o}</option>`).join('')}
+        </select>
+      </div>
+      ${showOrigin ? `
+      <p style="margin:0 0 12px;font-weight:700;color:var(--green-dark);font-size:13px">Haulage at Origin Details</p>
+      <div class="freight-route-row" style="margin-bottom:16px">
+        <div class="form-field filled"><label class="field-label">Pickup Location</label><input class="field-control" data-field="additionalServices.haulage.pickupLocation" value="${addon.pickupLocation}"></div>
+        <div class="route-arrow">${ICON_ARROW}</div>
+        <div class="form-field filled searchable-field" data-ss-mode="port"><label class="field-label">Port of Loading</label><input type="text" class="field-control ss-display" autocomplete="off" value="${formatPortDisplay(addon.portOfLoading)}" placeholder="Search..."><input type="hidden" data-field="additionalServices.haulage.portOfLoading" value="${addon.portOfLoading}"><div class="ss-menu"></div></div>
+      </div>
+      <div class="form-field filled"><label class="field-label">Stuffing Date (Optional)</label><input type="date" class="field-control" data-field="additionalServices.haulage.stuffingDate" data-field-type="date" value="${addon.stuffingDate ? displayDateToInputValue(addon.stuffingDate) : ''}"></div>
+      ` : ''}
+      ${showDest ? `
+      <p style="margin:16px 0 12px;font-weight:700;color:var(--green-dark);font-size:13px">Haulage at Destination Details</p>
+      <div class="freight-route-row" style="margin-bottom:16px">
+        <div class="form-field filled searchable-field" data-ss-mode="port"><label class="field-label">Port of Discharge</label><input type="text" class="field-control ss-display" autocomplete="off" value="${formatPortDisplay(addon.portOfDischarge)}" placeholder="Search..."><input type="hidden" data-field="additionalServices.haulage.portOfDischarge" value="${addon.portOfDischarge}"><div class="ss-menu"></div></div>
+        <div class="route-arrow">${ICON_ARROW}</div>
+        <div class="form-field filled"><label class="field-label">Delivery Location</label><input class="field-control" data-field="additionalServices.haulage.deliveryLocation" value="${addon.deliveryLocation}"></div>
+      </div>
+      <div class="form-field filled"><label class="field-label">De-stuffing Date (Optional)</label><input type="date" class="field-control" data-field="additionalServices.haulage.destuffingDate" data-field-type="date" value="${addon.destuffingDate ? displayDateToInputValue(addon.destuffingDate) : ''}"></div>
+      ` : ''}
+      <div class="form-section-label" style="margin-top:16px">Haulage Tracker</div>
+      <p class="section-sub" style="margin:0 0 4px">We will provide tracking for the easy and secure transport of your goods.</p>
+      <div class="toggle-pair" style="margin-bottom:16px">
+        <button type="button" class="toggle-option ${addon.tracker?'selected':''}" data-toggle-haulage="tracker" data-toggle-value="true"><span class="radio-dot"></span>Include Haulage Tracker</button>
+        <button type="button" class="toggle-option ${!addon.tracker?'selected':''}" data-toggle-haulage="tracker" data-toggle-value="false"><span class="radio-dot"></span>No Haulage Tracker</button>
+      </div>
+      <div class="form-section-label">Haulage Escort</div>
+      <p class="section-sub" style="margin:0 0 4px">We will help you relate directly with the customs and ensure your cargo is transported safely</p>
+      <div class="toggle-pair">
+        <button type="button" class="toggle-option ${addon.escort?'selected':''}" data-toggle-haulage="escort" data-toggle-value="true"><span class="radio-dot"></span>Include Haulage Escort</button>
+        <button type="button" class="toggle-option ${!addon.escort?'selected':''}" data-toggle-haulage="escort" data-toggle-value="false"><span class="radio-dot"></span>No Haulage Escort</button>
+      </div>
+    </div>
+  </div>`;
+}
+function renderBrokerageAddonCard(addon){
+  return `
+  <div class="repeatable-card">
+    <div class="repeatable-card-head">
+      <span>— Custom Brokerage</span>
+      <button type="button" class="remove-icon-btn" data-remove-service="brokerage" title="Remove">${ICON_X}</button>
+    </div>
+    <div class="repeatable-card-body">
+      <label style="display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:var(--green-dark);cursor:pointer">
+        <input type="checkbox" data-field="additionalServices.brokerage.enabled" ${addon.enabled?'checked':''} style="width:16px;height:16px;accent-color:var(--green-dark)">
+        Customs Brokerage &amp; Terminal
+      </label>
+    </div>
+  </div>`;
+}
+function renderAdditionalServicesSection(draft){
+  const as = draft.additionalServices;
+  let html = '';
+  if(as.haulage) html += renderHaulageAddonCard(as.haulage);
+  if(as.brokerage) html += renderBrokerageAddonCard(as.brokerage);
+  const available = ADDITIONAL_SERVICES.filter(s=>!as[s.key]);
+  if(available.length){
+    html += `
+    <div class="dropdown">
+      <button type="button" class="add-block-btn dropdown-toggle">${ICON_PLUS} Add Service</button>
+      <div class="dropdown-menu">
+        ${available.map(s=>`<button type="button" class="dropdown-item" data-add-service="${s.key}">${s.label}</button>`).join('')}
+      </div>
+    </div>`;
+  }
+  return html;
+}
+
+function renderCreateStep2Ocean(){
+  const d = createShipmentState.draft;
+  const o = d.ocean;
+  return `
+  <div class="create-banner">${ICON_WARN}<span><b>Please Note!</b> Are you shipping over 9,000 KG? Kindly contact support <a href="#" data-toast-only="Support contact isn't wired up in this prototype yet">here</a>.</span></div>
+
+  <div class="freight-card">
+    <div class="freight-card-head">
+      <div><h4>Freight details</h4><p>Please provide the required information</p></div>
+      <select class="direction-select" data-field="direction">
+        <option ${d.direction==='Export'?'selected':''}>Export</option>
+        <option ${d.direction==='Import'?'selected':''}>Import</option>
+      </select>
+    </div>
+    <div class="freight-route-row">
+      <div class="form-field filled searchable-field" data-ss-mode="port"><label class="field-label">Origin Port</label><input type="text" class="field-control ss-display" autocomplete="off" value="${formatPortDisplay(o.pol)}" placeholder="Search..."><input type="hidden" data-field="ocean.pol" value="${o.pol}"><div class="ss-menu"></div></div>
+      <div class="route-arrow">${ICON_ARROW}</div>
+      <div class="form-field filled searchable-field" data-ss-mode="port"><label class="field-label">Destination Port</label><input type="text" class="field-control ss-display" autocomplete="off" value="${formatPortDisplay(o.pod)}" placeholder="Search..."><input type="hidden" data-field="ocean.pod" value="${o.pod}"><div class="ss-menu"></div></div>
+    </div>
+  </div>
+
+  <div class="form-section-label" style="border-top:none;padding-top:0">Shipment details</div>
+  <p class="section-sub" style="margin:0 0 16px">Please provide the shipment details</p>
+  <div class="form-grid">
+    ${renderCustomerFieldHtml(d.customer)}
+    <div class="form-field filled"><label class="field-label">Office/Branch</label><select class="field-control" data-field="ocean.officeBranch"><option value="">Select option...</option>${OFFICES.map(o2=>`<option ${o2===o.officeBranch?'selected':''}>${o2}</option>`).join('')}</select></div>
+    <div class="form-field filled"><label class="field-label">Pick up Date</label><input type="date" class="field-control" data-field="ocean.pickupDate" data-field-type="date" value="${o.pickupDate ? displayDateToInputValue(o.pickupDate) : ''}"></div>
+    <div style="margin-bottom:18px"><div style="font-size:11px;color:var(--silver-light);font-weight:600;text-transform:uppercase;letter-spacing:.02em;margin-bottom:6px">Total Value of Goods</div><div style="display:flex;gap:8px"><select class="field-control" style="flex:0 0 84px" data-field="ocean.currency">${CURRENCIES.map(c=>`<option ${c===o.currency?'selected':''}>${c}</option>`).join('')}</select><input class="field-control" style="flex:1" data-field="ocean.totalValue" value="${o.totalValue}" placeholder="0.00"></div></div>
+    <div class="form-field filled"><label class="field-label">BL Number (Optional)</label><input class="field-control" data-field="ocean.bl" value="${o.bl}" placeholder="Enter BL number"></div>
+    <div class="form-field filled"><label class="field-label">Attention</label><input class="field-control" data-field="ocean.attention" value="${o.attention}" placeholder="Enter attention name"></div>
+  </div>
+
+  <div class="form-section-label">Hazardous</div>
+  <p class="section-sub" style="margin:0 0 4px">Is your cargo hazardous</p>
+  <div class="toggle-pair">
+    <button type="button" class="toggle-option ${o.hazardous?'selected':''}" data-toggle-hazardous="true"><span class="radio-dot"></span>Yes</button>
+    <button type="button" class="toggle-option ${!o.hazardous?'selected':''}" data-toggle-hazardous="false"><span class="radio-dot"></span>No</button>
+  </div>
+
+  <div class="form-section-label">Container details</div>
+  <p class="section-sub" style="margin:0 0 4px">Is each container of the same size and type?</p>
+  <div class="toggle-pair" style="margin-bottom:18px">
+    <button type="button" class="toggle-option ${o.uniformContainers?'selected':''}" data-toggle-uniform="true"><span class="radio-dot"></span>Yes, it is</button>
+    <button type="button" class="toggle-option ${!o.uniformContainers?'selected':''}" data-toggle-uniform="false"><span class="radio-dot"></span>No, it isn't</button>
+  </div>
+  ${renderContainerSpecsSection(d)}
+
+  <div class="form-section-label">Additional Services</div>
+  <p class="section-sub" style="margin:0 0 14px">Please add all additional services that apply</p>
+  ${renderAdditionalServicesSection(d)}
+  `;
+}
+
+function renderCreateStep2Air(){
+  const d = createShipmentState.draft;
+  const a = d.air;
+  const vw = volumetricWeightOf(a);
+  return `
+  <div class="create-banner">${ICON_WARN}<span><b>Please Note!</b> Are you shipping over 9,000 KG? Kindly contact support <a href="#" data-toast-only="Support contact isn't wired up in this prototype yet">here</a>.</span></div>
+
+  <div class="delivery-type-tabs">
+    ${['Port to Port','Port to Door','Door to Port','Door to Door'].map(t=>`<button type="button" class="delivery-type-tab ${a.deliveryType===t?'active':''}" data-delivery-type="${t}">${t}</button>`).join('')}
+    <select class="direction-select" data-field="direction" style="margin-left:auto">
+      <option ${d.direction==='Export'?'selected':''}>Export</option>
+      <option ${d.direction==='Import'?'selected':''}>Import</option>
+    </select>
+  </div>
+  <div class="freight-route-row" style="margin-bottom:20px">
+    <div class="form-field filled searchable-field" data-ss-mode="airport"><label class="field-label">Pickup Airport</label><input type="text" class="field-control ss-display" autocomplete="off" value="${formatAirportDisplay(a.originAirport)}" placeholder="Search..."><input type="hidden" data-field="air.originAirport" value="${a.originAirport}"><div class="ss-menu"></div></div>
+    <div class="route-arrow">${ICON_ARROW}</div>
+    <div class="form-field filled searchable-field" data-ss-mode="airport"><label class="field-label">Destination Airport</label><input type="text" class="field-control ss-display" autocomplete="off" value="${formatAirportDisplay(a.destAirport)}" placeholder="Search..."><input type="hidden" data-field="air.destAirport" value="${a.destAirport}"><div class="ss-menu"></div></div>
+  </div>
+
+  <div class="form-section-label" style="border-top:none;padding-top:0">Shipment details</div>
+  <p class="section-sub" style="margin:0 0 16px">Please provide your container details</p>
+  <div class="form-grid">
+    ${renderCustomerFieldHtml(d.customer)}
+    <div class="form-field filled"><label class="field-label">Attention</label><input class="field-control" data-field="air.attention" value="${a.attention}" placeholder="Enter attention name"></div>
+    <div class="form-field filled"><label class="field-label">Office/Branch</label><select class="field-control" data-field="air.officeBranch"><option value="">Select option...</option>${OFFICES.map(o=>`<option ${o===a.officeBranch?'selected':''}>${o}</option>`).join('')}</select></div>
+    <div class="form-field filled"><label class="field-label">Total Weight of Goods (KG)</label><input class="field-control" data-field="air.totalWeight" value="${a.totalWeight}" placeholder="Enter weight"></div>
+    <div class="form-field filled"><label class="field-label">Package Pickup Medium</label><select class="field-control" data-field="air.packagePickupMedium"><option value="">Select option...</option>${PACKAGE_PICKUP_MEDIUMS.map(o=>`<option ${o===a.packagePickupMedium?'selected':''}>${o}</option>`).join('')}</select></div>
+    <div class="form-field filled"><label class="field-label">Form M (Optional)</label><input class="field-control" data-field="air.formM" value="${a.formM}" placeholder="Enter Number"></div>
+    <div class="form-field filled"><label class="field-label">Banker's Acceptance number BA (Optional)</label><input class="field-control" data-field="air.bankersAcceptance" value="${a.bankersAcceptance}" placeholder="Enter Number"></div>
+  </div>
+
+  <div class="form-section-label">Contact details <span style="text-transform:none;font-weight:400">(Optional)</span></div>
+  <div class="form-grid" style="margin-top:14px">
+    <div class="form-field filled"><label class="field-label">Sender Name</label><input class="field-control" data-field="air.senderName" value="${a.senderName}" placeholder="Enter contact name"></div>
+    <div class="form-field filled"><label class="field-label">Sender Email</label><input class="field-control" data-field="air.senderEmail" value="${a.senderEmail}" placeholder="@mail.com"></div>
+    <div class="form-field filled"><label class="field-label">Sender Phone Number</label><div class="phone-input-group"><select class="field-control" data-field="air.senderDialCode">${DIAL_CODES.map(c=>`<option ${c===a.senderDialCode?'selected':''}>${c}</option>`).join('')}</select><input class="field-control" data-field="air.senderPhone" value="${a.senderPhone}" placeholder="8012345678"></div></div>
+    <div class="form-field filled"><label class="field-label">Number of Pallets</label><select class="field-control" data-field="air.numberOfPallets">${PALLET_COUNTS.map(p=>`<option ${p===a.numberOfPallets?'selected':''}>${p}</option>`).join('')}</select></div>
+  </div>
+  <p class="section-sub" style="margin:0 0 4px">Is each pallet of the same size?</p>
+  <div class="toggle-pair" style="margin-bottom:18px">
+    <button type="button" class="toggle-option ${a.uniformPallets?'selected':''}" data-toggle-pallets="true"><span class="radio-dot"></span>Yes, it is</button>
+    <button type="button" class="toggle-option ${!a.uniformPallets?'selected':''}" data-toggle-pallets="false"><span class="radio-dot"></span>No, it isn't</button>
+  </div>
+
+  <div class="form-section-label">Cargo Volumetric Weight</div>
+  <div class="form-grid" style="margin-top:14px">
+    <div class="form-field filled"><label class="field-label">Commodity HS Code (Optional)</label><input class="field-control" data-field="air.hsCode" value="${a.hsCode}" placeholder="Enter commodity HS code"></div>
+    <div class="form-field filled"><label class="field-label">Commodity Type</label><select class="field-control" data-field="air.commodityType"><option value="">Enter commodity type</option>${COMMODITY_TYPES.map(c=>`<option ${c===a.commodityType?'selected':''}>${c}</option>`).join('')}</select></div>
+    <div class="form-field filled"><label class="field-label">Commodity Category</label><select class="field-control" data-field="air.commodityCategory"><option value="">Enter commodity category</option>${COMMODITY_CATEGORIES.map(c=>`<option ${c===a.commodityCategory?'selected':''}>${c}</option>`).join('')}</select></div>
+    <div class="form-field filled"><label class="field-label">Commodity Description</label><input class="field-control" data-field="air.commodityDescription" value="${a.commodityDescription}" placeholder="Enter commodity description"></div>
+    <div class="form-field filled"><label class="field-label">Unit for Dimensions</label><select class="field-control" data-field="air.dimensionUnit">${DIMENSION_UNITS.map(u=>`<option ${u===a.dimensionUnit?'selected':''}>${u}</option>`).join('')}</select></div>
+    <div class="form-field filled"><label class="field-label">Length of Cargo</label><input class="field-control" data-field="air.length" value="${a.length}" placeholder="0"></div>
+    <div class="form-field filled"><label class="field-label">Width of Cargo</label><input class="field-control" data-field="air.width" value="${a.width}" placeholder="0"></div>
+    <div class="form-field filled"><label class="field-label">Height of Cargo</label><input class="field-control" data-field="air.height" value="${a.height}" placeholder="0"></div>
+    <div class="form-field filled"><label class="field-label">Calculated Volumetric Weight (kg)</label><input class="field-control" id="air-vw-output" readonly value="${vw ? vw+' kg' : ''}"></div>
+  </div>
+
+  <div class="form-field full">
+    <label class="field-label">Add a comment or update</label>
+    <textarea class="field-control" rows="3" data-field="air.comment" placeholder="Add a comment or update...">${a.comment}</textarea>
+  </div>
+
+  <div class="form-section-label">Additional Services</div>
+  <p class="section-sub" style="margin:0 0 14px">Please add all additional services that apply</p>
+  ${renderAdditionalServicesSection(d)}
+  `;
+}
+
 function renderCreateStep2(){
-  const cat = categoryOf(createShipmentState.category);
-  el('create-step2-category-badge').innerHTML = `${cat.icon}${cat.label}`;
-  el('create-common-fields').innerHTML = commonFieldDefs(createShipmentState.category).map(f=>renderDynField(f, createShipmentState.draft)).join('');
-  el('create-category-fields').innerHTML = CATEGORY_FIELD_DEFS[createShipmentState.category].map(f=>renderDynField(f, createShipmentState.draft)).join('');
+  const cat = createShipmentState.category;
+  el('create-step2-category-badge').innerHTML = `${categoryOf(cat).icon}${categoryOf(cat).label}`;
+  if(cat==='OCEAN' || cat==='AIR'){
+    el('create-common-fields').style.display = 'block';
+    el('create-common-fields').innerHTML = cat==='OCEAN' ? renderCreateStep2Ocean() : renderCreateStep2Air();
+    el('create-category-fields-section').style.display = 'none';
+    el('create-category-fields').innerHTML = '';
+  } else {
+    el('create-common-fields').style.display = '';
+    el('create-common-fields').innerHTML = commonFieldDefs(cat).map(f=>renderDynField(f, createShipmentState.draft)).join('');
+    el('create-category-fields-section').style.display = '';
+    el('create-category-fields').innerHTML = CATEGORY_FIELD_DEFS[cat].map(f=>renderDynField(f, createShipmentState.draft)).join('');
+  }
   renderCreateOwnerFields();
   wireSearchableFieldsIn(el('create-step-2'));
 }
@@ -2075,18 +2468,42 @@ function openCreateShipmentModal(){
 function validateCreateDraft(){
   const d = createShipmentState.draft;
   const cat = createShipmentState.category;
+  if(cat==='OCEAN'){
+    if(!d.customer.trim()) return 'Customer Name is required';
+    if(!d.ocean.pol || !d.ocean.pod) return 'Origin Port and Destination Port are required';
+    if(!d.ocean.officeBranch) return 'Office/Branch is required';
+    if(!d.ocean.pickupDate) return 'Pick up Date is required';
+    if(!d.ocean.totalValue) return 'Total Value of Goods is required';
+    const badSpec = d.ocean.containerSpecs.find(s=>!s.commodityType || !s.commodityCategory || !s.commodityDescription.trim() || !s.count || !s.weight);
+    if(badSpec) return 'Every container block needs Commodity Type, Category, Description, Count, and Weight';
+    return null;
+  }
+  if(cat==='AIR'){
+    if(!d.customer.trim()) return 'Customer Name is required';
+    if(!d.air.originAirport || !d.air.destAirport) return 'Pickup Airport and Destination Airport are required';
+    return null;
+  }
   const dl = dateLabelsOf(cat);
   if(!d.customer.trim()) return 'Customer is required';
   if(!d.origin.trim()) return 'Origin is required';
   if(!d.destination.trim()) return 'Destination is required';
   if(!d.etd) return `${dl.start} is required`;
   if(!d.eta) return `${dl.end} is required`;
-  if(cat==='OCEAN' && (!d.ocean.pol || !d.ocean.pod)) return 'Port of Loading and Port of Discharge are required';
-  if(cat==='AIR' && (!d.air.originAirport || !d.air.destAirport)) return 'Origin and Destination Airport are required';
   if(cat==='HAULAGE' && (!d.haulage.pickupLocation.trim() || !d.haulage.deliveryLocation.trim())) return 'Pickup and Delivery Location are required';
   if(cat==='BROKERAGE' && !d.brokerage.customsOffice) return 'Customs Office is required';
   return null;
 }
+
+// Ocean/Air's bespoke forms don't ask for ETD/ETA directly (Ocean only asks Pick up
+// Date; Air asks no date at all) — a target date is still needed to interpolate the
+// milestone schedule, so a reasonable trade-lane default is applied here and can be
+// refined later via Edit Shipment. Flagged clearly since it's an inferred value.
+function addDaysToDisplayDate(displayDate, days){
+  const d = parseDisplayDate(displayDate);
+  d.setDate(d.getDate() + days);
+  return formatDate(d);
+}
+function todayDisplay(){ return formatDate(new Date()); }
 
 function buildManualShipmentDetail(draft, category, jobRef){
   const primary = teamMember(draft.ownerId);
@@ -2095,17 +2512,35 @@ function buildManualShipmentDetail(draft, category, jobRef){
   const seed = Object.keys(SHIPMENTS).length + 3;
   const responsibilities = assignResponsibilities(shipTeamIds, seed);
 
+  let origin = draft.origin, destination = draft.destination, etd = draft.etd, eta = draft.eta, quoteRef = draft.quoteRef, incoterm = draft.incoterm;
+  if(category==='OCEAN'){
+    origin = draft.ocean.pol; destination = draft.ocean.pod;
+    etd = draft.ocean.pickupDate; eta = addDaysToDisplayDate(etd, 21);
+    quoteRef = ''; incoterm = '';
+  } else if(category==='AIR'){
+    origin = draft.air.originAirport; destination = draft.air.destAirport;
+    etd = todayDisplay(); eta = addDaysToDisplayDate(etd, 3);
+    quoteRef = ''; incoterm = '';
+  }
+
   const base = {
     jobRef, category, direction: draft.direction, customer: draft.customer.trim(),
-    origin: draft.origin.trim(), destination: draft.destination.trim(),
-    route: `${draft.origin.trim()} → ${draft.destination.trim()}`,
+    origin: origin.trim(), destination: destination.trim(),
+    route: `${origin.trim()} → ${destination.trim()}`,
     status: 'Active', slaHealth: 'Healthy',
     ownerId: draft.ownerId, supportingOwnerIds: draft.supportingOwnerIds,
-    completedMilestones: 0, quoteRef: draft.quoteRef.trim() || '—',
-    incoterm: draft.incoterm || '', etd: draft.etd, eta: draft.eta,
+    completedMilestones: 0, quoteRef: quoteRef.trim() || '—',
+    incoterm: incoterm || '', etd, eta,
+    additionalServices: draft.additionalServices,
   };
   if(category==='OCEAN') base.ocean = {...draft.ocean};
-  if(category==='AIR') base.air = {...draft.air};
+  if(category==='AIR') base.air = {
+    ...draft.air,
+    chargeableWeight: Math.max(parseFloat(draft.air.totalWeight)||0, parseFloat(volumetricWeightOf(draft.air))||0) || draft.air.totalWeight,
+    pieces: draft.air.numberOfPallets,
+    grossWeight: draft.air.totalWeight,
+    cargoDescription: draft.air.commodityDescription,
+  };
   if(category==='HAULAGE') base.haulage = {...draft.haulage};
   if(category==='BROKERAGE') base.brokerage = {...draft.brokerage};
 
@@ -2434,6 +2869,96 @@ document.body.addEventListener('click', (e)=>{
     renderCreateOwnerFields();
     return;
   }
+
+  // --- Ocean / Air bespoke creation form interactions ---
+  const toastOnlyLink = t.closest('[data-toast-only]');
+  if(toastOnlyLink){ e.preventDefault(); showToast(toastOnlyLink.dataset.toastOnly); return; }
+
+  const addCustomerLink = t.closest('[data-add-customer]');
+  if(addCustomerLink){
+    e.preventDefault();
+    const wrap = addCustomerLink.closest('.customer-field-wrap');
+    const select = wrap.querySelector('select');
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.className = 'field-control';
+    input.placeholder = 'Type new customer name...';
+    select.replaceWith(input);
+    input.focus();
+    const commit = ()=>{
+      readDynFieldsFrom(el('create-step-2'), createShipmentState.draft);
+      const name = input.value.trim();
+      if(name){
+        if(!CUSTOMERS.includes(name)) CUSTOMERS.push(name);
+        createShipmentState.draft.customer = name;
+      }
+      renderCreateStep2();
+    };
+    input.addEventListener('keydown', ev=>{ if(ev.key==='Enter'){ ev.preventDefault(); commit(); } });
+    input.addEventListener('blur', commit);
+    return;
+  }
+
+  const hazardousToggle = t.closest('[data-toggle-hazardous]');
+  if(hazardousToggle){
+    const val = hazardousToggle.dataset.toggleHazardous === 'true';
+    reflowCreateStep2(d=>{ d.ocean.hazardous = val; });
+    return;
+  }
+  const uniformToggle = t.closest('[data-toggle-uniform]');
+  if(uniformToggle){
+    const val = uniformToggle.dataset.toggleUniform === 'true';
+    reflowCreateStep2(d=>{
+      d.ocean.uniformContainers = val;
+      if(val) d.ocean.containerSpecs = [d.ocean.containerSpecs[0] || emptyContainerSpec()];
+    });
+    return;
+  }
+  if(t.closest('[data-add-container-spec]')){
+    reflowCreateStep2(d=>{ d.ocean.containerSpecs.push(emptyContainerSpec()); });
+    return;
+  }
+  const removeSpecBtn = t.closest('[data-remove-container-spec]');
+  if(removeSpecBtn){
+    const idx = parseInt(removeSpecBtn.dataset.removeContainerSpec, 10);
+    reflowCreateStep2(d=>{ d.ocean.containerSpecs.splice(idx, 1); });
+    return;
+  }
+  const addServiceBtn = t.closest('[data-add-service]');
+  if(addServiceBtn){
+    const key = addServiceBtn.dataset.addService;
+    reflowCreateStep2(d=>{
+      if(key==='haulage') d.additionalServices.haulage = emptyHaulageAddon();
+      if(key==='brokerage') d.additionalServices.brokerage = emptyBrokerageAddon();
+    });
+    return;
+  }
+  const removeServiceBtn = t.closest('[data-remove-service]');
+  if(removeServiceBtn){
+    const key = removeServiceBtn.dataset.removeService;
+    reflowCreateStep2(d=>{ d.additionalServices[key] = null; });
+    return;
+  }
+  const haulageAddonToggle = t.closest('[data-toggle-haulage]');
+  if(haulageAddonToggle){
+    const field = haulageAddonToggle.dataset.toggleHaulage;
+    const val = haulageAddonToggle.dataset.toggleValue === 'true';
+    reflowCreateStep2(d=>{ d.additionalServices.haulage[field] = val; });
+    return;
+  }
+  const deliveryTypeTab = t.closest('[data-delivery-type]');
+  if(deliveryTypeTab){
+    const val = deliveryTypeTab.dataset.deliveryType;
+    reflowCreateStep2(d=>{ d.air.deliveryType = val; });
+    return;
+  }
+  const palletsToggle = t.closest('[data-toggle-pallets]');
+  if(palletsToggle){
+    const val = palletsToggle.dataset.togglePallets === 'true';
+    reflowCreateStep2(d=>{ d.air.uniformPallets = val; });
+    return;
+  }
+
   if(t.closest('#create-shipment-submit')){
     readDynFieldsFrom(el('create-step-2'), createShipmentState.draft);
     const err = validateCreateDraft();
@@ -2510,6 +3035,39 @@ document.body.addEventListener('click', (e)=>{
 el('shipment-search').addEventListener('input', (e)=>{
   state.searchQuery = e.target.value;
   renderShipmentsList();
+});
+
+// Haulage-addon scope select needs to reveal/hide its Origin/Destination sub-blocks —
+// readDynFieldsFrom() picks up the browser's already-updated select.value, so no
+// explicit mutation is needed here, just a re-render off the freshly-synced draft.
+document.body.addEventListener('change', (e)=>{
+  if(e.target.dataset && e.target.dataset.field === 'additionalServices.haulage.scope'){
+    reflowCreateStep2(()=>{});
+  }
+});
+
+// Live volumetric-weight calculation for the Air Freight form — updates the readonly
+// output directly (no full re-render) so typing digits doesn't lose focus/cursor.
+function recomputeVolumetricWeight(){
+  if(!createShipmentState.draft || !createShipmentState.draft.air) return;
+  const container = el('create-step-2');
+  const out = el('air-vw-output');
+  if(!out) return;
+  const val = {
+    length: container.querySelector('[data-field="air.length"]')?.value,
+    width: container.querySelector('[data-field="air.width"]')?.value,
+    height: container.querySelector('[data-field="air.height"]')?.value,
+    dimensionUnit: container.querySelector('[data-field="air.dimensionUnit"]')?.value || 'cm',
+  };
+  const vw = volumetricWeightOf(val);
+  out.value = vw ? `${vw} kg` : '';
+}
+document.body.addEventListener('input', (e)=>{
+  const f = e.target.dataset && e.target.dataset.field;
+  if(f==='air.length' || f==='air.width' || f==='air.height') recomputeVolumetricWeight();
+});
+document.body.addEventListener('change', (e)=>{
+  if(e.target.dataset && e.target.dataset.field==='air.dimensionUnit') recomputeVolumetricWeight();
 });
 
 /* ==========================================================================
