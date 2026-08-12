@@ -447,6 +447,7 @@ textarea.field-control{resize:vertical;min-height:70px}
 
 .field-control[readonly]{background:var(--green-chip-bg);color:var(--silver-dark)}
 .add-service-menu-wrap{position:relative}
+.toggle-box{border:1px solid var(--border-tint);border-radius:var(--radius-md);padding:14px 16px}
 
 @media (max-width:900px){
   .form-grid{grid-template-columns:1fr}
@@ -1243,11 +1244,13 @@ function buildTrackingTemplateFor(s){
     ];
   }
   if(s.category==='HAULAGE'){
+    const from = s.direction==='Import' ? s.haulage.portOfDischarge : s.haulage.originAddress;
+    const to = s.direction==='Import' ? s.haulage.destinationAddress : s.haulage.portOfLoading;
     return [
-      {label:'Vehicle Dispatched', loc:s.haulage.pickupLocation, source:'Haulage'},
+      {label:'Vehicle Dispatched', loc:from, source:'Haulage'},
       {label:'In Transit', loc:'En Route', source:'Haulage'},
-      {label:'Arrived at Destination', loc:s.haulage.deliveryLocation, source:'Haulage'},
-      {label:'Proof of Delivery Signed', loc:s.haulage.deliveryLocation, source:'Haulage'},
+      {label:'Arrived at Destination', loc:to, source:'Haulage'},
+      {label:'Proof of Delivery Signed', loc:to, source:'Haulage'},
     ];
   }
   return [];
@@ -1384,10 +1387,10 @@ const SHIPMENT_LIST_BASE = [
     ocean:{pol:'Apapa Port, Lagos', pod:'Port of Douala', freightType:'FCL', vessel:'OOCL Africa', voyage:'AF0456', carrier:'OOCL', bl:'OOLU2384910X'}},
   {jobRef:'ZELO000006', category:'OCEAN', direction:'Import', customer:'Nigerian Breweries', origin:'Antwerp, Belgium', destination:'Lagos, Nigeria', route:'Antwerp, Belgium → Lagos, Nigeria', status:'Completed', slaHealth:'Healthy', eta:'10 Jul 2026', ownerId:'u6', supportingOwnerIds:[], completedMilestones:10, quoteRef:'OP-QT-8590', incoterm:'CIF', etd:'20 Jun 2026',
     ocean:{pol:'Port of Antwerp', pod:'Apapa Port, Lagos', freightType:'FCL', vessel:'APL Antwerp', voyage:'EU0912', carrier:'APL', bl:'APLU5567234B'}},
-  {jobRef:'ZELO000007', category:'HAULAGE', direction:'Domestic', customer:'Flour Mills of Nigeria', origin:'Lagos, Nigeria', destination:'Kano, Nigeria', route:'Lagos, Nigeria → Kano, Nigeria', status:'Active', slaHealth:'At-Risk', eta:'21 Jul 2026', ownerId:'u3', supportingOwnerIds:['u4'], completedMilestones:3, quoteRef:'OP-QT-8905', incoterm:'', etd:'18 Jul 2026',
-    haulage:{pickupLocation:'Apapa Port Warehouse, Lagos', deliveryLocation:'Bompai Industrial Estate, Kano', haulageType:'Container Haulage', truckNumber:'LND-224-KJA', driverName:'Emeka Obi', driverPhone:'+234 802 556 3311', waybill:'WB-77291'}},
-  {jobRef:'ZELO000008', category:'BROKERAGE', direction:'Import', customer:'Unilever Nigeria', origin:'Rotterdam, Netherlands', destination:'Lagos, Nigeria', route:'Rotterdam, Netherlands → Lagos, Nigeria', status:'Active', slaHealth:'Healthy', eta:'22 Jul 2026', ownerId:'u4', supportingOwnerIds:['u6'], completedMilestones:4, quoteRef:'OP-QT-8912', incoterm:'DDP', etd:'08 Jul 2026',
-    brokerage:{customsOffice:'Apapa Port, Lagos', declarationNumber:'SGD-2026-771203', hsCode:'3401.11, 3402.90', formM:'MF20260456781', paar:'PAAR-88231', clearingAgent:'Titi Aluko', dutyPayable:'₦4,820,000'}},
+  {jobRef:'ZELO000007', category:'HAULAGE', direction:'Import', customer:'Flour Mills of Nigeria', origin:'Apapa Port, Lagos', destination:'Bompai Industrial Estate, Kano', route:'Apapa Port, Lagos → Bompai Industrial Estate, Kano', status:'Active', slaHealth:'At-Risk', eta:'21 Jul 2026', ownerId:'u3', supportingOwnerIds:['u4'], completedMilestones:3, quoteRef:'OP-QT-8905', incoterm:'', etd:'18 Jul 2026',
+    haulage:{portOfDischarge:'Apapa Port, Lagos', destinationAddress:'Bompai Industrial Estate, Kano', originAddress:'', portOfLoading:'', officeBranch:'Apapa Branch', currency:'NGN', totalValue:'42000000', bl:'', attention:'', portEta:'21 Jul 2026', tdoExpiryDate:'25 Jul 2026', tdoWrittenDate:'18 Jul 2026', hazardous:false, uniformContainers:true, containerSpecs:[{hsCode:'', commodityType:'Food & Beverages', commodityCategory:'Perishable', commodityDescription:'Bagged flour', count:'5', weight:'22', size:'40ft', type:'Dry'}], tracker:true, escort:false, brokerageAddon:false, tbl:false, comment:''}},
+  {jobRef:'ZELO000008', category:'BROKERAGE', direction:'Import', customer:'Unilever Nigeria', origin:'Port of Rotterdam', destination:'Apapa Port, Lagos', route:'Port of Rotterdam → Apapa Port, Lagos', status:'Active', slaHealth:'Healthy', eta:'22 Jul 2026', ownerId:'u4', supportingOwnerIds:['u6'], completedMilestones:4, quoteRef:'OP-QT-8912', incoterm:'DDP', etd:'08 Jul 2026',
+    brokerage:{originPort:'Port of Rotterdam', destinationPort:'Apapa Port, Lagos', consigneeName:'Unilever Nigeria Plc', consigneeAddress:'Oregun Industrial Estate, Lagos', officeBranch:'Lagos HQ', currency:'NGN', totalValue:'18500000', bl:'', attention:'', portEta:'22 Jul 2026', transportMode:'Sea', nepcNumber:'', formM:'MF20260456781', paar:'PAAR-88231', hazardous:false, uniformContainers:false, containerSpecs:[{hsCode:'3401.11', commodityType:'Chemicals', commodityCategory:'Non-Hazardous', commodityDescription:'Soap and detergent raw materials', count:'8', weight:'120', size:'40ft', type:'Dry'}], comment:''}},
 ];
 
 const SHIPMENTS = {};
@@ -1512,8 +1515,11 @@ function renderShipmentDetail(){
 function headerStripDynamicCells(s){
   if(s.category==='OCEAN') return [['POL', locodeOf(s.ocean.pol)], ['POD', locodeOf(s.ocean.pod)]];
   if(s.category==='AIR') return [['Origin Airport', airportCodeOf(s.air.originAirport)], ['Destination Airport', airportCodeOf(s.air.destAirport)]];
-  if(s.category==='HAULAGE') return [['Pickup', s.haulage.pickupLocation], ['Delivery', s.haulage.deliveryLocation]];
-  return [['Customs Office', locodeOf(s.brokerage.customsOffice)], ['Declaration No.', s.brokerage.declarationNumber || '—']];
+  if(s.category==='HAULAGE'){
+    if(s.direction==='Import') return [['Port of Discharge', locodeOf(s.haulage.portOfDischarge)], ['Destination', s.haulage.destinationAddress || '—']];
+    return [['Origin', s.haulage.originAddress || '—'], ['Port of Loading', locodeOf(s.haulage.portOfLoading)]];
+  }
+  return [['Origin Port', locodeOf(s.brokerage.originPort)], ['Destination Port', locodeOf(s.brokerage.destinationPort)]];
 }
 
 function renderShipHeader(){
@@ -1601,24 +1607,35 @@ function categorySpecificDetailRows(s){
   }
   if(s.category==='HAULAGE'){
     const h = s.haulage;
-    return [
-      ['Haulage Type', h.haulageType],
-      ['Pickup Location', h.pickupLocation],
-      ['Delivery Location', h.deliveryLocation],
-      ['Truck / Vehicle Number', h.truckNumber || '—'],
-      ['Driver', h.driverName ? h.driverName + (h.driverPhone ? ' · ' + h.driverPhone : '') : '—'],
-      ['Waybill Number', h.waybill || '—'],
+    const rows = [
+      ['Office/Branch', h.officeBranch || '—'],
+      ['Bill of Lading (B/L)', h.bl || '—'],
+      ['Attention', h.attention || '—'],
+      ['Total Value of Goods', h.totalValue ? `${h.currency} ${h.totalValue}` : '—'],
+      ['Hazardous Cargo', h.hazardous ? '<span class="chip chip-error">Hazardous</span>' : '<span class="chip chip-neutral">Non-Hazardous</span>'],
+      ['Haulage Tracker', h.tracker ? 'Included' : 'Not included'],
+      ['Haulage Escort', h.escort ? 'Included' : 'Not included'],
     ];
+    if(s.direction==='Import'){
+      rows.unshift(['Destination Address', h.destinationAddress || '—'], ['Port of Discharge', `${locodeOf(h.portOfDischarge)}<div class="v-sub">${h.portOfDischarge}</div>`]);
+    } else {
+      rows.unshift(['Port of Loading', `${locodeOf(h.portOfLoading)}<div class="v-sub">${h.portOfLoading}</div>`], ['Origin Address', h.originAddress || '—']);
+    }
+    return rows;
   }
   const b = s.brokerage;
   return [
-    ['Customs Office', `${locodeOf(b.customsOffice)}<div class="v-sub">${b.customsOffice}</div>`],
-    ['Declaration Number (SGD)', b.declarationNumber || '—'],
-    ['HS Code(s)', b.hsCode || '—'],
-    ['Form M', b.formM || '—'],
-    ['PAAR', b.paar || '—'],
-    ['Clearing Agent', b.clearingAgent || '—'],
-    ['Duty Payable', b.dutyPayable || '—'],
+    ['Origin Port', `${locodeOf(b.originPort)}<div class="v-sub">${b.originPort}</div>`],
+    ['Destination Port', `${locodeOf(b.destinationPort)}<div class="v-sub">${b.destinationPort}</div>`],
+    ['Consignee', b.consigneeName || '—'],
+    ['Consignee Address', b.consigneeAddress || '—'],
+    ['Office/Branch', b.officeBranch || '—'],
+    ['Transport Mode', b.transportMode || '—'],
+    ['Bill of Lading (B/L)', b.bl || '—'],
+    s.direction==='Export' ? ['NEPC Number', b.nepcNumber || '—'] : ['Form M', b.formM || '—'],
+    ...(s.direction!=='Export' ? [['PAAR', b.paar || '—']] : []),
+    ['Total Value of Goods', b.totalValue ? `${b.currency} ${b.totalValue}` : '—'],
+    ['Hazardous Cargo', b.hazardous ? '<span class="chip chip-error">Hazardous</span>' : '<span class="chip chip-neutral">Non-Hazardous</span>'],
   ];
 }
 
@@ -1739,23 +1756,36 @@ function renderCargoSection(){
       ['Cargo Description', s.air.cargoDescription || '—'],
     ];
   } else if(s.category==='HAULAGE'){
-    title = `${ICON_TRUCK}Consignment &amp; Vehicle Details`;
-    sub = 'Vehicle and cargo details for this haulage job.';
+    title = `${ICON_TRUCK}Consignment Details`;
+    sub = 'Booking-level cargo details for this haulage job.';
     rows = [
-      ['Haulage Type', s.haulage.haulageType],
-      ['Truck / Vehicle Number', s.haulage.truckNumber || '—'],
-      ['Driver', s.haulage.driverName || '—'],
-      ['Driver Phone', s.haulage.driverPhone || '—'],
+      ['TDO Written Date', s.haulage.tdoWrittenDate || '—'],
+      ['TDO Expiry Date', s.haulage.tdoExpiryDate || '—'],
+      ['Port ETA', s.haulage.portEta || '—'],
+      ['Do you require TBL?', s.haulage.tbl ? 'Yes' : 'No'],
     ];
+    el('cargo-card').innerHTML = `
+      <h3 class="section-title">${title}</h3>
+      <p class="section-sub">${sub}</p>
+      ${renderBookingPlanTableHtml(s.haulage.containerSpecs)}
+      <div class="detail-fields-grid">${rows.map(([k,v])=>`<div class="detail-field"><div class="k">${k}</div><div class="v">${v}</div></div>`).join('')}</div>
+      ${renderAdditionalServicesSummaryHtml(s)}`;
+    return;
   } else {
     title = `${ICON_STAMP}Declaration Details`;
     sub = 'Customs clearance reference data for this job.';
     rows = [
-      ['Declaration Number (SGD)', s.brokerage.declarationNumber || '—'],
-      ['HS Code(s)', s.brokerage.hsCode || '—'],
-      ['Clearing Agent', s.brokerage.clearingAgent || '—'],
-      ['Duty Payable', s.brokerage.dutyPayable || '—'],
+      ['Transport Mode', s.brokerage.transportMode || '—'],
+      s.direction==='Export' ? ['NEPC Number', s.brokerage.nepcNumber || '—'] : ['Form M', s.brokerage.formM || '—'],
+      ...(s.direction!=='Export' ? [['PAAR', s.brokerage.paar || '—']] : []),
     ];
+    el('cargo-card').innerHTML = `
+      <h3 class="section-title">${title}</h3>
+      <p class="section-sub">${sub}</p>
+      ${renderBookingPlanTableHtml(s.brokerage.containerSpecs)}
+      <div class="detail-fields-grid">${rows.map(([k,v])=>`<div class="detail-field"><div class="k">${k}</div><div class="v">${v}</div></div>`).join('')}</div>
+      ${renderAdditionalServicesSummaryHtml(s)}`;
+    return;
   }
   el('cargo-card').innerHTML = `
     <h3 class="section-title">${title}</h3>
@@ -1986,22 +2016,25 @@ const CATEGORY_FIELD_DEFS = {
     {key:'air.cargoDescription', label:'Cargo Description (optional)', type:'text'},
   ],
   HAULAGE: [
-    {key:'haulage.pickupLocation', label:'Pickup Location', type:'text'},
-    {key:'haulage.deliveryLocation', label:'Delivery Location', type:'text'},
-    {key:'haulage.haulageType', label:'Haulage Type', type:'select', options:['Container Haulage','Bulk Haulage','Flatbed','General Cargo']},
-    {key:'haulage.truckNumber', label:'Truck / Vehicle Number (optional)', type:'text'},
-    {key:'haulage.driverName', label:'Driver Name (optional)', type:'text'},
-    {key:'haulage.driverPhone', label:'Driver Phone (optional)', type:'text'},
-    {key:'haulage.waybill', label:'Waybill Number (optional)', type:'text'},
+    {key:'haulage.officeBranch', label:'Office/Branch', type:'select', options:OFFICES},
+    {key:'haulage.portOfDischarge', label:'Port of Discharge (optional)', type:'port'},
+    {key:'haulage.destinationAddress', label:'Destination Address (optional)', type:'text'},
+    {key:'haulage.originAddress', label:'Origin Address (optional)', type:'text'},
+    {key:'haulage.portOfLoading', label:'Port of Loading (optional)', type:'port'},
+    {key:'haulage.bl', label:'BL Number (optional)', type:'text'},
+    {key:'haulage.attention', label:'Attention (optional)', type:'text'},
   ],
   BROKERAGE: [
-    {key:'brokerage.customsOffice', label:'Customs Office / Port of Entry', type:'port'},
-    {key:'brokerage.declarationNumber', label:'Declaration Number — SGD (optional)', type:'text'},
-    {key:'brokerage.hsCode', label:'HS Code(s) (optional)', type:'text'},
-    {key:'brokerage.formM', label:'Form M Number (optional)', type:'text'},
-    {key:'brokerage.paar', label:'PAAR Number (optional)', type:'text'},
-    {key:'brokerage.clearingAgent', label:'Clearing Agent (optional)', type:'text'},
-    {key:'brokerage.dutyPayable', label:'Customs Value / Duty Payable (optional)', type:'text'},
+    {key:'brokerage.originPort', label:'Origin Port', type:'port'},
+    {key:'brokerage.destinationPort', label:'Destination Port', type:'port'},
+    {key:'brokerage.consigneeName', label:"Consignee's Name (optional)", type:'text'},
+    {key:'brokerage.consigneeAddress', label:"Consignee's Address (optional)", type:'text'},
+    {key:'brokerage.officeBranch', label:'Office/Branch', type:'select', options:OFFICES},
+    {key:'brokerage.transportMode', label:'Transport Mode', type:'select', options:['Sea','Air','Land']},
+    {key:'brokerage.bl', label:'BL Number (optional)', type:'text'},
+    {key:'brokerage.formM', label:'Form M (optional)', type:'text'},
+    {key:'brokerage.paar', label:'PAAR (optional)', type:'text'},
+    {key:'brokerage.nepcNumber', label:'NEPC Number (optional)', type:'text'},
   ],
 };
 
@@ -2101,7 +2134,7 @@ function emptyContainerSpec(){
 }
 function emptyDraftFor(category){
   const draft = {
-    customer:'', direction: category==='HAULAGE' ? 'Domestic' : 'Import', quoteRef:'', incoterm:'', origin:'', destination:'',
+    customer:'', direction:'Import', quoteRef:'', incoterm:'', origin:'', destination:'',
     etd:'', eta:'', ownerId: TEAM[0].id, supportingOwnerIds: [],
     additionalServices: { haulage: null, brokerage: null },
   };
@@ -2120,8 +2153,20 @@ function emptyDraftFor(category){
     dimensionUnit:'cm', length:'', width:'', height:'',
     comment:'',
   };
-  if(category==='HAULAGE') draft.haulage = {pickupLocation:'', deliveryLocation:'', haulageType:'Container Haulage', truckNumber:'', driverName:'', driverPhone:'', waybill:''};
-  if(category==='BROKERAGE') draft.brokerage = {customsOffice:'', declarationNumber:'', hsCode:'', formM:'', paar:'', clearingAgent:'', dutyPayable:''};
+  if(category==='HAULAGE') draft.haulage = {
+    portOfDischarge:'', destinationAddress:'', originAddress:'', portOfLoading:'',
+    officeBranch:'', currency:'NGN', totalValue:'', bl:'', attention:'',
+    portEta:'', tdoExpiryDate:'', tdoWrittenDate:'',
+    hazardous:false, uniformContainers:true, containerSpecs:[emptyContainerSpec()],
+    tracker:false, escort:false, brokerageAddon:false, tbl:false, comment:'',
+  };
+  if(category==='BROKERAGE') draft.brokerage = {
+    originPort:'', destinationPort:'', consigneeName:'', consigneeAddress:'',
+    officeBranch:'', currency:'NGN', totalValue:'', bl:'', attention:'', portEta:'',
+    transportMode:'', nepcNumber:'', formM:'', paar:'',
+    hazardous:false, uniformContainers:false, containerSpecs:[emptyContainerSpec()],
+    comment:'',
+  };
   return draft;
 }
 function emptyHaulageAddon(){
@@ -2197,14 +2242,14 @@ function renderCustomerFieldHtml(value){
 }
 
 const CONTAINER_ORDINALS = ['First','Second','Third','Fourth','Fifth','Sixth','Seventh','Eighth'];
-function renderContainerSpecBlock(spec, idx, total){
-  const base = `ocean.containerSpecs.${idx}`;
+function renderContainerSpecBlock(spec, idx, total, prefix){
+  const base = `${prefix}.containerSpecs.${idx}`;
   const ordinal = CONTAINER_ORDINALS[idx] || `${idx+1}th`;
   return `
   <div class="repeatable-card">
     <div class="repeatable-card-head">
       <span>${ordinal} container details</span>
-      ${total>1 ? `<button type="button" class="remove-icon-btn" data-remove-container-spec="${idx}" title="Remove">${ICON_X}</button>` : ''}
+      ${total>1 ? `<button type="button" class="remove-icon-btn" data-remove-container-spec="${idx}" data-container-prefix="${prefix}" title="Remove">${ICON_X}</button>` : ''}
     </div>
     <div class="repeatable-card-body">
       <p class="section-sub" style="margin:0 0 14px">Please provide your container details</p>
@@ -2221,13 +2266,42 @@ function renderContainerSpecBlock(spec, idx, total){
     </div>
   </div>`;
 }
-function renderContainerSpecsSection(draft){
-  const specs = draft.ocean.containerSpecs;
-  let html = specs.map((s,i)=>renderContainerSpecBlock(s, i, specs.length)).join('');
-  if(!draft.ocean.uniformContainers){
-    html += `<button type="button" class="add-block-btn" data-add-container-spec>${ICON_PLUS} Add Container</button>`;
+function renderContainerSpecsSection(draft, prefix){
+  const specs = draft[prefix].containerSpecs;
+  let html = specs.map((s,i)=>renderContainerSpecBlock(s, i, specs.length, prefix)).join('');
+  if(!draft[prefix].uniformContainers){
+    html += `<button type="button" class="add-block-btn" data-add-container-spec data-container-prefix="${prefix}">${ICON_PLUS} Add Container</button>`;
   }
   return html;
+}
+function renderHazardousToggleHtml(prefix, hazardous){
+  return `
+  <div class="form-section-label">Hazardous</div>
+  <p class="section-sub" style="margin:0 0 4px">Is your cargo hazardous</p>
+  <div class="toggle-pair" style="margin-bottom:18px">
+    <button type="button" class="toggle-option ${hazardous?'selected':''}" data-toggle-name="${prefix}.hazardous" data-toggle-value="true"><span class="radio-dot"></span>Yes</button>
+    <button type="button" class="toggle-option ${!hazardous?'selected':''}" data-toggle-name="${prefix}.hazardous" data-toggle-value="false"><span class="radio-dot"></span>No</button>
+  </div>`;
+}
+function renderUniformToggleHtml(prefix, uniform, boxed, questionText){
+  const inner = `
+    <p class="section-sub" style="margin:0 0 4px${boxed?';font-weight:700;color:var(--green-dark)':''}">${questionText}</p>
+    <div class="toggle-pair">
+      <button type="button" class="toggle-option ${uniform?'selected':''}" data-toggle-uniform-for="${prefix}" data-toggle-value="true"><span class="radio-dot"></span>Yes, it is</button>
+      <button type="button" class="toggle-option ${!uniform?'selected':''}" data-toggle-uniform-for="${prefix}" data-toggle-value="false"><span class="radio-dot"></span>No, it isn't</button>
+    </div>`;
+  return boxed ? `<div class="toggle-box" style="margin-bottom:20px">${inner}</div>` : `<div style="margin-bottom:18px">${inner}</div>`;
+}
+function renderBookingPlanTableHtml(specs){
+  if(!specs || !specs.length) return '';
+  return `
+    <div class="form-section-label" style="border-top:none;padding-top:0;margin-bottom:10px">Booking Plan</div>
+    <div class="table-wrap" style="margin-bottom:22px">
+      <table class="data-table">
+        <thead><tr><th>Commodity</th><th>Category</th><th>Count</th><th>Weight (Tons)</th><th>Size</th><th>Type</th></tr></thead>
+        <tbody>${specs.map(sp=>`<tr><td>${sp.commodityDescription || sp.commodityType || '—'}</td><td>${sp.commodityCategory||'—'}</td><td>${sp.count||'—'}</td><td>${sp.weight||'—'}</td><td>${sp.size}</td><td>${sp.type}</td></tr>`).join('')}</tbody>
+      </table>
+    </div>`;
 }
 
 const ADDITIONAL_SERVICES = [{key:'haulage', label:'Haulage'}, {key:'brokerage', label:'Custom Brokerage'}];
@@ -2358,7 +2432,7 @@ function renderCreateStep2Ocean(){
     <button type="button" class="toggle-option ${o.uniformContainers?'selected':''}" data-toggle-uniform="true"><span class="radio-dot"></span>Yes, it is</button>
     <button type="button" class="toggle-option ${!o.uniformContainers?'selected':''}" data-toggle-uniform="false"><span class="radio-dot"></span>No, it isn't</button>
   </div>
-  ${renderContainerSpecsSection(d)}
+  ${renderContainerSpecsSection(d, 'ocean')}
 
   <div class="form-section-label">Additional Services</div>
   <p class="section-sub" style="margin:0 0 14px">Please add all additional services that apply</p>
@@ -2435,20 +2509,146 @@ function renderCreateStep2Air(){
   `;
 }
 
+function renderCreateStep2Haulage(){
+  const d = createShipmentState.draft;
+  const h = d.haulage;
+  const isImport = d.direction === 'Import';
+  return `
+  <div class="freight-card">
+    <div class="freight-card-head">
+      <div><h4>Haulage details</h4><p>Please provide the required information</p></div>
+      <select class="direction-select" data-field="direction">
+        <option ${d.direction==='Export'?'selected':''}>Export</option>
+        <option ${d.direction==='Import'?'selected':''}>Import</option>
+      </select>
+    </div>
+    <div class="freight-route-row">
+      ${isImport ? `
+      <div class="form-field filled searchable-field" data-ss-mode="port"><label class="field-label">Port of Discharge</label><input type="text" class="field-control ss-display" autocomplete="off" value="${formatPortDisplay(h.portOfDischarge)}" placeholder="Search..."><input type="hidden" data-field="haulage.portOfDischarge" value="${h.portOfDischarge}"><div class="ss-menu"></div></div>
+      <div class="route-arrow">${ICON_ARROW}</div>
+      <div class="form-field filled"><label class="field-label">Destination Address</label><input class="field-control" data-field="haulage.destinationAddress" value="${h.destinationAddress}"></div>
+      ` : `
+      <div class="form-field filled"><label class="field-label">Origin Address</label><input class="field-control" data-field="haulage.originAddress" value="${h.originAddress}"></div>
+      <div class="route-arrow">${ICON_ARROW}</div>
+      <div class="form-field filled searchable-field" data-ss-mode="port"><label class="field-label">Port of Loading</label><input type="text" class="field-control ss-display" autocomplete="off" value="${formatPortDisplay(h.portOfLoading)}" placeholder="Search..."><input type="hidden" data-field="haulage.portOfLoading" value="${h.portOfLoading}"><div class="ss-menu"></div></div>
+      `}
+    </div>
+  </div>
+
+  <div class="form-section-label" style="border-top:none;padding-top:0">Shipment details</div>
+  <p class="section-sub" style="margin:0 0 16px">Please provide the shipment details</p>
+  <div class="form-grid">
+    ${renderCustomerFieldHtml(d.customer)}
+    <div class="form-field filled"><label class="field-label">Office/Branch</label><select class="field-control" data-field="haulage.officeBranch"><option value="">Select option...</option>${OFFICES.map(o=>`<option ${o===h.officeBranch?'selected':''}>${o}</option>`).join('')}</select></div>
+    <div style="margin-bottom:18px"><div style="font-size:11px;color:var(--silver-light);font-weight:600;text-transform:uppercase;letter-spacing:.02em;margin-bottom:6px">Total Value of Goods</div><div style="display:flex;gap:8px"><select class="field-control" style="flex:0 0 84px" data-field="haulage.currency">${CURRENCIES.map(c=>`<option ${c===h.currency?'selected':''}>${c}</option>`).join('')}</select><input class="field-control" style="flex:1" data-field="haulage.totalValue" value="${h.totalValue}" placeholder="0.00"></div></div>
+    <div class="form-field filled"><label class="field-label">BL Number (Optional)</label><input class="field-control" data-field="haulage.bl" value="${h.bl}" placeholder="Enter BL number"></div>
+    <div class="form-field filled"><label class="field-label">Attention</label><input class="field-control" data-field="haulage.attention" value="${h.attention}" placeholder="Enter attention name"></div>
+    <div class="form-field filled"><label class="field-label">Port ETA (Optional)</label><input type="date" class="field-control" data-field="haulage.portEta" data-field-type="date" value="${h.portEta ? displayDateToInputValue(h.portEta) : ''}"></div>
+    <div class="form-field filled"><label class="field-label">TDO Expiry date</label><input type="date" class="field-control" data-field="haulage.tdoExpiryDate" data-field-type="date" value="${h.tdoExpiryDate ? displayDateToInputValue(h.tdoExpiryDate) : ''}"></div>
+    <div class="form-field filled"><label class="field-label">TDO Written date</label><input type="date" class="field-control" data-field="haulage.tdoWrittenDate" data-field-type="date" value="${h.tdoWrittenDate ? displayDateToInputValue(h.tdoWrittenDate) : ''}"></div>
+  </div>
+
+  ${renderHazardousToggleHtml('haulage', h.hazardous)}
+  ${renderUniformToggleHtml('haulage', h.uniformContainers, true, 'Is each container of the same size?')}
+
+  <div class="form-section-label">Container details</div>
+  ${renderContainerSpecsSection(d, 'haulage')}
+
+  <div class="form-section-label">Additional Services</div>
+  <div style="margin-top:14px">
+    <p style="font-weight:700;color:var(--green-dark);font-size:13px;margin:0 0 2px">Haulage Tracker</p>
+    <p class="section-sub" style="margin:0 0 4px">We will provide tracking for the easy and secure transport of your goods.</p>
+    <div class="toggle-pair" style="margin-bottom:18px">
+      <button type="button" class="toggle-option ${h.tracker?'selected':''}" data-toggle-name="haulage.tracker" data-toggle-value="true"><span class="radio-dot"></span>Include Haulage Tracker</button>
+      <button type="button" class="toggle-option ${!h.tracker?'selected':''}" data-toggle-name="haulage.tracker" data-toggle-value="false"><span class="radio-dot"></span>No Haulage Tracker</button>
+    </div>
+    <p style="font-weight:700;color:var(--green-dark);font-size:13px;margin:0 0 2px">Haulage Escort</p>
+    <p class="section-sub" style="margin:0 0 4px">We will provide escort for the easy and secure transport of your goods.</p>
+    <div class="toggle-pair" style="margin-bottom:18px">
+      <button type="button" class="toggle-option ${h.escort?'selected':''}" data-toggle-name="haulage.escort" data-toggle-value="true"><span class="radio-dot"></span>Include Haulage Escort</button>
+      <button type="button" class="toggle-option ${!h.escort?'selected':''}" data-toggle-name="haulage.escort" data-toggle-value="false"><span class="radio-dot"></span>No Haulage Escort</button>
+    </div>
+    <p style="font-weight:700;color:var(--green-dark);font-size:13px;margin:0 0 2px">Custom Brokerage</p>
+    <p class="section-sub" style="margin:0 0 4px">We will help you relate directly with the customs and ensure your cargo is transported safely</p>
+    <div class="toggle-pair" style="margin-bottom:18px">
+      <button type="button" class="toggle-option ${h.brokerageAddon?'selected':''}" data-toggle-name="haulage.brokerageAddon" data-toggle-value="true"><span class="radio-dot"></span>Include Custom Brokerage</button>
+      <button type="button" class="toggle-option ${!h.brokerageAddon?'selected':''}" data-toggle-name="haulage.brokerageAddon" data-toggle-value="false"><span class="radio-dot"></span>No Custom Brokerage</button>
+    </div>
+    <p style="font-weight:700;color:var(--green-dark);font-size:13px;margin:0 0 2px">Do you require TBL?</p>
+    <div class="toggle-pair">
+      <button type="button" class="toggle-option ${h.tbl?'selected':''}" data-toggle-name="haulage.tbl" data-toggle-value="true"><span class="radio-dot"></span>Include TBL</button>
+      <button type="button" class="toggle-option ${!h.tbl?'selected':''}" data-toggle-name="haulage.tbl" data-toggle-value="false"><span class="radio-dot"></span>No TBL</button>
+    </div>
+  </div>
+
+  <div class="form-field full" style="margin-top:20px">
+    <label class="field-label">Add a comment or update</label>
+    <textarea class="field-control" rows="3" data-field="haulage.comment" placeholder="Add a comment or update...">${h.comment}</textarea>
+  </div>
+  `;
+}
+
+function renderCreateStep2Brokerage(){
+  const d = createShipmentState.draft;
+  const b = d.brokerage;
+  const isExport = d.direction === 'Export';
+  return `
+  <div class="create-banner">${ICON_WARN}<span><b>Please Note!</b> Are you shipping over 9,000 KG? Kindly contact support <a href="#" data-toast-only="Support contact isn't wired up in this prototype yet">here</a>.</span></div>
+
+  <div class="freight-card">
+    <div class="freight-card-head">
+      <div><h4>Freight details</h4><p>Please provide the required information</p></div>
+      <select class="direction-select" data-field="direction">
+        <option ${d.direction==='Export'?'selected':''}>Export</option>
+        <option ${d.direction==='Import'?'selected':''}>Import</option>
+      </select>
+    </div>
+    <div class="freight-route-row">
+      <div class="form-field filled searchable-field" data-ss-mode="port"><label class="field-label">Origin Port</label><input type="text" class="field-control ss-display" autocomplete="off" value="${formatPortDisplay(b.originPort)}" placeholder="Search..."><input type="hidden" data-field="brokerage.originPort" value="${b.originPort}"><div class="ss-menu"></div></div>
+      <div class="route-arrow">${ICON_ARROW}</div>
+      <div class="form-field filled searchable-field" data-ss-mode="port"><label class="field-label">Destination Port</label><input type="text" class="field-control ss-display" autocomplete="off" value="${formatPortDisplay(b.destinationPort)}" placeholder="Search..."><input type="hidden" data-field="brokerage.destinationPort" value="${b.destinationPort}"><div class="ss-menu"></div></div>
+    </div>
+  </div>
+
+  <div class="form-section-label" style="border-top:none;padding-top:0">Shipment details</div>
+  <p class="section-sub" style="margin:0 0 16px">Please provide the shipment details</p>
+  <div class="form-grid">
+    ${renderCustomerFieldHtml(d.customer)}
+    <div class="form-field filled"><label class="field-label">Consignee's Name (Optional)</label><input class="field-control" data-field="brokerage.consigneeName" value="${b.consigneeName}" placeholder="Enter Consignee's Name"></div>
+    <div class="form-field filled"><label class="field-label">Consignee's Address (Optional)</label><input class="field-control" data-field="brokerage.consigneeAddress" value="${b.consigneeAddress}" placeholder="Enter Consignee's Address"></div>
+    <div class="form-field filled"><label class="field-label">Office/Branch</label><select class="field-control" data-field="brokerage.officeBranch"><option value="">Select option...</option>${OFFICES.map(o=>`<option ${o===b.officeBranch?'selected':''}>${o}</option>`).join('')}</select></div>
+    <div style="margin-bottom:18px"><div style="font-size:11px;color:var(--silver-light);font-weight:600;text-transform:uppercase;letter-spacing:.02em;margin-bottom:6px">Total Value of Goods</div><div style="display:flex;gap:8px"><select class="field-control" style="flex:0 0 84px" data-field="brokerage.currency">${CURRENCIES.map(c=>`<option ${c===b.currency?'selected':''}>${c}</option>`).join('')}</select><input class="field-control" style="flex:1" data-field="brokerage.totalValue" value="${b.totalValue}" placeholder="0.00"></div></div>
+    <div class="form-field filled"><label class="field-label">BL Number (Optional)</label><input class="field-control" data-field="brokerage.bl" value="${b.bl}" placeholder="Enter BL number"></div>
+    <div class="form-field filled"><label class="field-label">Attention</label><input class="field-control" data-field="brokerage.attention" value="${b.attention}" placeholder="Enter attention name"></div>
+    <div class="form-field filled"><label class="field-label">Port ETA (Optional)</label><input type="date" class="field-control" data-field="brokerage.portEta" data-field-type="date" value="${b.portEta ? displayDateToInputValue(b.portEta) : ''}"></div>
+    <div class="form-field filled"><label class="field-label">Transport Mode</label><select class="field-control" data-field="brokerage.transportMode"><option value="">Select option...</option>${['Sea','Air','Land'].map(o=>`<option ${o===b.transportMode?'selected':''}>${o}</option>`).join('')}</select></div>
+    ${isExport
+      ? `<div class="form-field filled"><label class="field-label">NEPC Number (Optional)</label><input class="field-control" data-field="brokerage.nepcNumber" value="${b.nepcNumber}" placeholder="Enter NEPC number"></div>`
+      : `<div class="form-field filled"><label class="field-label">Form M (Optional)</label><input class="field-control" data-field="brokerage.formM" value="${b.formM}" placeholder="Enter Number"></div>
+         <div class="form-field filled"><label class="field-label">PAAR (Optional)</label><input class="field-control" data-field="brokerage.paar" value="${b.paar}" placeholder="Enter Number"></div>`}
+  </div>
+
+  ${renderHazardousToggleHtml('brokerage', b.hazardous)}
+  ${renderUniformToggleHtml('brokerage', b.uniformContainers, false, 'Is each container of the same size and type?')}
+
+  <div class="form-section-label">Container details</div>
+  ${renderContainerSpecsSection(d, 'brokerage')}
+
+  <div class="form-field full" style="margin-top:20px">
+    <label class="field-label">Add a comment or update</label>
+    <textarea class="field-control" rows="3" data-field="brokerage.comment" placeholder="Add a comment or update...">${b.comment}</textarea>
+  </div>
+  `;
+}
+
 function renderCreateStep2(){
   const cat = createShipmentState.category;
   el('create-step2-category-badge').innerHTML = `${categoryOf(cat).icon}${categoryOf(cat).label}`;
-  if(cat==='OCEAN' || cat==='AIR'){
-    el('create-common-fields').style.display = 'block';
-    el('create-common-fields').innerHTML = cat==='OCEAN' ? renderCreateStep2Ocean() : renderCreateStep2Air();
-    el('create-category-fields-section').style.display = 'none';
-    el('create-category-fields').innerHTML = '';
-  } else {
-    el('create-common-fields').style.display = '';
-    el('create-common-fields').innerHTML = commonFieldDefs(cat).map(f=>renderDynField(f, createShipmentState.draft)).join('');
-    el('create-category-fields-section').style.display = '';
-    el('create-category-fields').innerHTML = CATEGORY_FIELD_DEFS[cat].map(f=>renderDynField(f, createShipmentState.draft)).join('');
-  }
+  const renderers = {OCEAN: renderCreateStep2Ocean, AIR: renderCreateStep2Air, HAULAGE: renderCreateStep2Haulage, BROKERAGE: renderCreateStep2Brokerage};
+  el('create-common-fields').style.display = 'block';
+  el('create-common-fields').innerHTML = renderers[cat]();
+  el('create-category-fields-section').style.display = 'none';
+  el('create-category-fields').innerHTML = '';
   renderCreateOwnerFields();
   wireSearchableFieldsIn(el('create-step-2'));
 }
@@ -2483,14 +2683,22 @@ function validateCreateDraft(){
     if(!d.air.originAirport || !d.air.destAirport) return 'Pickup Airport and Destination Airport are required';
     return null;
   }
-  const dl = dateLabelsOf(cat);
-  if(!d.customer.trim()) return 'Customer is required';
-  if(!d.origin.trim()) return 'Origin is required';
-  if(!d.destination.trim()) return 'Destination is required';
-  if(!d.etd) return `${dl.start} is required`;
-  if(!d.eta) return `${dl.end} is required`;
-  if(cat==='HAULAGE' && (!d.haulage.pickupLocation.trim() || !d.haulage.deliveryLocation.trim())) return 'Pickup and Delivery Location are required';
-  if(cat==='BROKERAGE' && !d.brokerage.customsOffice) return 'Customs Office is required';
+  if(cat==='HAULAGE'){
+    if(!d.customer.trim()) return 'Customer Name is required';
+    if(d.direction==='Import'){
+      if(!d.haulage.portOfDischarge || !d.haulage.destinationAddress.trim()) return 'Port of Discharge and Destination Address are required';
+    } else {
+      if(!d.haulage.originAddress.trim() || !d.haulage.portOfLoading) return 'Origin Address and Port of Loading are required';
+    }
+    return null;
+  }
+  if(cat==='BROKERAGE'){
+    if(!d.customer.trim()) return 'Customer Name is required';
+    if(!d.brokerage.originPort || !d.brokerage.destinationPort) return 'Origin Port and Destination Port are required';
+    const badSpec = d.brokerage.containerSpecs.find(s=>!s.commodityType || !s.commodityCategory || !s.commodityDescription.trim() || !s.count || !s.weight);
+    if(badSpec) return 'Every container block needs Commodity Type, Category, Description, Count, and Weight';
+    return null;
+  }
   return null;
 }
 
@@ -2520,6 +2728,17 @@ function buildManualShipmentDetail(draft, category, jobRef){
   } else if(category==='AIR'){
     origin = draft.air.originAirport; destination = draft.air.destAirport;
     etd = todayDisplay(); eta = addDaysToDisplayDate(etd, 3);
+    quoteRef = ''; incoterm = '';
+  } else if(category==='HAULAGE'){
+    if(draft.direction==='Import'){ origin = draft.haulage.portOfDischarge; destination = draft.haulage.destinationAddress; }
+    else { origin = draft.haulage.originAddress; destination = draft.haulage.portOfLoading; }
+    etd = draft.haulage.tdoWrittenDate || todayDisplay();
+    eta = draft.haulage.portEta || addDaysToDisplayDate(etd, 7);
+    quoteRef = ''; incoterm = '';
+  } else if(category==='BROKERAGE'){
+    origin = draft.brokerage.originPort; destination = draft.brokerage.destinationPort;
+    etd = todayDisplay();
+    eta = draft.brokerage.portEta || addDaysToDisplayDate(etd, 14);
     quoteRef = ''; incoterm = '';
   }
 
@@ -2914,14 +3133,34 @@ document.body.addEventListener('click', (e)=>{
     });
     return;
   }
-  if(t.closest('[data-add-container-spec]')){
-    reflowCreateStep2(d=>{ d.ocean.containerSpecs.push(emptyContainerSpec()); });
+  const addSpecBtn = t.closest('[data-add-container-spec]');
+  if(addSpecBtn){
+    const prefix = addSpecBtn.dataset.containerPrefix || 'ocean';
+    reflowCreateStep2(d=>{ d[prefix].containerSpecs.push(emptyContainerSpec()); });
     return;
   }
   const removeSpecBtn = t.closest('[data-remove-container-spec]');
   if(removeSpecBtn){
     const idx = parseInt(removeSpecBtn.dataset.removeContainerSpec, 10);
-    reflowCreateStep2(d=>{ d.ocean.containerSpecs.splice(idx, 1); });
+    const prefix = removeSpecBtn.dataset.containerPrefix || 'ocean';
+    reflowCreateStep2(d=>{ d[prefix].containerSpecs.splice(idx, 1); });
+    return;
+  }
+  const uniformToggle2 = t.closest('[data-toggle-uniform-for]');
+  if(uniformToggle2){
+    const prefix = uniformToggle2.dataset.toggleUniformFor;
+    const val = uniformToggle2.dataset.toggleValue === 'true';
+    reflowCreateStep2(d=>{
+      d[prefix].uniformContainers = val;
+      if(val) d[prefix].containerSpecs = [d[prefix].containerSpecs[0] || emptyContainerSpec()];
+    });
+    return;
+  }
+  const genericToggle = t.closest('[data-toggle-name]');
+  if(genericToggle){
+    const path = genericToggle.dataset.toggleName;
+    const val = genericToggle.dataset.toggleValue === 'true';
+    reflowCreateStep2(d=>{ setPath(d, path, val); });
     return;
   }
   const addServiceBtn = t.closest('[data-add-service]');
@@ -3041,7 +3280,11 @@ el('shipment-search').addEventListener('input', (e)=>{
 // readDynFieldsFrom() picks up the browser's already-updated select.value, so no
 // explicit mutation is needed here, just a re-render off the freshly-synced draft.
 document.body.addEventListener('change', (e)=>{
-  if(e.target.dataset && e.target.dataset.field === 'additionalServices.haulage.scope'){
+  const f = e.target.dataset && e.target.dataset.field;
+  if(f === 'additionalServices.haulage.scope'){
+    reflowCreateStep2(()=>{});
+  }
+  if(f === 'direction' && (createShipmentState.category === 'HAULAGE' || createShipmentState.category === 'BROKERAGE')){
     reflowCreateStep2(()=>{});
   }
 });
