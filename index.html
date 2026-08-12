@@ -614,7 +614,7 @@ textarea.field-control{resize:vertical;min-height:70px}
         <div class="tab-pane" id="tab-overview">
           <div class="overview-layout" style="margin-bottom:22px">
             <div class="card card-pad">
-              <h3 class="section-title">Shipment Details</h3>
+              <h3 class="section-title">Shipment Information</h3>
               <p class="section-sub" style="margin:0 0 18px">Core reference data for this job.</p>
               <div class="detail-fields-grid" id="ship-detail-fields"></div>
             </div>
@@ -625,7 +625,9 @@ textarea.field-control{resize:vertical;min-height:70px}
             </div>
           </div>
 
-          <div class="card card-pad" id="cargo-card"></div>
+          <div class="card card-pad" id="commodity-card" style="margin-bottom:22px"></div>
+          <div class="card card-pad" id="container-card" style="margin-bottom:22px"></div>
+          <div class="card card-pad" id="additional-services-card"></div>
         </div>
 
         <!-- Tab: Progress -->
@@ -1475,7 +1477,9 @@ function renderShipmentDetail(){
   renderShipHeader();
   renderShipDetailFields();
   renderShipmentTeamDisplay();
-  renderCargoSection();
+  renderCommodityCard();
+  renderContainerCard();
+  renderAdditionalServicesCard();
   renderServiceDelivery();
   renderShipmentTracking();
   renderDocuments();
@@ -1550,6 +1554,8 @@ function renderShipHeader(){
   `;
 }
 
+// Shipment Information card — core booking-level reference fields (no commodity,
+// no container, no additional-services data; those live in their own cards below).
 function categorySpecificDetailRows(s){
   if(s.category==='OCEAN'){
     const o = s.ocean;
@@ -1560,14 +1566,6 @@ function categorySpecificDetailRows(s){
       ['Pickup Date', o.pickupDate || '—'],
       ['Total Value of Goods', o.totalValue ? `${o.currency} ${o.totalValue}` : '—'],
       ['Bill of Lading (B/L)', o.bl || '—'],
-      ['Hazardous Cargo', o.hazardous ? '<span class="chip chip-error">Hazardous</span>' : '<span class="chip chip-neutral">Non-Hazardous</span>'],
-      ['Commodity', o.commodityDescription || o.commodityType || '—'],
-      ['Commodity Type / Category', [o.commodityType, o.commodityCategory].filter(Boolean).join(' · ') || '—'],
-      ['Commodity HS Code', o.hsCode || '—'],
-      ['Container Count', o.containerCount || '—'],
-      ['Container Weight (Tons)', o.containerWeight || '—'],
-      ['Container Size / Type', `${o.containerSize} · ${o.containerType}`],
-      ['Uniform Containers', o.uniformContainers ? 'Yes' : 'No'],
     ];
     if(o.freightType || o.vessel || o.voyage || o.carrier){
       rows.push(['Freight Type', o.freightType || '—'], ['Vessel / Voyage', (o.vessel||'—') + (o.voyage ? ' · '+o.voyage : '')], ['Carrier', o.carrier || '—']);
@@ -1578,20 +1576,11 @@ function categorySpecificDetailRows(s){
     const a = s.air;
     const originIsAirport = a.deliveryType==='Port to Port' || a.deliveryType==='Port to Door';
     const destIsAirport = a.deliveryType==='Port to Port' || a.deliveryType==='Door to Port';
-    const vw = volumetricWeightOf(a);
     const rows = [
       ['Delivery Type', a.deliveryType || '—'],
       [originIsAirport ? 'Airport of Loading' : 'Origin Address', originIsAirport ? `${airportCodeOf(a.originAirport)}<div class="v-sub">${a.originAirport}</div>` : (a.originAddress || '—')],
       [destIsAirport ? 'Airport of Discharge' : 'Destination Address', destIsAirport ? `${airportCodeOf(a.destAirport)}<div class="v-sub">${a.destAirport}</div>` : (a.destinationAddress || '—')],
       ['Office/Branch', a.officeBranch || '—'],
-      ['Hazardous Cargo', a.hazardous ? '<span class="chip chip-error">Hazardous</span>' : '<span class="chip chip-neutral">Non-Hazardous</span>'],
-      ['Commodity', a.commodityDescription || a.commodityType || '—'],
-      ['Commodity Type / Category', [a.commodityType, a.commodityCategory].filter(Boolean).join(' · ') || '—'],
-      ['Commodity HS Code', a.hsCode || '—'],
-      ['Number of Pallets', a.numberOfPallets || '—'],
-      ['Uniform Pallets', a.uniformPallets ? 'Yes' : 'No'],
-      ['Dimensions', (a.length && a.width && a.height) ? `${a.length} × ${a.width} × ${a.height} ${a.dimensionUnit}` : '—'],
-      ['Volumetric Weight', vw ? vw + ' kg' : '—'],
     ];
     if(a.airline || a.flightNo || a.mawb || a.hawb){
       rows.push(['Airline', a.airline || '—'], ['Flight Number', a.flightNo || '—'], ['MAWB', a.mawb || '—'], ['HAWB', a.hawb || '—']);
@@ -1614,16 +1603,6 @@ function categorySpecificDetailRows(s){
       ['TDO Written Date', h.tdoWrittenDate || '—'],
       ['TDO Expiry Date', h.tdoExpiryDate || '—'],
       ['Stuffing Date', h.stuffingDate || '—'],
-      ['Hazardous Cargo', h.hazardous ? '<span class="chip chip-error">Hazardous</span>' : '<span class="chip chip-neutral">Non-Hazardous</span>'],
-      ['Commodity', h.commodityDescription || h.commodityType || '—'],
-      ['Commodity Type / Category', [h.commodityType, h.commodityCategory].filter(Boolean).join(' · ') || '—'],
-      ['Commodity HS Code', h.hsCode || '—'],
-      ['Container Count', h.containerCount || '—'],
-      ['Container Weight (Tons)', h.containerWeight || '—'],
-      ['Container Size / Type', `${h.containerSize} · ${h.containerType}`],
-      ['Haulage Tracker', h.tracker ? 'Included' : 'Not included'],
-      ['Haulage Escort', h.escort ? 'Included' : 'Not included'],
-      ['Custom Brokerage', h.brokerageAddon ? 'Included' : 'Not included'],
     );
     return rows;
   }
@@ -1638,13 +1617,6 @@ function categorySpecificDetailRows(s){
     ['Bill of Lading (B/L)', b.bl || '—'],
     ['Port ETA', b.portEta || '—'],
     ['Total Value of Goods', b.totalValue ? `${b.currency} ${b.totalValue}` : '—'],
-    ['Hazardous Cargo', b.hazardous ? '<span class="chip chip-error">Hazardous</span>' : '<span class="chip chip-neutral">Non-Hazardous</span>'],
-    ['Commodity', b.commodityDescription || b.commodityType || '—'],
-    ['Commodity Type / Category', [b.commodityType, b.commodityCategory].filter(Boolean).join(' · ') || '—'],
-    ['Commodity HS Code', b.hsCode || '—'],
-    ['Container Count', b.containerCount || '—'],
-    ['Container Weight (Tons)', b.containerWeight || '—'],
-    ['Container Size / Type', `${b.containerSize} · ${b.containerType}`],
   ];
 }
 
@@ -1704,39 +1676,55 @@ function renderContainers(){
   `).join('') || `<tr><td colspan="6" style="text-align:center;color:var(--silver-light);padding:30px">No containers added yet.</td></tr>`;
 }
 
-// Read-only summary of any Additional Services (Haulage / Customs Brokerage add-ons)
-// attached at booking time — distinct from the standalone Haulage/Brokerage service
-// categories, which are their own shipments with their own full field set.
-function renderAdditionalServicesSummaryHtml(s){
-  const as = s.additionalServices;
-  if(!as || (!as.haulage && !as.brokerage)) return '';
-  let html = `<div class="form-section-label" style="margin-top:20px">Additional Services</div><div class="detail-fields-grid" style="margin-top:14px">`;
-  if(as.haulage){
-    const isAir = s.category==='AIR';
-    const loadLabel = isAir ? 'Airport of Loading' : 'Port of Loading';
-    const dischargeLabel = isAir ? 'Airport of Discharge' : 'Port of Discharge';
-    const formatFn = isAir ? formatAirportDisplay : formatPortDisplay;
-    const legs = [];
-    if(as.haulageType==='At Origin' || as.haulageType==='Origin & Destination') legs.push(`Pickup: ${as.pickupAddress||'—'} → ${loadLabel}: ${formatFn(as.loadingPoint)||'—'}`);
-    if(as.haulageType==='At Destination' || as.haulageType==='Origin & Destination') legs.push(`${dischargeLabel}: ${formatFn(as.dischargePoint)||'—'} → Drop Off: ${as.dropOffAddress||'—'}`);
-    html += `<div class="detail-field"><div class="k">Haulage</div><div class="v">${as.haulageType}${as.tracker?' · Tracker':''}${as.escort?' · Escort':''}<div class="v-sub">${legs.join(' · ')}</div></div></div>`;
+// Commodity Information card — cargo classification for whichever category is active.
+// Air has no separate Container Information component (it ships by pallet, not
+// container), so its cargo-dimension/volumetric-weight fields live here instead.
+function commodityInfoRows(s){
+  if(s.category==='AIR'){
+    const a = s.air;
+    const vw = volumetricWeightOf(a);
+    return [
+      ['Hazardous Cargo', a.hazardous ? '<span class="chip chip-error">Hazardous</span>' : '<span class="chip chip-neutral">Non-Hazardous</span>'],
+      ['Commodity', a.commodityDescription || a.commodityType || '—'],
+      ['Commodity Type / Category', [a.commodityType, a.commodityCategory].filter(Boolean).join(' · ') || '—'],
+      ['Commodity HS Code', a.hsCode || '—'],
+      ['Number of Pallets', a.numberOfPallets || '—'],
+      ['Uniform Pallets', a.uniformPallets ? 'Yes' : 'No'],
+      ['Dimensions', (a.length && a.width && a.height) ? `${a.length} × ${a.width} × ${a.height} ${a.dimensionUnit}` : '—'],
+      ['Volumetric Weight', vw ? vw + ' kg' : '—'],
+    ];
   }
-  if(as.brokerage){
-    html += `<div class="detail-field"><div class="k">Customs Brokerage</div><div class="v">Included</div></div>`;
-  }
-  html += `</div>`;
-  return html;
+  const c = s[s.category.toLowerCase()];
+  return [
+    ['Hazardous Cargo', c.hazardous ? '<span class="chip chip-error">Hazardous</span>' : '<span class="chip chip-neutral">Non-Hazardous</span>'],
+    ['Commodity', c.commodityDescription || c.commodityType || '—'],
+    ['Commodity Type / Category', [c.commodityType, c.commodityCategory].filter(Boolean).join(' · ') || '—'],
+    ['Commodity HS Code', c.hsCode || '—'],
+  ];
+}
+function renderCommodityCard(){
+  const s = currentShipment();
+  const rows = commodityInfoRows(s);
+  el('commodity-card').innerHTML = `
+    <h3 class="section-title">Commodity Information</h3>
+    <p class="section-sub" style="margin:0 0 18px">What's being shipped, and how it's classified.</p>
+    <div class="detail-fields-grid">${rows.map(([k,v])=>`<div class="detail-field"><div class="k">${k}</div><div class="v">${v}</div></div>`).join('')}</div>`;
 }
 
-// Overview tab, second card — swaps content entirely based on service category.
-function renderCargoSection(){
+// Container Information card — its own standalone component, separate from
+// Shipment/Commodity/Additional Services. Air has no containers (pallet-based
+// instead — see commodityInfoRows), so this card is hidden for Air shipments.
+function renderContainerCard(){
   const s = currentShipment();
+  const card = el('container-card');
+  if(s.category==='AIR'){ card.style.display = 'none'; card.innerHTML = ''; return; }
+  card.style.display = 'block';
   if(s.category==='OCEAN'){
-    el('cargo-card').innerHTML = `
+    card.innerHTML = `
       <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:18px;flex-wrap:wrap;gap:12px">
         <div>
-          <h3 class="section-title">${ICON_SHIP}Containers</h3>
-          <p class="section-sub" style="margin:0">Equipment assigned to this shipment.</p>
+          <h3 class="section-title">${ICON_SHIP}Container Information</h3>
+          <p class="section-sub" style="margin:0">Booking plan and equipment assigned to this shipment.</p>
         </div>
         <button class="btn btn-accent btn-sm" id="btn-add-container">${ICON_PLUS}Add Container</button>
       </div>
@@ -1746,61 +1734,59 @@ function renderCargoSection(){
           <thead><tr><th>Container Number</th><th>Size</th><th>Type</th><th>Seal Number</th><th>Weight</th><th style="text-align:right">Actions</th></tr></thead>
           <tbody id="container-tbody"></tbody>
         </table>
-      </div>
-      ${renderAdditionalServicesSummaryHtml(s)}`;
+      </div>`;
     renderContainers();
     return;
   }
-  if(s.category==='AIR'){
-    const a = s.air;
-    const vw = volumetricWeightOf(a);
-    const rows = [
-      ['Commodity', a.commodityDescription || a.commodityType || '—'],
-      ['Commodity Category', a.commodityCategory || '—'],
-      ['Commodity HS Code', a.hsCode || '—'],
-      ['Number of Pallets', a.numberOfPallets || '—'],
-      ['Uniform Pallets', a.uniformPallets ? 'Yes' : 'No'],
-      ['Dimensions', (a.length && a.width && a.height) ? `${a.length} × ${a.width} × ${a.height} ${a.dimensionUnit}` : '—'],
-      ['Volumetric Weight', vw ? vw + ' kg' : '—'],
-      ['Hazardous Cargo', a.hazardous ? 'Yes' : 'No'],
-    ];
-    el('cargo-card').innerHTML = `
-      <h3 class="section-title">${ICON_PLANE}Cargo Details</h3>
-      <p class="section-sub">Piece count, dimensions, and weight for this air shipment.</p>
-      <div class="detail-fields-grid">${rows.map(([k,v])=>`<div class="detail-field"><div class="k">${k}</div><div class="v">${v}</div></div>`).join('')}</div>
-      ${renderAdditionalServicesSummaryHtml(s)}`;
-    return;
-  }
+  const c = s.category==='HAULAGE' ? s.haulage : s.brokerage;
+  card.innerHTML = `
+    <h3 class="section-title">${ICON_TRUCK}Container Information</h3>
+    <p class="section-sub" style="margin:0 0 4px">Booking plan for this job.</p>
+    ${renderBookingPlanTableHtml(c)}`;
+}
+
+// Additional Services card — checkbox-driven Haulage/Customs Brokerage add-ons on
+// Ocean/Air, native Tracker/Escort/Custom Brokerage fields on Haulage, and hidden
+// entirely on Customs Brokerage (which has no additional services of its own).
+function renderAdditionalServicesCard(){
+  const s = currentShipment();
+  const card = el('additional-services-card');
+  if(s.category==='BROKERAGE'){ card.style.display = 'none'; card.innerHTML = ''; return; }
   if(s.category==='HAULAGE'){
     const h = s.haulage;
-    const rows = [
-      ['TDO Written Date', h.tdoWrittenDate || '—'],
-      ['TDO Expiry Date', h.tdoExpiryDate || '—'],
-      ['Port ETA', h.portEta || '—'],
-      ['Stuffing Date', h.stuffingDate || '—'],
-      ['Haulage Tracker', h.tracker ? 'Included' : 'Not included'],
-      ['Haulage Escort', h.escort ? 'Included' : 'Not included'],
-      ['Custom Brokerage', h.brokerageAddon ? 'Included' : 'Not included'],
-    ];
-    el('cargo-card').innerHTML = `
-      <h3 class="section-title">${ICON_TRUCK}Consignment Details</h3>
-      <p class="section-sub">Booking-level cargo details for this haulage job.</p>
-      ${renderBookingPlanTableHtml(h)}
-      <div class="detail-fields-grid">${rows.map(([k,v])=>`<div class="detail-field"><div class="k">${k}</div><div class="v">${v}</div></div>`).join('')}</div>`;
+    card.style.display = 'block';
+    card.innerHTML = `
+      <h3 class="section-title">Additional Services</h3>
+      <p class="section-sub" style="margin:0 0 18px">Native Haulage add-ons for this job.</p>
+      <div class="detail-fields-grid">
+        <div class="detail-field"><div class="k">Haulage Tracker</div><div class="v">${h.tracker ? 'Included' : 'Not included'}</div></div>
+        <div class="detail-field"><div class="k">Haulage Escort</div><div class="v">${h.escort ? 'Included' : 'Not included'}</div></div>
+        <div class="detail-field"><div class="k">Custom Brokerage</div><div class="v">${h.brokerageAddon ? 'Included' : 'Not included'}</div></div>
+      </div>`;
     return;
   }
-  const b = s.brokerage;
-  const rows = [
-    ['Transport Mode', b.transportMode || '—'],
-    ['Consignee', b.consigneeName || '—'],
-    ['Consignee Address', b.consigneeAddress || '—'],
-    ['Port ETA', b.portEta || '—'],
-  ];
-  el('cargo-card').innerHTML = `
-    <h3 class="section-title">${ICON_STAMP}Declaration Details</h3>
-    <p class="section-sub">Customs clearance reference data for this job.</p>
-    ${renderBookingPlanTableHtml(b)}
-    <div class="detail-fields-grid">${rows.map(([k,v])=>`<div class="detail-field"><div class="k">${k}</div><div class="v">${v}</div></div>`).join('')}</div>`;
+  // Ocean / Air
+  const as = s.additionalServices;
+  if(!as || (!as.haulage && !as.brokerage)){ card.style.display = 'none'; card.innerHTML = ''; return; }
+  card.style.display = 'block';
+  let fieldsHtml = '';
+  if(as.haulage){
+    const isAir = s.category==='AIR';
+    const loadLabel = isAir ? 'Airport of Loading' : 'Port of Loading';
+    const dischargeLabel = isAir ? 'Airport of Discharge' : 'Port of Discharge';
+    const formatFn = isAir ? formatAirportDisplay : formatPortDisplay;
+    const legs = [];
+    if(as.haulageType==='At Origin' || as.haulageType==='Origin & Destination') legs.push(`Pickup: ${as.pickupAddress||'—'} → ${loadLabel}: ${formatFn(as.loadingPoint)||'—'}`);
+    if(as.haulageType==='At Destination' || as.haulageType==='Origin & Destination') legs.push(`${dischargeLabel}: ${formatFn(as.dischargePoint)||'—'} → Drop Off: ${as.dropOffAddress||'—'}`);
+    fieldsHtml += `<div class="detail-field"><div class="k">Haulage</div><div class="v">${as.haulageType}${as.tracker?' · Tracker':''}${as.escort?' · Escort':''}<div class="v-sub">${legs.join(' · ')}</div></div></div>`;
+  }
+  if(as.brokerage){
+    fieldsHtml += `<div class="detail-field"><div class="k">Customs Brokerage</div><div class="v">Included</div></div>`;
+  }
+  card.innerHTML = `
+    <h3 class="section-title">Additional Services</h3>
+    <p class="section-sub" style="margin:0 0 18px">Add-on services attached at booking time.</p>
+    <div class="detail-fields-grid">${fieldsHtml}</div>`;
 }
 
 function resolveTaskOwners(s, responsibility){
@@ -2967,7 +2953,7 @@ document.body.addEventListener('click', (e)=>{
       const s = currentShipment();
       applyDraftToShipment(s, shipmentFormState.draft, shipmentFormState.category);
       closeModal('modal-create-shipment');
-      renderShipHeader(); renderShipDetailFields(); renderCargoSection(); renderShipmentsList(); renderServiceDelivery(); renderShipmentTracking();
+      renderShipHeader(); renderShipDetailFields(); renderCommodityCard(); renderContainerCard(); renderAdditionalServicesCard(); renderShipmentsList(); renderServiceDelivery(); renderShipmentTracking();
       showToast('Shipment details saved');
     } else {
       const jobRef = nextJobRef();
