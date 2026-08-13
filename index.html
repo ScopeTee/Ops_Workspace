@@ -1,0 +1,3093 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OnePort 365 · Freight Operations Workspace</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Open+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ==========================================================================
+   OnePort 365 — Design Tokens
+   ========================================================================== */
+:root{
+  --green-dark:#023819;
+  --green-dark-hover:#03571f;
+  --green-accent:#BFFB4F;
+  --green-accent-hover:#a9e83a;
+  --green-light:#D1DBBD;
+  --green-light-surface:#F4F6EF;
+  --green-chip-bg:#EDEFE8;
+  --gold:#FFCC1A;
+  --gold-bg:#FFF3CC;
+  --gold-text:#8a6a00;
+  --success:#1F8A5B;
+  --success-bg:#E1F1E8;
+  --success-text:#0f7a45;
+  --error:#FF1A1A;
+  --error-bg:#FDE0E0;
+  --error-text:#cc1414;
+  --cream:#FDFBF1;
+  --white:#FFFFFF;
+  --silver-light:#808080;
+  --silver-dark:#383838;
+  --border-tint: rgba(2,56,25,.12);
+  --border-tint-soft: rgba(2,56,25,.07);
+  --radius-sm:6px;
+  --radius-md:8px;
+  --radius-lg:12px;
+  --radius-xl:16px;
+  --shadow-e1: 0 1px 2px rgba(2,56,25,.05), 0 1px 3px rgba(2,56,25,.04);
+  --shadow-e2: 0 2px 4px rgba(2,56,25,.05), 0 8px 20px -8px rgba(2,56,25,.14);
+  --shadow-e3: 0 4px 8px rgba(2,56,25,.06), 0 18px 40px -16px rgba(2,56,25,.22);
+  --font-display:'Poppins', system-ui, sans-serif;
+  --font-body:'Open Sans', system-ui, sans-serif;
+}
+
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  font-family:var(--font-body);
+  color:var(--silver-dark);
+  background:var(--cream);
+  font-size:14px;
+  line-height:1.55;
+  -webkit-font-smoothing:antialiased;
+}
+h1,h2,h3,h4{font-family:var(--font-display);color:var(--green-dark);margin:0}
+button{font-family:var(--font-body);cursor:pointer}
+input,select,textarea{font-family:var(--font-body)}
+::-webkit-scrollbar{width:9px;height:9px}
+::-webkit-scrollbar-thumb{background:rgba(2,56,25,.18);border-radius:10px}
+::-webkit-scrollbar-track{background:transparent}
+
+/* ==========================================================================
+   App Shell
+   ========================================================================== */
+.app-shell{display:flex;min-height:100vh}
+
+/* --- Sidebar --- */
+.sidebar{
+  width:236px;flex-shrink:0;background:var(--green-dark);color:var(--cream);
+  display:flex;flex-direction:column;padding:24px 16px;position:sticky;top:0;height:100vh;
+}
+.sidebar-logo{display:flex;align-items:center;gap:10px;padding:6px 8px 26px;border-bottom:1px solid rgba(253,251,241,.12);margin-bottom:22px}
+.sidebar-logo .mark{width:34px;height:34px;border-radius:9px;background:var(--green-accent);display:grid;place-items:center;font-family:var(--font-display);font-weight:700;font-size:14px;color:var(--green-dark);flex-shrink:0}
+.sidebar-logo .word{font-family:var(--font-display);font-weight:600;font-size:15.5px;letter-spacing:-.01em;color:var(--cream)}
+.sidebar-logo .sub{font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:rgba(253,251,241,.55);margin-top:1px}
+
+.nav-section-label{font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:rgba(253,251,241,.4);font-weight:700;padding:0 10px;margin-bottom:8px}
+.nav-list{list-style:none;margin:0 0 22px;padding:0;display:flex;flex-direction:column;gap:3px}
+.nav-item{
+  display:flex;align-items:center;gap:11px;padding:10px 12px;border-radius:var(--radius-md);
+  color:rgba(253,251,241,.75);font-weight:600;font-size:13.5px;text-decoration:none;
+  transition:.14s;position:relative;
+}
+.nav-item svg{flex-shrink:0;opacity:.85}
+.nav-item:hover{background:rgba(253,251,241,.08);color:var(--cream)}
+.nav-item.active{background:var(--green-accent);color:var(--green-dark)}
+.nav-item.active svg{opacity:1}
+
+.sidebar-footer{margin-top:auto;padding-top:16px;border-top:1px solid rgba(253,251,241,.12)}
+.sidebar-user{display:flex;align-items:center;gap:10px;padding:8px}
+.sidebar-user .avatar{width:34px;height:34px;border-radius:9px;background:rgba(253,251,241,.12);display:grid;place-items:center;font-family:var(--font-display);font-weight:600;font-size:12.5px;color:var(--cream)}
+.sidebar-user .name{font-size:13px;font-weight:700;color:var(--cream)}
+.sidebar-user .role{font-size:11px;color:rgba(253,251,241,.55)}
+
+/* --- Main --- */
+.main{flex:1;min-width:0;display:flex;flex-direction:column}
+.topbar{
+  display:flex;align-items:center;padding:18px 32px;min-height:60px;
+  background:var(--white);border-bottom:1px solid var(--border-tint);position:sticky;top:0;z-index:30;
+}
+.breadcrumbs{display:flex;align-items:center;gap:8px;font-size:13.5px;font-family:var(--font-body)}
+.breadcrumbs .crumb{color:var(--silver-light)}
+.breadcrumbs .crumb-current{color:var(--green-dark);font-weight:700}
+.breadcrumbs .sep{color:var(--silver-light)}
+
+.content{padding:28px 32px 64px;flex:1}
+.view{display:none}
+.view.active{display:block}
+
+.back-link{display:inline-flex;align-items:center;gap:7px;font-size:13px;font-weight:600;color:var(--silver-light);text-decoration:none;margin-bottom:14px;transition:.12s}
+.back-link:hover{color:var(--green-dark)}
+.back-link svg{flex-shrink:0}
+
+/* ==========================================================================
+   Reusable components
+   ========================================================================== */
+.card{background:var(--white);border:1px solid var(--border-tint);border-radius:var(--radius-xl);box-shadow:var(--shadow-e1)}
+.card-pad{padding:22px 24px}
+.section-title{font-family:var(--font-display);font-weight:600;font-size:17px;color:var(--green-dark);margin:0 0 4px;display:flex;align-items:center;gap:8px}
+.section-title svg{color:var(--green-accent-hover);flex-shrink:0}
+.section-sub{font-size:13px;color:var(--silver-light);margin:0 0 18px}
+.powered-by{font-size:11px;color:var(--silver-light);margin:2px 0 18px}
+.powered-by b{color:var(--silver-dark)}
+
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;border:none;cursor:pointer;
+  font-family:var(--font-display);font-weight:600;font-size:13.5px;border-radius:var(--radius-md);
+  padding:11px 18px;transition:.15s;white-space:nowrap;
+}
+.btn svg{flex-shrink:0}
+.btn-accent{background:var(--green-accent);color:var(--green-dark)}
+.btn-accent:hover{background:var(--green-accent-hover)}
+.btn-solid{background:var(--green-dark);color:var(--green-accent)}
+.btn-solid:hover{background:var(--green-dark-hover)}
+.btn-outline{background:var(--white);color:var(--green-dark);border:1.5px solid var(--green-dark)}
+.btn-outline:hover{background:var(--green-dark);color:var(--green-accent)}
+.btn-ghost{background:transparent;color:var(--green-dark);padding:8px 10px}
+.btn-ghost:hover{background:var(--green-light-surface)}
+.btn-sm{padding:8px 13px;font-size:12.5px}
+.btn:disabled{background:#8FA08C;color:var(--cream);cursor:not-allowed}
+.btn-icon{width:36px;height:36px;padding:0;border-radius:var(--radius-md)}
+
+.chip{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;font-weight:700;padding:4px 10px;border-radius:var(--radius-sm);white-space:nowrap}
+.chip-neutral{background:var(--green-chip-bg);color:#4a5a3f}
+.chip-success{background:var(--success-bg);color:var(--success-text)}
+.chip-warning{background:var(--gold-bg);color:var(--gold-text)}
+.chip-error{background:var(--error-bg);color:var(--error-text)}
+
+.status-chip{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;padding:5px 12px;border-radius:999px}
+.status-chip .status-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.status-chip .status-icon{display:inline-flex;flex-shrink:0}
+.status-active{background:var(--green-light-surface);color:var(--green-dark)}
+.status-active .status-dot{background:var(--green-accent);animation:status-pulse 2s infinite}
+.status-completed{background:var(--success-bg);color:var(--success-text)}
+.status-cancelled{background:var(--green-chip-bg);color:#5c5c5c}
+@keyframes status-pulse{0%{box-shadow:0 0 0 0 rgba(191,251,79,.5)}70%{box-shadow:0 0 0 6px rgba(191,251,79,0)}100%{box-shadow:0 0 0 0 rgba(191,251,79,0)}}
+
+.badge-sla{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:700;padding:6px 13px;border-radius:999px}
+.badge-sla .sla-icon{display:inline-flex;flex-shrink:0}
+.badge-sla.sm{padding:3px 9px;font-size:11px;gap:5px}
+.status-chip.sm{padding:3px 9px;font-size:11px;gap:5px}
+
+.avatar{display:grid;place-items:center;border-radius:10px;font-family:var(--font-display);font-weight:600;flex-shrink:0}
+.avatar-sm{width:32px;height:32px;font-size:11.5px;border-radius:8px}
+.avatar-md{width:40px;height:40px;font-size:13.5px}
+.avatar-lg{width:52px;height:52px;font-size:17px;border-radius:13px}
+
+.tabs{display:flex;gap:8px;border-bottom:1px solid var(--border-tint);margin-bottom:24px}
+.tab-btn{
+  display:inline-flex;align-items:center;gap:7px;background:transparent;border:none;padding:12px 4px;margin-right:22px;font-family:var(--font-display);
+  font-weight:600;font-size:14.5px;color:var(--silver-light);cursor:pointer;position:relative;top:1px;
+  border-bottom:2.5px solid transparent;
+}
+.tab-btn:hover{color:var(--green-dark)}
+.tab-btn.active{color:var(--green-dark);border-bottom-color:var(--green-accent)}
+
+table{width:100%;border-collapse:collapse}
+.data-table thead th{
+  text-align:left;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--silver-light);
+  font-weight:700;padding:12px 16px;white-space:nowrap;position:sticky;top:0;z-index:2;
+  background:var(--green-light-surface);box-shadow:inset 0 -1px 0 var(--border-tint);
+}
+.data-table tbody td{padding:14px 16px;border-bottom:1px solid var(--border-tint-soft);font-size:13.5px;vertical-align:middle}
+.data-table tbody tr:last-child td{border-bottom:none}
+.data-table tbody tr.clickable{cursor:pointer;transition:.12s}
+.data-table tbody tr.clickable:hover{background:var(--green-light-surface)}
+.table-wrap{overflow:auto;max-height:65vh}
+
+.data-table tbody tr.sla-at-risk td:first-child{border-left:3px solid var(--gold)}
+.data-table tbody tr.sla-at-risk .task-name{color:var(--gold-text)}
+.data-table tbody tr.sla-breached td:first-child{border-left:3px solid var(--error)}
+.data-table tbody tr.sla-breached .task-name{color:var(--error-text)}
+.task-name{color:var(--green-dark);font-weight:700}
+.sla-history-note{font-size:10.5px;margin-top:4px;font-weight:700}
+.sla-history-note.breach{color:var(--error-text)}
+.sla-history-note.at-risk{color:var(--gold-text)}
+.task-owner-cell{display:flex;flex-wrap:wrap;gap:8px}
+.task-owner-cell .owner-pill{display:flex;align-items:center;gap:6px}
+.task-owner-cell .owner-pill span{font-size:12px;color:var(--silver-dark)}
+.task-owner-unassigned{color:var(--silver-light);font-style:italic;font-size:12.5px}
+
+.form-field{position:relative;margin-bottom:18px}
+.form-field label.field-label{
+  position:absolute;top:-8px;left:11px;background:var(--white);padding:0 5px;font-size:11px;color:var(--silver-light);
+  font-weight:600;z-index:1;
+}
+.form-field.focused label.field-label,.form-field.filled label.field-label{color:var(--green-dark)}
+.form-field.err label.field-label{color:var(--error)}
+.field-control{
+  width:100%;border:1.5px solid rgba(2,56,25,.35);border-radius:var(--radius-md);padding:14px 14px;
+  font-size:14px;color:var(--green-dark);background:var(--white);outline:none;transition:.12s;
+}
+.field-control:focus{border-color:var(--green-dark);border-width:2px;padding:13px 13px}
+.form-field.err .field-control{border-color:var(--error);border-width:2px;color:var(--error)}
+.field-hint{font-size:11.5px;color:var(--silver-light);margin-top:2px}
+select.field-control{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='none' stroke='%23808080' stroke-width='2' viewBox='0 0 24 24'%3E%3Cpath d='M6 9l6 6 6-6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center;padding-right:38px}
+textarea.field-control{resize:vertical;min-height:70px}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:0 16px}
+.form-grid .full{grid-column:1 / -1}
+
+.searchable-field{position:relative}
+.ss-menu{position:absolute;left:0;right:0;top:calc(100% + 4px);background:var(--white);border:1px solid var(--border-tint);border-radius:var(--radius-md);box-shadow:var(--shadow-e3);max-height:220px;overflow:auto;z-index:60;display:none}
+.ss-menu.open{display:block}
+.ss-option{padding:9px 12px;font-size:13px;color:var(--green-dark);cursor:pointer}
+.ss-option:hover{background:var(--green-light-surface)}
+.ss-empty{padding:9px 12px;font-size:12.5px;color:var(--silver-light)}
+
+/* Empty / placeholder state */
+.placeholder-page{display:flex;align-items:center;justify-content:center;min-height:60vh}
+.placeholder-card{text-align:center;max-width:420px;padding:48px 40px}
+.placeholder-card .icon-wrap{
+  width:64px;height:64px;border-radius:16px;background:var(--green-light-surface);margin:0 auto 22px;
+  display:grid;place-items:center;
+}
+.placeholder-card h2{font-size:22px;margin-bottom:10px}
+.placeholder-card p{font-size:14px;color:var(--silver-light);line-height:1.6;margin:0}
+.placeholder-tag{display:inline-block;margin-top:20px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:700;color:var(--silver-light);background:var(--green-chip-bg);padding:6px 14px;border-radius:999px}
+
+/* Modal */
+.modal-overlay{
+  position:fixed;inset:0;background:rgba(2,20,10,.45);display:none;align-items:center;justify-content:center;
+  z-index:1000;padding:24px;backdrop-filter:blur(1.5px);
+}
+.modal-overlay.open{display:flex}
+.modal{
+  background:var(--white);border-radius:var(--radius-xl);box-shadow:var(--shadow-e3);width:100%;max-width:520px;
+  max-height:88vh;display:flex;flex-direction:column;
+}
+.modal.modal-wide{max-width:720px}
+.modal-head{display:flex;align-items:flex-start;justify-content:space-between;padding:22px 26px;border-bottom:1px solid var(--border-tint)}
+.modal-head h3{font-size:18px}
+.modal-head p{font-size:12.5px;color:var(--silver-light);margin:4px 0 0}
+.modal-close{background:transparent;border:none;color:var(--silver-light);padding:4px;border-radius:6px;line-height:0}
+.modal-close:hover{background:var(--green-light-surface);color:var(--green-dark)}
+.modal-body{padding:24px 26px;overflow-y:auto}
+.modal-foot{display:flex;justify-content:flex-end;gap:10px;padding:18px 26px;border-top:1px solid var(--border-tint)}
+
+/* Dropdown menu (Actions button + row overflow menus) */
+.dropdown{position:relative;display:inline-block}
+.dropdown-menu{position:absolute;right:0;top:calc(100% + 6px);background:var(--white);border:1px solid var(--border-tint);border-radius:var(--radius-md);box-shadow:var(--shadow-e3);min-width:220px;padding:6px;display:none;z-index:50}
+.dropdown-menu-sm{min-width:170px}
+.dropdown.open .dropdown-menu{display:block}
+.dropdown-toggle .chevron{transition:transform .15s}
+.dropdown.open .dropdown-toggle .chevron{transform:rotate(180deg)}
+.dropdown-item{display:flex;align-items:center;gap:10px;width:100%;text-align:left;background:transparent;border:none;padding:10px 12px;border-radius:6px;font-size:13.5px;font-weight:600;color:var(--green-dark);cursor:pointer}
+.dropdown-item:hover{background:var(--green-light-surface)}
+.dropdown-item-danger{color:var(--error)}
+.dropdown-item-danger:hover{background:var(--error-bg)}
+
+/* Toast */
+#toast-wrap{position:fixed;bottom:24px;right:24px;z-index:2000;display:flex;flex-direction:column;gap:10px}
+.toast{
+  background:var(--green-dark);color:var(--cream);padding:13px 18px;border-radius:var(--radius-md);font-size:13px;
+  font-weight:600;box-shadow:var(--shadow-e3);display:flex;align-items:center;gap:10px;min-width:220px;
+  animation:toast-in .18s ease-out;
+}
+.toast.success{background:var(--green-dark)}
+.toast.error{background:#3a0d0d}
+@keyframes toast-in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+/* Header block on Shipment Detail */
+.ship-header-card{padding:24px 28px 22px;margin-bottom:24px}
+.ship-header-row1{display:flex;justify-content:space-between;align-items:flex-start;gap:20px;flex-wrap:wrap;margin-bottom:20px}
+.ship-header-id{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.ship-header-id h1{font-size:28px;letter-spacing:-.01em}
+.ship-header-strip{display:flex;align-items:stretch;gap:26px;padding-top:18px;border-top:1px solid var(--border-tint-soft);flex-wrap:wrap}
+.strip-cell{display:flex;flex-direction:column;justify-content:center;gap:6px;min-width:0}
+.strip-cell .k-row{display:flex;align-items:center;gap:5px}
+.strip-cell .k-row svg{color:var(--silver-light);flex-shrink:0}
+.strip-cell .k{font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--silver-light);font-weight:700}
+.strip-cell .v{font-size:14.5px;font-weight:600;color:var(--green-dark)}
+.strip-divider{width:1px;background:var(--border-tint);align-self:stretch}
+
+/* Details grid */
+.detail-fields-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:20px 24px}
+.detail-field .k-row{display:flex;align-items:center;gap:5px;margin-bottom:6px}
+.detail-field .k-row svg{color:var(--silver-light);flex-shrink:0}
+.detail-field .k{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--silver-light);font-weight:700;margin-bottom:6px}
+.detail-field .v{font-size:14.5px;font-weight:600;color:var(--green-dark)}
+.detail-field .v .v-sub{font-size:11px;font-weight:500;color:var(--silver-light);margin-top:2px}
+.quote-link{color:var(--green-dark);font-weight:700;text-decoration:underline;text-decoration-color:rgba(2,56,25,.35);text-underline-offset:2px;cursor:pointer}
+.quote-link:hover{text-decoration-color:var(--green-dark)}
+
+/* Shipment Details — Basic/Commodity/Additional Services grouped as subsections
+   within one card, each its own bordered block (Container Info stays a separate
+   standalone card, not one of these subsections). */
+.subsection{border:1px solid var(--border-tint);border-radius:var(--radius-lg);margin-bottom:18px}
+.subsection:last-child{margin-bottom:0}
+.subsection-head{padding:14px 20px;font-weight:700;color:var(--green-dark);font-size:14px;border-bottom:1px solid var(--border-tint)}
+.subsection-body{padding:20px}
+.detail-fields-grid.cols-3{grid-template-columns:repeat(3,1fr)}
+@media (max-width:700px){
+  .detail-fields-grid.cols-3{grid-template-columns:1fr}
+}
+
+.overview-layout{display:grid;grid-template-columns:4fr 1fr;gap:22px;align-items:stretch}
+@media (max-width:1100px){
+  .overview-layout{grid-template-columns:1fr}
+  .overview-layout .shipment-team-card{display:none}
+}
+
+/* Shipment Team (read-only display) */
+.team-primary-row{display:flex;align-items:center;gap:12px}
+.crown-badge{color:var(--gold);display:inline-flex;flex-shrink:0}
+.team-name{font-family:var(--font-display);font-weight:600;font-size:15px;color:var(--green-dark)}
+.team-name-sm{font-size:13.5px;font-weight:600;color:var(--silver-dark)}
+.team-divider{height:1px;background:var(--border-tint);margin:16px 0}
+.team-supporting-list{display:flex;flex-direction:column;gap:14px}
+.team-member-row{display:flex;align-items:center;gap:12px}
+.team-empty{font-size:13px;color:var(--silver-light)}
+
+/* Owner select (Shipment Team modal) */
+.owner-select-list{display:flex;flex-direction:column;gap:8px;max-height:400px;overflow:auto}
+.owner-select-row{display:flex;align-items:center;gap:12px;padding:10px 12px;border:1px solid var(--border-tint);border-radius:var(--radius-md);transition:.12s;flex-wrap:wrap}
+.owner-select-row.is-primary{border-color:var(--green-accent);background:var(--green-light-surface)}
+.owner-select-row .owner-checkbox{width:18px;height:18px;accent-color:var(--green-dark);flex-shrink:0;cursor:pointer}
+.owner-select-row .who{flex:1;min-width:120px}
+.owner-select-row .who .nm{font-weight:700;font-size:13.5px;color:var(--green-dark)}
+.owner-select-row .who .rl{font-size:11.5px;color:var(--silver-light)}
+.resp-toggle-btn{display:inline-flex;align-items:center;gap:6px;min-width:150px;justify-content:space-between;background:var(--white);border:1.5px solid rgba(2,56,25,.2);border-radius:var(--radius-sm);padding:7px 10px;font-size:11.5px;font-weight:600;color:var(--silver-dark);cursor:pointer;transition:.12s}
+.resp-toggle-btn:hover{border-color:var(--green-dark)}
+.resp-toggle-btn .resp-summary{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:150px}
+.resp-toggle-btn-placeholder{min-width:150px;height:32px;flex-shrink:0}
+.resp-option{display:flex;align-items:center;gap:8px;width:100%;text-align:left;background:transparent;border:none;padding:8px 10px;border-radius:6px;font-size:12.5px;font-weight:600;color:var(--green-dark);cursor:pointer}
+.resp-option:hover{background:var(--green-light-surface)}
+.resp-option .resp-checkbox{width:14px;height:14px;border:1.5px solid rgba(2,56,25,.3);border-radius:4px;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--white)}
+.resp-option.checked .resp-checkbox{background:var(--green-accent);border-color:var(--green-accent);color:var(--green-dark)}
+.crown-btn{background:transparent;border:none;padding:6px;border-radius:6px;cursor:pointer;color:var(--silver-light);display:inline-flex;align-items:center;justify-content:center;transition:.12s;flex-shrink:0}
+.crown-btn:hover{background:var(--green-light-surface);color:var(--gold-text)}
+.crown-btn.filled{color:var(--gold)}
+.crown-btn-placeholder{width:32px;height:32px;flex-shrink:0}
+
+/* Progress tab layout */
+.progress-layout{display:grid;grid-template-columns:1.9fr 1fr;gap:22px;align-items:start}
+@media (max-width:1100px){.progress-layout{grid-template-columns:1fr}}
+
+/* Timeline (shipment tracking) */
+.timeline{position:relative;padding-left:2px}
+.timeline-item{display:flex;gap:14px;position:relative;padding-bottom:24px}
+.timeline-item:last-child{padding-bottom:0}
+.timeline-item .rail{position:relative;display:flex;flex-direction:column;align-items:center;flex-shrink:0}
+.timeline-dot{width:26px;height:26px;border-radius:50%;background:var(--green-dark);color:var(--green-accent);display:grid;place-items:center;z-index:1;flex-shrink:0}
+.timeline-item.pending .timeline-dot{background:var(--white);border:2px solid var(--border-tint);color:var(--silver-light)}
+.timeline-line{width:2px;flex:1;background:var(--border-tint);margin-top:2px}
+.timeline-content{flex:1;padding-bottom:2px;padding-top:2px}
+.track-top{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:3px}
+.track-source-tag{display:inline-flex;align-items:center;font-size:10px;font-weight:700;padding:3px 8px;border-radius:5px;text-transform:uppercase;letter-spacing:.04em;flex-shrink:0}
+.tag-terminal{background:var(--green-chip-bg);color:#4a5a3f}
+.tag-vessel{background:var(--green-light);color:var(--green-dark)}
+.tag-haulage{background:var(--gold-bg);color:var(--gold-text)}
+.tag-airport{background:var(--green-chip-bg);color:#4a5a3f}
+.tag-flight{background:var(--green-light);color:var(--green-dark)}
+.tag-customs{background:var(--success-bg);color:var(--success-text)}
+.timeline-content .ttitle{font-weight:700;color:var(--green-dark);font-size:13.5px}
+.timeline-item.pending .timeline-content .ttitle{color:var(--silver-light);font-weight:600}
+.timeline-content .tmeta{font-size:12px;color:var(--silver-light);margin-top:3px}
+
+/* Documents */
+.doc-header-stats{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:14px}
+.doc-count{display:flex;align-items:center;gap:14px}
+.doc-count .num{font-family:var(--font-display);font-weight:600;font-size:32px;color:var(--green-dark)}
+.doc-count .lbl{font-size:12.5px;color:var(--silver-light)}
+.dropzone{
+  border:2px dashed rgba(2,56,25,.28);border-radius:var(--radius-lg);padding:34px 20px;text-align:center;
+  background:var(--green-light-surface);transition:.15s;cursor:pointer;
+}
+.dropzone.dragover{border-color:var(--green-dark);background:var(--green-light)}
+.dropzone svg{margin-bottom:10px}
+.dropzone .dz-title{font-weight:700;color:var(--green-dark);font-size:14px;margin-bottom:4px}
+.dropzone .dz-sub{font-size:12px;color:var(--silver-light)}
+.upload-hints{margin-top:10px;display:flex;flex-direction:column;gap:2px}
+.file-pill-list{display:flex;flex-direction:column;gap:8px;margin-top:16px}
+.file-pill{display:flex;align-items:center;gap:10px;background:var(--green-light-surface);border-radius:var(--radius-md);padding:9px 12px;font-size:12.5px}
+.file-pill .fname{flex:1;font-weight:600;color:var(--green-dark);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.file-pill .fsize{color:var(--silver-light);flex-shrink:0}
+.file-pill .frm{background:transparent;border:none;color:var(--silver-light);flex-shrink:0}
+.file-pill .frm:hover{color:var(--error)}
+
+.page-head{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:18px;flex-wrap:wrap;gap:12px}
+.page-head h1{font-size:24px;margin-bottom:4px}
+.page-head .sub{font-size:13.5px;color:var(--silver-light)}
+
+.list-search{display:flex;align-items:center;gap:10px;background:var(--white);border:1.5px solid var(--border-tint);border-radius:var(--radius-md);padding:12px 16px;margin-bottom:18px;max-width:460px;transition:.12s}
+.list-search:focus-within{border-color:var(--green-dark);box-shadow:0 0 0 3px rgba(191,251,79,.25)}
+.list-search svg{color:var(--silver-light);flex-shrink:0}
+.list-search input{border:none;outline:none;background:transparent;font-size:13.5px;width:100%;color:var(--silver-dark)}
+
+/* Create Shipment — service type picker */
+.service-type-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.service-type-card{display:flex;flex-direction:column;align-items:flex-start;gap:10px;text-align:left;background:var(--white);border:1.5px solid var(--border-tint);border-radius:var(--radius-lg);padding:18px;cursor:pointer;transition:.14s;width:100%}
+.service-type-card:hover{border-color:var(--green-accent-hover)}
+.service-type-card.active{border-color:var(--green-dark);background:var(--green-light-surface);box-shadow:0 0 0 3px rgba(191,251,79,.25)}
+.service-type-card .stc-icon{width:44px;height:44px;border-radius:12px;background:var(--green-light-surface);display:grid;place-items:center;color:var(--green-dark);flex-shrink:0}
+.service-type-card.active .stc-icon{background:var(--green-accent)}
+.service-type-card .stc-icon svg{width:20px;height:20px}
+.service-type-card .stc-label{font-family:var(--font-display);font-weight:600;font-size:14.5px;color:var(--green-dark)}
+.service-type-card .stc-blurb{font-size:12px;color:var(--silver-light);line-height:1.4}
+.form-section-label{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--silver-light);border-top:1px solid var(--border-tint);padding-top:14px;margin-bottom:2px}
+.owner-chip-toggle{border:1.5px solid var(--border-tint);background:var(--white);color:var(--silver-dark)}
+.owner-chip-toggle.active{background:var(--green-accent);border-color:var(--green-accent);color:var(--green-dark)}
+
+/* Ocean / Air bespoke creation forms */
+.create-banner{background:var(--green-dark);color:var(--cream);border-radius:var(--radius-md);padding:11px 14px;font-size:12.5px;font-weight:600;display:flex;align-items:center;gap:8px;margin-bottom:18px}
+.create-banner a{color:var(--green-accent)}
+.freight-card{background:var(--green-light-surface);border-radius:var(--radius-lg);padding:18px;margin-bottom:20px}
+.freight-card-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px;gap:12px;flex-wrap:wrap}
+.freight-card-head h4{font-family:var(--font-display);font-weight:600;font-size:15px;color:var(--green-dark);margin:0 0 2px}
+.freight-card-head p{font-size:12px;color:var(--silver-light);margin:0}
+.freight-route-row{display:flex;align-items:center;gap:12px}
+.freight-route-row .form-field{flex:1;margin-bottom:0}
+.route-arrow{width:30px;height:30px;border-radius:50%;background:var(--green-light);color:var(--green-dark);display:grid;place-items:center;flex-shrink:0}
+.direction-select{border:1.5px solid var(--green-dark);border-radius:var(--radius-md);padding:8px 30px 8px 12px;font-family:var(--font-display);font-weight:600;font-size:12.5px;color:var(--green-dark);background-color:var(--white)}
+
+.delivery-type-tabs{display:flex;gap:22px;border-bottom:1px solid var(--border-tint);margin-bottom:18px;flex-wrap:wrap}
+.delivery-type-tab{background:transparent;border:none;padding:10px 2px;font-family:var(--font-display);font-weight:600;font-size:13px;color:var(--silver-light);cursor:pointer;border-bottom:2.5px solid transparent}
+.delivery-type-tab.active{color:var(--green-dark);border-bottom-color:var(--green-dark)}
+
+.toggle-pair{display:flex;gap:22px;align-items:center;padding-top:4px;flex-wrap:wrap}
+.toggle-option{display:inline-flex;align-items:center;gap:7px;cursor:pointer;font-size:13px;color:var(--silver-dark);background:transparent;border:none;padding:2px 0;font-family:var(--font-body)}
+.toggle-option .radio-dot{width:16px;height:16px;border-radius:50%;border:1.5px solid rgba(2,56,25,.3);display:inline-flex;align-items:center;justify-content:center;flex-shrink:0}
+.toggle-option.selected{color:var(--green-dark);font-weight:700}
+.toggle-option.selected .radio-dot{border-color:var(--green-dark)}
+.toggle-option.selected .radio-dot::after{content:'';width:8px;height:8px;border-radius:50%;background:var(--green-dark)}
+
+.repeatable-card{border:1px solid var(--border-tint);border-radius:var(--radius-lg);margin-bottom:16px;overflow:hidden}
+.repeatable-card-head{display:flex;justify-content:space-between;align-items:center;background:var(--green-light-surface);padding:12px 16px;font-weight:700;color:var(--green-dark);font-size:13.5px}
+.repeatable-card-body{padding:16px}
+.remove-icon-btn{background:transparent;border:none;color:var(--error);cursor:pointer;padding:4px;flex-shrink:0;display:inline-flex}
+
+.add-block-btn{display:flex;align-items:center;justify-content:center;gap:6px;width:100%;background:var(--green-light-surface);border:1px dashed var(--green-accent-hover);color:var(--green-dark);font-family:var(--font-display);font-weight:600;font-size:12.5px;padding:11px;border-radius:var(--radius-md);cursor:pointer;margin-bottom:16px}
+.add-block-btn:hover{background:var(--green-light)}
+
+.phone-input-group{display:flex;gap:8px}
+.phone-input-group select{flex:0 0 104px;padding-right:32px}
+.phone-input-group input{flex:1}
+
+.field-control[readonly]{background:var(--green-chip-bg);color:var(--silver-dark)}
+.add-service-menu-wrap{position:relative}
+.toggle-box{border:1px solid var(--border-tint);border-radius:var(--radius-md);padding:14px 16px}
+
+@media (max-width:900px){
+  .form-grid{grid-template-columns:1fr}
+  .service-type-grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<div class="app-shell">
+
+  <!-- ============================ SIDEBAR ============================ -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div class="mark">OP</div>
+      <div>
+        <div class="word">OnePort 365</div>
+        <div class="sub">Ops Workspace</div>
+      </div>
+    </div>
+
+    <div class="nav-section-label">Menu</div>
+    <ul class="nav-list">
+      <li><a href="#" class="nav-item" data-nav="dashboard">
+        <svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="9" rx="1.5"></rect><rect x="14" y="3" width="7" height="5" rx="1.5"></rect><rect x="14" y="12" width="7" height="9" rx="1.5"></rect><rect x="3" y="16" width="7" height="5" rx="1.5"></rect></svg>
+        Dashboard
+      </a></li>
+      <li><a href="#" class="nav-item" data-nav="quotes">
+        <svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 3h6a2 2 0 012 2v14l-5-3-5 3V5a2 2 0 012-2z"></path></svg>
+        Quotes
+      </a></li>
+      <li><a href="#" class="nav-item active" data-nav="shipments">
+        <svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="1" y="7" width="15" height="11" rx="1.5"></rect><path d="M16 10h3.5L22 13.5V18h-6"></path><circle cx="6" cy="20" r="2"></circle><circle cx="17.5" cy="20" r="2"></circle></svg>
+        Shipments
+      </a></li>
+    </ul>
+
+    <div class="sidebar-footer">
+      <div class="sidebar-user">
+        <div class="avatar">NM</div>
+        <div>
+          <div class="name">Nkechi M.</div>
+          <div class="role">Operations Lead</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ============================ MAIN ============================ -->
+  <div class="main">
+    <header class="topbar">
+      <div class="breadcrumbs" id="breadcrumbs"></div>
+    </header>
+
+    <main class="content">
+
+      <!-- ===================== DASHBOARD (placeholder) ===================== -->
+      <section class="view" id="view-dashboard">
+        <div class="placeholder-page">
+          <div class="card placeholder-card">
+            <div class="icon-wrap">
+              <svg width="28" height="28" fill="none" stroke="#023819" stroke-width="1.8" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="9" rx="1.5"></rect><rect x="14" y="3" width="7" height="5" rx="1.5"></rect><rect x="14" y="12" width="7" height="9" rx="1.5"></rect><rect x="3" y="16" width="7" height="5" rx="1.5"></rect></svg>
+            </div>
+            <h2>Dashboard</h2>
+            <p>Operational overview and key metrics will live here — active shipments, SLA health, and team workload at a glance.</p>
+            <span class="placeholder-tag">Coming soon</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===================== QUOTES (placeholder) ===================== -->
+      <section class="view" id="view-quotes">
+        <div class="placeholder-page">
+          <div class="card placeholder-card">
+            <div class="icon-wrap">
+              <svg width="28" height="28" fill="none" stroke="#023819" stroke-width="1.8" viewBox="0 0 24 24"><path d="M9 3h6a2 2 0 012 2v14l-5-3-5 3V5a2 2 0 012-2z"></path></svg>
+            </div>
+            <h2>Quotes</h2>
+            <p>The RFQ and quoting workspace — request tracking, readiness scoring, and rate management — will be built out here.</p>
+            <span class="placeholder-tag">Coming soon</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===================== SHIPMENTS LIST ===================== -->
+      <section class="view active" id="view-shipments">
+        <div class="page-head">
+          <div>
+            <h1>Shipments</h1>
+            <div class="sub" id="shipments-count-label">Loading shipments…</div>
+          </div>
+          <div class="dropdown">
+            <button class="btn btn-accent dropdown-toggle" type="button">
+              <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" stroke-linecap="round"></path></svg>
+              Add Shipment
+              <svg class="chevron" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.4" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+            </button>
+            <div class="dropdown-menu">
+              <button class="dropdown-item" data-add-shipment="quote">
+                <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 3h6a2 2 0 012 2v14l-5-3-5 3V5a2 2 0 012-2z"></path></svg>
+                Create from Quote
+              </button>
+              <button class="dropdown-item" data-add-shipment="manual">
+                <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"></path><path d="M18.5 2.5a2.1 2.1 0 013 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                Create Manually
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="list-search">
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="M21 21l-4-4" stroke-linecap="round"></path></svg>
+          <input type="text" id="shipment-search" placeholder="Search by Shipment Number, Customer, or Owner...">
+        </div>
+
+        <div class="card">
+          <div class="table-wrap">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Shipment Number</th>
+                  <th>Customer</th>
+                  <th>Service Type</th>
+                  <th>Route</th>
+                  <th>Shipment Status</th>
+                  <th>SLA Status</th>
+                  <th>Owner</th>
+                </tr>
+              </thead>
+              <tbody id="shipments-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===================== SHIPMENT DETAIL ===================== -->
+      <section class="view" id="view-shipment-detail">
+
+        <a href="#" class="back-link">
+          <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M19 12H5M11 18l-6-6 6-6" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+          Back to Shipments
+        </a>
+
+        <!-- Header -->
+        <div class="card ship-header-card" id="ship-header"></div>
+
+        <!-- Tabs -->
+        <div class="tabs">
+          <button class="tab-btn active" data-tab="overview">
+            <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"></rect><rect x="14" y="3" width="7" height="7" rx="1.5"></rect><rect x="14" y="14" width="7" height="7" rx="1.5"></rect><rect x="3" y="14" width="7" height="7" rx="1.5"></rect></svg>
+            Overview
+          </button>
+          <button class="tab-btn" data-tab="progress">
+            <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 17l6-6 4 4 8-8M21 7v6M15 7h6" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+            Progress
+          </button>
+          <button class="tab-btn" data-tab="documents">
+            <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 7a2 2 0 012-2h4l2 2h8a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V7z"></path></svg>
+            Documents
+          </button>
+        </div>
+
+        <!-- Tab: Overview -->
+        <div class="tab-pane" id="tab-overview">
+          <div class="overview-layout" style="margin-bottom:22px">
+            <div class="card card-pad">
+              <h3 class="section-title">Shipment Details</h3>
+              <p class="section-sub" style="margin:0 0 18px">Everything captured for this job, grouped by section.</p>
+              <div id="ship-detail-sections"></div>
+            </div>
+            <div class="card card-pad shipment-team-card">
+              <h3 class="section-title">Shipment Team</h3>
+              <p class="section-sub">Who's assigned to this shipment.</p>
+              <div id="shipment-team-display"></div>
+            </div>
+          </div>
+
+          <div class="card card-pad" id="container-card"></div>
+        </div>
+
+        <!-- Tab: Progress -->
+        <div class="tab-pane" id="tab-progress" style="display:none">
+          <div class="progress-layout">
+            <div class="card card-pad">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
+                <h3 class="section-title" style="margin-bottom:0">Service Delivery</h3>
+                <span class="chip chip-neutral" id="service-delivery-template-pill"></span>
+              </div>
+              <p class="section-sub">Milestones for this shipment. Completion is logged manually.</p>
+              <div class="table-wrap">
+                <table class="data-table">
+                  <thead>
+                    <tr><th>Task</th><th>Owner</th><th>Due Date &amp; Time</th><th>Status</th><th style="text-align:right">Actions</th></tr>
+                  </thead>
+                  <tbody id="service-delivery-tbody"></tbody>
+                </table>
+              </div>
+            </div>
+            <div class="card card-pad">
+              <h3 class="section-title">Shipment Tracking</h3>
+              <div class="powered-by">Powered by <b>OneTrack365</b></div>
+              <div class="timeline" id="physical-timeline"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab: Documents -->
+        <div class="tab-pane" id="tab-documents" style="display:none">
+          <div class="card card-pad">
+            <div class="doc-header-stats">
+              <div class="doc-count">
+                <span class="num" id="doc-total-count">0</span>
+                <span class="lbl">documents uploaded</span>
+              </div>
+              <button class="btn btn-accent" id="btn-upload-docs">
+                <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M12 16V4M6 10l6-6 6 6M4 20h16" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+                Upload Documents
+              </button>
+            </div>
+            <div class="table-wrap">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>File Name</th>
+                    <th>Category</th>
+                    <th>Uploaded By</th>
+                    <th>Date &amp; Time</th>
+                    <th style="text-align:right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="documents-tbody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+      </section>
+
+    </main>
+  </div>
+</div>
+
+<!-- ============================ MODALS ============================ -->
+
+<!-- Shipment Team (multi-select, responsibilities, Primary Owner) -->
+<div class="modal-overlay" id="modal-assign-owner">
+  <div class="modal modal-wide">
+    <div class="modal-head">
+      <div>
+        <h3>Shipment Team</h3>
+        <p>Select the people working on this shipment, assign responsibilities, and designate one Primary Owner.</p>
+      </div>
+      <button class="modal-close" data-close-modal><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18" stroke-linecap="round"></path></svg></button>
+    </div>
+    <div class="modal-body">
+      <div class="owner-select-list" id="owner-select-list"></div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-outline" data-close-modal>Cancel</button>
+      <button class="btn btn-accent" id="save-assign-owner">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- Update Status -->
+<div class="modal-overlay" id="modal-update-status">
+  <div class="modal">
+    <div class="modal-head">
+      <div>
+        <h3>Update Shipment Status</h3>
+        <p>Set the overall status of this job.</p>
+      </div>
+      <button class="modal-close" data-close-modal><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18" stroke-linecap="round"></path></svg></button>
+    </div>
+    <div class="modal-body">
+      <div class="form-field filled">
+        <label class="field-label">Shipment Status</label>
+        <select class="field-control" id="input-update-status">
+          <option>Active</option>
+          <option>Completed</option>
+          <option>Cancelled</option>
+        </select>
+      </div>
+      <div class="form-field">
+        <label class="field-label">Notes (optional)</label>
+        <textarea class="field-control" id="input-update-status-notes" rows="3" placeholder="Add context for this status change..."></textarea>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-outline" data-close-modal>Cancel</button>
+      <button class="btn btn-accent" id="save-update-status">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- Edit Shipment reuses the Create Shipment modal below (see shipmentFormState.mode) -->
+
+
+<!-- Add / Edit Container -->
+<div class="modal-overlay" id="modal-container">
+  <div class="modal">
+    <div class="modal-head">
+      <div>
+        <h3 id="container-modal-title">Add Container</h3>
+        <p>Single-step entry — no assignment workflow.</p>
+      </div>
+      <button class="modal-close" data-close-modal><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18" stroke-linecap="round"></path></svg></button>
+    </div>
+    <div class="modal-body">
+      <div class="form-field">
+        <label class="field-label">Container Number</label>
+        <input class="field-control" id="input-container-number" placeholder="e.g. OOCU7452209">
+      </div>
+      <div class="form-grid">
+        <div class="form-field">
+          <label class="field-label">Size</label>
+          <select class="field-control" id="input-container-size">
+            <option>20ft</option>
+            <option>40ft</option>
+            <option>40ft HC</option>
+            <option>45ft HC</option>
+          </select>
+        </div>
+        <div class="form-field">
+          <label class="field-label">Type</label>
+          <select class="field-control" id="input-container-type">
+            <option>Dry</option>
+            <option>Reefer</option>
+            <option>Open Top</option>
+            <option>Flat Rack</option>
+            <option>Tank</option>
+          </select>
+        </div>
+        <div class="form-field">
+          <label class="field-label">Seal Number (optional)</label>
+          <input class="field-control" id="input-container-seal" placeholder="e.g. SL-88213">
+        </div>
+        <div class="form-field">
+          <label class="field-label">Weight (optional)</label>
+          <input class="field-control" id="input-container-weight" placeholder="e.g. 18,200 kg">
+        </div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-outline" data-close-modal>Cancel</button>
+      <button class="btn btn-accent" id="save-container">Save Container</button>
+    </div>
+  </div>
+</div>
+
+<!-- Mark Milestone Complete -->
+<div class="modal-overlay" id="modal-milestone">
+  <div class="modal">
+    <div class="modal-head">
+      <div>
+        <h3>Mark Complete</h3>
+        <p id="milestone-modal-sub">Log completion for this milestone.</p>
+      </div>
+      <button class="modal-close" data-close-modal><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18" stroke-linecap="round"></path></svg></button>
+    </div>
+    <div class="modal-body">
+      <div class="form-field">
+        <label class="field-label">Optional Comment</label>
+        <textarea class="field-control" id="input-milestone-comment" rows="3" placeholder="Add any relevant detail..."></textarea>
+      </div>
+      <p class="field-hint">Completed by <b>Nkechi M.</b> at the current date and time — logged automatically.</p>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-outline" data-close-modal>Cancel</button>
+      <button class="btn btn-accent" id="save-milestone">Mark Complete</button>
+    </div>
+  </div>
+</div>
+
+<!-- Upload Documents -->
+<div class="modal-overlay" id="modal-upload-docs">
+  <div class="modal modal-wide">
+    <div class="modal-head">
+      <div>
+        <h3>Upload Documents</h3>
+        <p>Add supporting files for this shipment.</p>
+      </div>
+      <button class="modal-close" data-close-modal><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18" stroke-linecap="round"></path></svg></button>
+    </div>
+    <div class="modal-body">
+      <div class="dropzone" id="dropzone">
+        <input type="file" id="file-input" multiple style="display:none">
+        <svg width="30" height="30" fill="none" stroke="#023819" stroke-width="1.6" viewBox="0 0 24 24"><path d="M12 16V4M6 10l6-6 6 6M4 20h16" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+        <div class="dz-title">Drag & drop files here</div>
+        <div class="dz-sub">or click to browse from your device</div>
+      </div>
+      <div class="upload-hints">
+        <p class="field-hint">Supported formats: PDF, DOC, DOCX, XLS, XLSX, CSV, JPG, JPEG, PNG, GIF, ZIP</p>
+        <p class="field-hint">Maximum file size: 25 MB per file</p>
+      </div>
+      <div class="file-pill-list" id="file-pill-list"></div>
+
+      <div class="form-field" style="margin-top:22px">
+        <label class="field-label">Category (optional)</label>
+        <select class="field-control" id="input-doc-category">
+          <option value="">Select category…</option>
+          <option>Shipping</option>
+          <option>Finance</option>
+          <option>Customs</option>
+          <option>Compliance</option>
+          <option>General</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-outline" data-close-modal>Cancel</button>
+      <button class="btn btn-accent" id="save-upload-docs" disabled>Upload Files</button>
+    </div>
+  </div>
+</div>
+
+<!-- Update File (replace) -->
+<div class="modal-overlay" id="modal-update-file">
+  <div class="modal">
+    <div class="modal-head">
+      <div>
+        <h3>Update File</h3>
+        <p id="update-file-sub">Replace the file for this document record.</p>
+      </div>
+      <button class="modal-close" data-close-modal><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18" stroke-linecap="round"></path></svg></button>
+    </div>
+    <div class="modal-body">
+      <div class="dropzone" id="dropzone-update">
+        <input type="file" id="file-input-update" style="display:none">
+        <svg width="26" height="26" fill="none" stroke="#023819" stroke-width="1.6" viewBox="0 0 24 24"><path d="M12 16V4M6 10l6-6 6 6M4 20h16" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+        <div class="dz-title" id="update-file-name">Select a replacement file</div>
+        <div class="dz-sub">Metadata stays the same — only the file changes</div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-outline" data-close-modal>Cancel</button>
+      <button class="btn btn-accent" id="save-update-file" disabled>Replace File</button>
+    </div>
+  </div>
+</div>
+
+<!-- Delete Document Confirm -->
+<div class="modal-overlay" id="modal-delete-doc">
+  <div class="modal">
+    <div class="modal-head">
+      <div>
+        <h3>Delete Document</h3>
+        <p>This action cannot be undone in this prototype session.</p>
+      </div>
+      <button class="modal-close" data-close-modal><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18" stroke-linecap="round"></path></svg></button>
+    </div>
+    <div class="modal-body">
+      <p style="font-size:14px;color:var(--silver-dark);margin:0">Are you sure you want to delete <b id="delete-doc-name" style="color:var(--green-dark)"></b>?</p>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-outline" data-close-modal>Cancel</button>
+      <button class="btn" style="background:var(--error);color:#fff" id="confirm-delete-doc">Delete</button>
+    </div>
+  </div>
+</div>
+
+<!-- Create Shipment (manual, 2-step) -->
+<div class="modal-overlay" id="modal-create-shipment">
+  <div class="modal modal-wide">
+    <div class="modal-head">
+      <div>
+        <h3 id="create-modal-title">New Shipment — Choose Service Type</h3>
+        <p id="create-modal-sub">Select the type of service this shipment requires.</p>
+      </div>
+      <button class="modal-close" data-close-modal><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18" stroke-linecap="round"></path></svg></button>
+    </div>
+    <div class="modal-body">
+      <div id="create-step-1">
+        <div class="service-type-grid" id="create-category-grid"></div>
+      </div>
+      <div id="create-step-2" style="display:none">
+        <div class="chip chip-neutral" id="create-step2-category-badge" style="margin-bottom:16px"></div>
+        <div id="create-common-fields"></div>
+      </div>
+    </div>
+    <div class="modal-foot" id="create-modal-foot"></div>
+  </div>
+</div>
+
+<div id="toast-wrap"></div>
+
+<script>
+/* ==========================================================================
+   Icon helpers (used sparingly across the interface)
+   ========================================================================== */
+const ICON_CHECK = `<svg width="10" height="10" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5" stroke-linecap="round" stroke-linejoin="round"></path></svg>`;
+const ICON_X = `<svg width="10" height="10" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18" stroke-linecap="round"></path></svg>`;
+const ICON_WARN = `<svg width="10" height="10" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path d="M12 9v4M12 16h.01" stroke-linecap="round"></path><circle cx="12" cy="12" r="9"></circle></svg>`;
+const ICON_BUILDING = `<svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 21h18M5 21V7l6-4 6 4v14M9 9h1M9 13h1M14 9h1M14 13h1"></path></svg>`;
+const ICON_PERSON = `<svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"></circle><path d="M4 21v-1a8 8 0 0116 0v1"></path></svg>`;
+const ICON_CROWN_FILLED = `<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M3 18h18l-1.6-9.5-4.9 4-2.5-7.3-2.5 7.3-4.9-4L3 18z"></path><rect x="3" y="19" width="18" height="2" rx="1"></rect></svg>`;
+const ICON_CROWN_OUTLINE = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 18h18l-1.6-9.5-4.9 4-2.5-7.3-2.5 7.3-4.9-4L3 18z" stroke-linejoin="round"></path><path d="M3 20h18" stroke-linecap="round"></path></svg>`;
+const ICON_SHIP = `<svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 8l-9-5-9 5 9 5 9-5zM3 8v8l9 5 9-5V8M12 13v8"></path></svg>`;
+const ICON_PLANE = `<svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z" stroke-linecap="round" stroke-linejoin="round"></path></svg>`;
+const ICON_TRUCK = `<svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 16V6a1 1 0 011-1h9v11M3 16h10m0-11h3l4 4v7h-2M3 16a2 2 0 104 0 2 2 0 00-4 0zm10 0a2 2 0 104 0 2 2 0 00-4 0z" stroke-linecap="round" stroke-linejoin="round"></path></svg>`;
+const ICON_STAMP = `<svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 2h6v6l3 3v3H6v-3l3-3V2z" stroke-linejoin="round"></path><path d="M4 20h16M8 20v-3h8v3" stroke-linecap="round" stroke-linejoin="round"></path></svg>`;
+const ICON_PLUS = `<svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" stroke-linecap="round"></path></svg>`;
+const ICON_ARROW = `<svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6" stroke-linecap="round" stroke-linejoin="round"></path></svg>`;
+const SOURCE_ICON = {
+  Terminal: `<svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 21h18M5 21V9l7-6 7 6v12M9 21v-6h6v6"></path></svg>`,
+  Vessel: `<svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 17l1.2-5h13.6L20 17M6 12V7h3V5h6v2h3v5M3 21c1.3 0 1.3-1.3 2.6-1.3S7.9 21 9.2 21s1.3-1.3 2.6-1.3S14.1 21 15.4 21s1.3-1.3 2.6-1.3S20.3 21 21.6 21" stroke-linecap="round" stroke-linejoin="round"></path></svg>`,
+  Haulage: `<svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 16V6a1 1 0 011-1h9v11M3 16h10m0-11h3l4 4v7h-2M3 16a2 2 0 104 0 2 2 0 00-4 0zm10 0a2 2 0 104 0 2 2 0 00-4 0z" stroke-linecap="round" stroke-linejoin="round"></path></svg>`,
+  Airport: `<svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 21h18M5 21V9l7-6 7 6v12M9 21v-6h6v6"></path></svg>`,
+  Flight: `<svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z" stroke-linecap="round" stroke-linejoin="round"></path></svg>`,
+  Customs: `<svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 2h6v6l3 3v3H6v-3l3-3V2z" stroke-linejoin="round"></path><path d="M4 20h16M8 20v-3h8v3" stroke-linecap="round" stroke-linejoin="round"></path></svg>`,
+};
+
+/* ==========================================================================
+   Mock data
+   ========================================================================== */
+const CURRENT_USER = 'Nkechi M.';
+
+const TEAM = [
+  {id:'u1', name:'James Adewale', role:'Sales Lead', initials:'JA', fill:'dark'},
+  {id:'u2', name:'Sarah Adeyemi', role:'Ops Executive', initials:'SA', fill:'light'},
+  {id:'u3', name:'Michael Ibe', role:'Quotes Manager', initials:'MI', fill:'dark'},
+  {id:'u4', name:'Titi Aluko', role:'Customs Coordinator', initials:'TA', fill:'gold'},
+  {id:'u5', name:'Chidi Eze', role:'Documentation', initials:'CE', fill:'dark'},
+  {id:'u6', name:'Ada Nwosu', role:'Finance', initials:'AN', fill:'light'},
+];
+function teamMember(id){ return TEAM.find(t=>t.id===id); }
+function avatarFillStyle(fill){
+  if(fill==='light') return 'background:var(--green-light);color:var(--green-dark)';
+  if(fill==='gold') return 'background:var(--gold);color:var(--green-dark)';
+  return 'background:var(--green-dark);color:var(--green-accent)';
+}
+
+const RESPONSIBILITIES = ['Operations Manager','Operations Officer','Documentation Officer','Finance Officer','QA Officer','CX Officer','Clearing Officer','Transport Coordinator'];
+
+const SLA_CONFIG = {
+  'Healthy': {chip:'chip-success', dot:'var(--success)'},
+  'At-Risk': {chip:'chip-warning', dot:'var(--gold)'},
+  'Breached': {chip:'chip-error', dot:'var(--error)'},
+};
+function slaIcon(health){ return health==='Healthy' ? ICON_CHECK : ICON_WARN; }
+
+const STATUS_CLASS = { Active:'status-active', Completed:'status-completed', Cancelled:'status-cancelled' };
+function renderStatusChip(status, sizeClass=''){
+  const cls = STATUS_CLASS[status] || 'status-active';
+  let icon = `<span class="status-dot"></span>`;
+  if(status==='Completed') icon = `<span class="status-icon">${ICON_CHECK}</span>`;
+  else if(status==='Cancelled') icon = `<span class="status-icon">${ICON_X}</span>`;
+  return `<span class="status-chip ${cls} ${sizeClass}">${icon}${status}</span>`;
+}
+
+const SERVICE_CATEGORIES = [
+  {key:'OCEAN', label:'Ocean Freight', icon:ICON_SHIP, blurb:'FCL, LCL & Break Bulk sea freight'},
+  {key:'AIR', label:'Air Freight', icon:ICON_PLANE, blurb:'Airway bill-based air cargo'},
+  {key:'HAULAGE', label:'Haulage', icon:ICON_TRUCK, blurb:'Inland trucking & last-mile delivery'},
+  {key:'BROKERAGE', label:'Customs Brokerage', icon:ICON_STAMP, blurb:'Customs clearance & declaration services'},
+];
+function categoryOf(key){ return SERVICE_CATEGORIES.find(c=>c.key===key) || SERVICE_CATEGORIES[0]; }
+function shipmentTypeOf(s){ return s.direction; }
+function transportLabelOf(s){ return categoryOf(s.category).label; }
+function templateLabelOf(s){
+  if(s.category==='OCEAN') return s.direction==='Export' ? 'OneExport' : 'OneImport';
+  if(s.category==='AIR') return s.direction==='Export' ? 'OneAir Export' : 'OneAir Import';
+  if(s.category==='HAULAGE') return 'OneHaulage';
+  return 'OneClear';
+}
+function dateLabelsOf(category){
+  if(category==='HAULAGE') return {start:'Pickup Date', end:'Delivery Date'};
+  if(category==='BROKERAGE') return {start:'Submission Date', end:'Target Clearance Date'};
+  return {start:'ETD', end:'ETA'};
+}
+
+const PORTS = [
+  {code:'CNSHA', name:'Shanghai Yangshan Port'},
+  {code:'NGLOS', name:'Apapa Port, Lagos'},
+  {code:'NLRTM', name:'Port of Rotterdam'},
+  {code:'GHTEM', name:'Tema Port'},
+  {code:'DEHAM', name:'Port of Hamburg'},
+  {code:'CMDLA', name:'Port of Douala'},
+  {code:'BEANR', name:'Port of Antwerp'},
+  {code:'SGSIN', name:'Port of Singapore'},
+  {code:'USNYC', name:'Port of New York'},
+  {code:'GBFXT', name:'Port of Felixstowe'},
+  {code:'ESVLC', name:'Port of Valencia'},
+  {code:'KRPUS', name:'Port of Busan'},
+  {code:'CNTAO', name:'Port of Qingdao'},
+  {code:'AEJEA', name:'Jebel Ali Port, Dubai'},
+];
+const LOCODE_MAP = Object.fromEntries(PORTS.map(p=>[p.name, p.code]));
+function locodeOf(portName){ return LOCODE_MAP[portName] || portName; }
+
+const LOCATIONS = [
+  'Shanghai, China','Lagos, Nigeria','Rotterdam, Netherlands','Tema, Ghana','Hamburg, Germany',
+  'Shenzhen, China','Douala, Cameroon','Antwerp, Belgium','Singapore','Dubai, UAE',
+  'Mombasa, Kenya','Durban, South Africa','New York, USA','Felixstowe, United Kingdom',
+  'Valencia, Spain','Tianjin, China','Busan, South Korea','Qingdao, China','Ningbo, China','Santos, Brazil',
+  'Kano, Nigeria','Port Harcourt, Nigeria','Ibadan, Nigeria','Abuja, Nigeria',
+];
+
+const AIRPORTS = [
+  {code:'LOS', name:'Murtala Muhammed International Airport, Lagos'},
+  {code:'ABV', name:'Nnamdi Azikiwe International Airport, Abuja'},
+  {code:'SZX', name:'Shenzhen Bao\'an International Airport'},
+  {code:'PVG', name:'Shanghai Pudong International Airport'},
+  {code:'PEK', name:'Beijing Capital International Airport'},
+  {code:'DXB', name:'Dubai International Airport'},
+  {code:'LHR', name:'London Heathrow Airport'},
+  {code:'FRA', name:'Frankfurt Airport'},
+  {code:'AMS', name:'Amsterdam Schiphol Airport'},
+  {code:'JFK', name:'John F. Kennedy International Airport, New York'},
+  {code:'CAI', name:'Cairo International Airport'},
+  {code:'JNB', name:'O.R. Tambo International Airport, Johannesburg'},
+  {code:'ACC', name:'Kotoka International Airport, Accra'},
+];
+const AIRPORT_CODE_MAP = Object.fromEntries(AIRPORTS.map(a=>[a.name, a.code]));
+function airportCodeOf(name){ return AIRPORT_CODE_MAP[name] || name; }
+function formatAirportDisplay(name){
+  const a = AIRPORTS.find(x=>x.name===name);
+  return a ? `${a.code} — ${a.name}` : name;
+}
+
+// Reference data for the Ocean / Air creation forms
+const OFFICES = ['Lagos HQ','Apapa Branch','Port Harcourt Branch','Kano Branch','Abuja Branch'];
+const COMMODITY_TYPES = ['General Cargo','Electronics','Machinery & Equipment','Textiles & Apparel','Food & Beverages','Chemicals','Pharmaceuticals','Automotive Parts','Construction Materials','Consumer Goods'];
+const COMMODITY_CATEGORIES = ['Non-Hazardous','Hazardous','Perishable','Fragile','High Value','Oversized / Break Bulk'];
+const CURRENCIES = ['NGN','USD','EUR','GBP'];
+const PACKAGE_PICKUP_MEDIUMS = ['Self Drop-off','Pickup Requested','Courier Service'];
+const DIMENSION_UNITS = ['cm','in','m'];
+const DIAL_CODES = ['+234','+1','+44','+86','+971'];
+const PALLET_COUNTS = ['One','Two','Three','Four','Five','More than five'];
+
+const MONTH_MAP = {Jan:0,Feb:1,Mar:2,Apr:3,May:4,Jun:5,Jul:6,Aug:7,Sep:8,Oct:9,Nov:10,Dec:11};
+function parseDisplayDate(str){
+  const [d,mon,y] = str.split(' ');
+  return new Date(parseInt(y,10), MONTH_MAP[mon], parseInt(d,10));
+}
+function formatDate(date){
+  return date.toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'});
+}
+function displayDateToInputValue(str){
+  const date = parseDisplayDate(str);
+  const pad = n => String(n).padStart(2,'0');
+  return `${date.getFullYear()}-${pad(date.getMonth()+1)}-${pad(date.getDate())}`;
+}
+function inputDateToDisplay(val){
+  const [y,m,d] = val.split('-').map(Number);
+  return formatDate(new Date(y, m-1, d));
+}
+function formatPortDisplay(name){
+  const p = PORTS.find(x=>x.name===name);
+  return p ? `${p.code} — ${p.name}` : name;
+}
+function formatDateTime(date){
+  return `${formatDate(date)} • ${date.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'})}`;
+}
+function formatDueDateTime(date){
+  if(!date) return '—';
+  const now = new Date();
+  const startOfDay = d => new Date(d.getFullYear(), d.getMonth(), d.getDate());
+  const diffDays = Math.round((startOfDay(date) - startOfDay(now)) / 86400000);
+  const timeStr = date.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit',hour12:false});
+  if(diffDays === 0) return `Today • ${timeStr}`;
+  if(diffDays === 1) return `Tomorrow • ${timeStr}`;
+  return `${formatDate(date)} • ${timeStr}`;
+}
+function daysBetween(a,b){ return Math.round((b.getTime()-a.getTime())/86400000); }
+function computeLiveSlaHealth(dueDate){
+  if(!dueDate) return 'Healthy';
+  const diffDays = daysBetween(new Date(), dueDate);
+  if(diffDays < 0) return 'Breached';
+  if(diffDays <= 2) return 'At-Risk';
+  return 'Healthy';
+}
+
+const OCEAN_EXPORT_TEMPLATE = [
+  {name:'Booking Placement', responsibility:'Operations Officer'},
+  {name:'Empty Container', responsibility:'Transport Coordinator'},
+  {name:'Clean CCI', responsibility:'Documentation Officer'},
+  {name:'Draft BL to Customer', responsibility:'Documentation Officer'},
+  {name:'Gate-In', responsibility:'Transport Coordinator'},
+  {name:'Inspection', responsibility:'QA Officer'},
+  {name:'Vessel Confirmation', responsibility:'Operations Manager'},
+  {name:'Sailing Confirmation', responsibility:'Operations Manager'},
+  {name:'OBL Issuance', responsibility:'Documentation Officer'},
+  {name:'Document Release', responsibility:'CX Officer'},
+];
+const OCEAN_IMPORT_TEMPLATE = [
+  {name:'Pre-Alert Receipt', responsibility:'CX Officer'},
+  {name:'Form M Validation', responsibility:'Documentation Officer'},
+  {name:'PAAR Application', responsibility:'Clearing Officer'},
+  {name:'Draft Assessment', responsibility:'Clearing Officer'},
+  {name:'Final Assessment', responsibility:'Clearing Officer'},
+  {name:'THC Payment', responsibility:'Finance Officer'},
+  {name:'Delivery', responsibility:'Transport Coordinator'},
+  {name:'Empty Return', responsibility:'Transport Coordinator'},
+  {name:'Post Delivery Docs', responsibility:'Documentation Officer'},
+  {name:'Document Release', responsibility:'CX Officer'},
+];
+const AIR_EXPORT_TEMPLATE = [
+  {name:'Booking Confirmation', responsibility:'Operations Officer'},
+  {name:'Cargo Received at Origin', responsibility:'Transport Coordinator'},
+  {name:'Screening & Documentation', responsibility:'Documentation Officer'},
+  {name:'MAWB Issuance', responsibility:'Documentation Officer'},
+  {name:'Export Customs Clearance', responsibility:'Clearing Officer'},
+  {name:'Flight Departure', responsibility:'Operations Manager'},
+  {name:'Flight Arrival Confirmation', responsibility:'Operations Manager'},
+  {name:'Document Release', responsibility:'CX Officer'},
+];
+const AIR_IMPORT_TEMPLATE = [
+  {name:'Pre-Alert Receipt', responsibility:'CX Officer'},
+  {name:'Flight Arrival Confirmation', responsibility:'Operations Manager'},
+  {name:'Cargo Received at Destination', responsibility:'Transport Coordinator'},
+  {name:'Import Customs Clearance', responsibility:'Clearing Officer'},
+  {name:'Duty Payment', responsibility:'Finance Officer'},
+  {name:'Delivery', responsibility:'Transport Coordinator'},
+  {name:'Document Release', responsibility:'CX Officer'},
+];
+const HAULAGE_TEMPLATE = [
+  {name:'Pickup Scheduled', responsibility:'Operations Officer'},
+  {name:'Vehicle Assigned', responsibility:'Transport Coordinator'},
+  {name:'Cargo Loaded', responsibility:'Transport Coordinator'},
+  {name:'In Transit', responsibility:'Transport Coordinator'},
+  {name:'Delivered', responsibility:'Transport Coordinator'},
+  {name:'Proof of Delivery Signed', responsibility:'CX Officer'},
+];
+const BROKERAGE_TEMPLATE = [
+  {name:'Documents Received', responsibility:'Documentation Officer'},
+  {name:'Form M / PAAR Validation', responsibility:'Documentation Officer'},
+  {name:'Declaration Lodged (SGD)', responsibility:'Clearing Officer'},
+  {name:'Customs Assessment', responsibility:'Clearing Officer'},
+  {name:'Duty Payment', responsibility:'Finance Officer'},
+  {name:'Examination / Inspection', responsibility:'QA Officer'},
+  {name:'Release Order Issued', responsibility:'Clearing Officer'},
+];
+function milestoneTemplateOf(s){
+  if(s.category==='OCEAN') return s.direction==='Export' ? OCEAN_EXPORT_TEMPLATE : OCEAN_IMPORT_TEMPLATE;
+  if(s.category==='AIR') return s.direction==='Export' ? AIR_EXPORT_TEMPLATE : AIR_IMPORT_TEMPLATE;
+  if(s.category==='HAULAGE') return HAULAGE_TEMPLATE;
+  return BROKERAGE_TEMPLATE;
+}
+
+// Physical tracking events, derived from the shipment's own locations — category-specific,
+// and intentionally empty for Customs Brokerage (a paperwork service, not a physical movement).
+function buildTrackingTemplateFor(s){
+  if(s.category==='OCEAN'){
+    return [
+      {label:'Container Gated In · Origin Terminal', loc:s.ocean.pol, source:'Terminal'},
+      {label:'Vessel Departed', loc:s.ocean.pol, source:'Vessel'},
+      {label:'In Transit · Ocean Voyage', loc:'International Waters', source:'Vessel'},
+      {label:'Vessel Arrived', loc:s.ocean.pod, source:'Vessel'},
+      {label:'Container Gated Out', loc:s.ocean.pod, source:'Terminal'},
+      {label:'Inland Haulage to Consignee', loc:s.destination, source:'Haulage'},
+    ];
+  }
+  if(s.category==='AIR'){
+    return [
+      {label:'Cargo Received · Origin Warehouse', loc:s.air.originAirport, source:'Airport'},
+      {label:'Flight Departed', loc:s.air.originAirport, source:'Flight'},
+      {label:'Flight Arrived', loc:s.air.destAirport, source:'Flight'},
+      {label:'Customs Clearance', loc:s.air.destAirport, source:'Customs'},
+      {label:'Delivered to Consignee', loc:s.destination, source:'Haulage'},
+    ];
+  }
+  if(s.category==='HAULAGE'){
+    const from = s.direction==='Import' ? s.haulage.portOfDischarge : s.haulage.pickupAddress;
+    const to = s.direction==='Import' ? s.haulage.destinationAddress : s.haulage.portOfLoading;
+    return [
+      {label:'Vehicle Dispatched', loc:from, source:'Haulage'},
+      {label:'In Transit', loc:'En Route', source:'Haulage'},
+      {label:'Arrived at Destination', loc:to, source:'Haulage'},
+      {label:'Proof of Delivery Signed', loc:to, source:'Haulage'},
+    ];
+  }
+  return [];
+}
+const SOURCE_TAG_CLASS = {Terminal:'tag-terminal', Vessel:'tag-vessel', Haulage:'tag-haulage', Airport:'tag-airport', Flight:'tag-flight', Customs:'tag-customs'};
+
+function makeId(prefix){ return prefix + '-' + Math.random().toString(36).slice(2,8); }
+
+// Deterministic mock responsibility assignment per shipment team, with one guaranteed
+// "Unassigned" demo case (seed 7 / Dufil, Export template, missing QA Officer coverage)
+function assignResponsibilities(shipTeamIds, seed){
+  const resp = {};
+  resp[shipTeamIds[0]] = ['Operations Manager'];
+  const pool = RESPONSIBILITIES.filter(r=>r!=='Operations Manager');
+  let poolIdx = seed % pool.length;
+  for(let i=1;i<shipTeamIds.length;i++){
+    const id = shipTeamIds[i];
+    if(!resp[id]) resp[id] = [];
+    resp[id].push(pool[poolIdx % pool.length]); poolIdx++;
+    resp[id].push(pool[poolIdx % pool.length]); poolIdx++;
+  }
+  if(seed===7){
+    Object.keys(resp).forEach(id=>{ resp[id] = resp[id].filter(r=>r!=='QA Officer'); });
+  }
+  return resp;
+}
+
+// Build a fleshed-out shipment detail object from a light list record + a seed for variety
+function buildShipmentDetail(base, seed){
+  const primary = teamMember(base.ownerId);
+  const supporting = (base.supportingOwnerIds||[]).map(teamMember);
+  const shipTeamIds = [base.ownerId, ...(base.supportingOwnerIds||[])];
+  const responsibilities = assignResponsibilities(shipTeamIds, seed);
+
+  const containerCount = base.category==='OCEAN' ? 2 + (seed % 3) : 0;
+  const containers = [];
+  for(let i=0;i<containerCount;i++){
+    containers.push({
+      id: makeId('cnt'),
+      number: `${['OOCU','MSCU','MAEU','CMAU'][(seed+i)%4]}${7000000+seed*137+i*91}`,
+      size: ['20ft','40ft','40ft HC'][(seed+i)%3],
+      type: ['Dry','Reefer','Dry','Dry'][(seed+i)%4],
+      seal: i%2===0 ? `SL-${8800+seed+i}` : '',
+      weight: i%3!==0 ? `${17000+seed*40+i*300} kg` : '',
+    });
+  }
+
+  const template = milestoneTemplateOf(base);
+  const etdDate = parseDisplayDate(base.etd);
+  const etaDate = parseDisplayDate(base.eta);
+  const span = etaDate.getTime() - etdDate.getTime();
+  const completedCount = base.completedMilestones;
+
+  const milestones = template.map((t,i)=>{
+    const frac = template.length>1 ? i/(template.length-1) : 0;
+    let dueDate = new Date(etdDate.getTime() + span*frac);
+    dueDate.setHours(9 + ((i*3)%8), (i%2)*30, 0, 0);
+    if(i === template.length-1 && seed % 3 === 0) dueDate = null;
+    if(seed===3 && i===4){ dueDate = new Date(); dueDate.setHours(14,30,0,0); }
+    if(seed===4 && i===6){ dueDate = new Date(); dueDate.setDate(dueDate.getDate()+1); dueDate.setHours(10,0,0,0); }
+    const isDone = i < completedCount;
+    let completedSlaHealth = null, completedBy = '', completedAt = null, comment = '';
+    if(isDone){
+      completedSlaHealth = ((i+seed) % 5 === 0) ? 'Breached' : ((i+seed) % 7 === 0) ? 'At-Risk' : 'Healthy';
+      completedBy = teamMember(shipTeamIds[(i+seed+1)%shipTeamIds.length]).name;
+      completedAt = new Date(Date.now() - (template.length-i)*86400000);
+      comment = (i%3===0) ? 'Cleared without exceptions.' : '';
+    }
+    return {
+      id: makeId('ms'),
+      name: t.name,
+      responsibility: t.responsibility,
+      status: isDone ? 'Completed' : 'Not Started',
+      dueDate,
+      completedBy,
+      completedAt,
+      completedSlaHealth,
+      comment,
+    };
+  });
+
+  const trackingTemplate = buildTrackingTemplateFor(base);
+  const trackedCount = trackingTemplate.length ? Math.min(trackingTemplate.length, 2 + (seed % 5)) : 0;
+  const physicalTracking = trackingTemplate.map((t,i)=>({
+    label: t.label,
+    location: t.loc,
+    source: t.source,
+    timestamp: i < trackedCount ? new Date(Date.now() - (trackedCount-i)*3*3600000).toLocaleString('en-GB',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}) : null,
+    done: i < trackedCount,
+  }));
+
+  const docSeedNames = [
+    ['Bill_of_Lading.pdf','Shipping'],
+    ['Commercial_Invoice.pdf','Finance'],
+    ['Packing_List.xlsx','Shipping'],
+    ['Certificate_of_Origin.pdf','Compliance'],
+  ];
+  const docCount = 1 + (seed % docSeedNames.length);
+  const documents = [];
+  for(let i=0;i<docCount;i++){
+    const d = docSeedNames[i];
+    documents.push({
+      id: makeId('doc'),
+      name: d[0],
+      category: d[1],
+      uploadedBy: teamMember(shipTeamIds[(i+seed)%shipTeamIds.length]).name,
+      uploadedOn: new Date(Date.now() - (docCount-i)*86400000*2 - i*3600000*7),
+      isMock: true,
+      fileUrl: null,
+      size: null,
+    });
+  }
+
+  return {
+    ...base,
+    owners: { primary, supporting, responsibilities },
+    containers,
+    milestones,
+    physicalTracking,
+    documents,
+  };
+}
+
+const SHIPMENT_LIST_BASE = [
+  {jobRef:'ZELO000001', category:'OCEAN', direction:'Import', customer:'Dangote Industries', origin:'Shanghai, China', destination:'Lagos, Nigeria', route:'Shanghai, China → Lagos, Nigeria', status:'Active', slaHealth:'Healthy', eta:'02 Aug 2026', ownerId:'u1', supportingOwnerIds:['u5','u6'], completedMilestones:4, quoteRef:'OP-QT-8821', incoterm:'CIF', etd:'12 Jul 2026',
+    ocean:{pol:'Shanghai Yangshan Port', pod:'Apapa Port, Lagos', freightType:'FCL', vessel:'MSC Diana', voyage:'FE2201', carrier:'MSC', bl:'MEDUSH0123456', officeBranch:'Apapa Branch', pickupDate:'10 Jul 2026', currency:'NGN', totalValue:'85000000', hazardous:false, hsCode:'2523.29', commodityType:'Construction Materials', commodityCategory:'Non-Hazardous', commodityDescription:'Cement production raw materials', uniformContainers:true, containerCount:'4', containerWeight:'88', containerSize:'40ft', containerType:'Dry'},
+    additionalServices:{haulage:true, haulageType:'At Destination', pickupAddress:'', loadingPoint:'', dischargePoint:'Apapa Port, Lagos', dropOffAddress:'Dangote Cement Depot, Ibese', tracker:true, escort:false, brokerage:false}},
+  {jobRef:'ZELO000002', category:'OCEAN', direction:'Import', customer:'Nestlé West Africa', origin:'Rotterdam, Netherlands', destination:'Tema, Ghana', route:'Rotterdam, Netherlands → Tema, Ghana', status:'Active', slaHealth:'At-Risk', eta:'29 Jul 2026', ownerId:'u2', supportingOwnerIds:['u4'], completedMilestones:6, quoteRef:'OP-QT-8790', incoterm:'FOB', etd:'05 Jul 2026',
+    ocean:{pol:'Port of Rotterdam', pod:'Tema Port', freightType:'FCL', vessel:'MSC Rotterdam', voyage:'WA1187', carrier:'MSC', bl:'MSCURTM998211', officeBranch:'Lagos HQ', pickupDate:'28 Jun 2026', currency:'USD', totalValue:'240000', hazardous:false, hsCode:'1806.32', commodityType:'Food & Beverages', commodityCategory:'Perishable', commodityDescription:'Packaged confectionery and beverage concentrate', uniformContainers:true, containerCount:'6', containerWeight:'132', containerSize:'40ft HC', containerType:'Reefer'}},
+  {jobRef:'ZELO000003', category:'OCEAN', direction:'Import', customer:'Julius Berger Nigeria', origin:'Hamburg, Germany', destination:'Lagos, Nigeria', route:'Hamburg, Germany → Lagos, Nigeria', status:'Active', slaHealth:'Breached', eta:'20 Jul 2026', ownerId:'u3', supportingOwnerIds:[], completedMilestones:1, quoteRef:'OP-QT-8744', incoterm:'CFR', etd:'01 Jul 2026',
+    ocean:{pol:'Port of Hamburg', pod:'Apapa Port, Lagos', freightType:'Break Bulk', vessel:'Hapag Bremen', voyage:'', carrier:'Hapag-Lloyd', bl:'HLCUHAM774410', officeBranch:'Apapa Branch', pickupDate:'24 Jun 2026', currency:'EUR', totalValue:'610000', hazardous:false, hsCode:'8429.52', commodityType:'Machinery & Equipment', commodityCategory:'Oversized / Break Bulk', commodityDescription:'Excavator components', uniformContainers:false, containerCount:'2', containerWeight:'44', containerSize:'40ft HC', containerType:'Flat Rack'}},
+  {jobRef:'ZELO000004', category:'AIR', direction:'Import', customer:'MTN Nigeria', origin:'Shenzhen, China', destination:'Lagos, Nigeria', route:'Shenzhen, China → Lagos, Nigeria', status:'Cancelled', slaHealth:'Healthy', eta:'31 Jul 2026', ownerId:'u4', supportingOwnerIds:['u1'], completedMilestones:2, quoteRef:'OP-QT-8701', incoterm:'FCA', etd:'27 Jul 2026',
+    air:{deliveryType:'Port to Port', originAirport:'Shenzhen Bao\'an International Airport', destAirport:'Murtala Muhammed International Airport, Lagos', originAddress:'', destinationAddress:'', airline:'Emirates SkyCargo', flightNo:'EK9825', mawb:'176-8821304', hawb:'HAWB-55291', officeBranch:'Lagos HQ', hazardous:false, uniformPallets:true, hsCode:'8517.62', commodityType:'Electronics', commodityCategory:'High Value', commodityDescription:'Telecom network equipment', numberOfPallets:'Four', dimensionUnit:'cm', length:'120', width:'100', height:'110'},
+    additionalServices:{haulage:false, haulageType:'At Origin', pickupAddress:'', loadingPoint:'', dischargePoint:'', dropOffAddress:'', tracker:false, escort:false, brokerage:true}},
+  {jobRef:'ZELO000005', category:'OCEAN', direction:'Export', customer:'Dufil Prima Foods', origin:'Lagos, Nigeria', destination:'Douala, Cameroon', route:'Lagos, Nigeria → Douala, Cameroon', status:'Active', slaHealth:'Healthy', eta:'26 Jul 2026', ownerId:'u5', supportingOwnerIds:['u2','u3'], completedMilestones:7, quoteRef:'OP-QT-8650', incoterm:'CIF', etd:'14 Jul 2026',
+    ocean:{pol:'Apapa Port, Lagos', pod:'Port of Douala', freightType:'FCL', vessel:'OOCL Africa', voyage:'AF0456', carrier:'OOCL', bl:'OOLU2384910X', officeBranch:'Apapa Branch', pickupDate:'08 Jul 2026', currency:'NGN', totalValue:'52000000', hazardous:false, hsCode:'1902.30', commodityType:'Food & Beverages', commodityCategory:'Non-Hazardous', commodityDescription:'Instant noodles, cartoned', uniformContainers:true, containerCount:'5', containerWeight:'95', containerSize:'20ft', containerType:'Dry'}},
+  {jobRef:'ZELO000006', category:'OCEAN', direction:'Import', customer:'Nigerian Breweries', origin:'Antwerp, Belgium', destination:'Lagos, Nigeria', route:'Antwerp, Belgium → Lagos, Nigeria', status:'Completed', slaHealth:'Healthy', eta:'10 Jul 2026', ownerId:'u6', supportingOwnerIds:[], completedMilestones:10, quoteRef:'OP-QT-8590', incoterm:'CIF', etd:'20 Jun 2026',
+    ocean:{pol:'Port of Antwerp', pod:'Apapa Port, Lagos', freightType:'FCL', vessel:'APL Antwerp', voyage:'EU0912', carrier:'APL', bl:'APLU5567234B', officeBranch:'Apapa Branch', pickupDate:'14 Jun 2026', currency:'EUR', totalValue:'310000', hazardous:false, hsCode:'8422.30', commodityType:'Machinery & Equipment', commodityCategory:'Non-Hazardous', commodityDescription:'Bottling line spare parts', uniformContainers:true, containerCount:'3', containerWeight:'61', containerSize:'20ft', containerType:'Dry'}},
+  {jobRef:'ZELO000007', category:'HAULAGE', direction:'Import', customer:'Flour Mills of Nigeria', origin:'Apapa Port, Lagos', destination:'Bompai Industrial Estate, Kano', route:'Apapa Port, Lagos → Bompai Industrial Estate, Kano', status:'Active', slaHealth:'At-Risk', eta:'21 Jul 2026', ownerId:'u3', supportingOwnerIds:['u4'], completedMilestones:3, quoteRef:'OP-QT-8905', incoterm:'', etd:'18 Jul 2026',
+    haulage:{portOfDischarge:'Apapa Port, Lagos', destinationAddress:'Bompai Industrial Estate, Kano', pickupAddress:'', portOfLoading:'', officeBranch:'Apapa Branch', currency:'NGN', totalValue:'42000000', bl:'', portEta:'21 Jul 2026', tdoExpiryDate:'25 Jul 2026', tdoWrittenDate:'18 Jul 2026', stuffingDate:'16 Jul 2026', hazardous:false, hsCode:'1101.00', commodityType:'Food & Beverages', commodityCategory:'Perishable', commodityDescription:'Bagged flour', uniformContainers:true, containerCount:'5', containerWeight:'22', containerSize:'40ft', containerType:'Dry', tracker:true, escort:false, brokerageAddon:false}},
+  {jobRef:'ZELO000008', category:'BROKERAGE', direction:'Import', customer:'Unilever Nigeria', origin:'Port of Rotterdam', destination:'Apapa Port, Lagos', route:'Port of Rotterdam → Apapa Port, Lagos', status:'Active', slaHealth:'Healthy', eta:'22 Jul 2026', ownerId:'u4', supportingOwnerIds:['u6'], completedMilestones:4, quoteRef:'OP-QT-8912', incoterm:'DDP', etd:'08 Jul 2026',
+    brokerage:{pol:'Port of Rotterdam', pod:'Apapa Port, Lagos', consigneeName:'Unilever Nigeria Plc', consigneeAddress:'Oregun Industrial Estate, Lagos', officeBranch:'Lagos HQ', currency:'NGN', totalValue:'18500000', bl:'', portEta:'22 Jul 2026', transportMode:'Sea', hazardous:false, hsCode:'3401.11', commodityType:'Chemicals', commodityCategory:'Non-Hazardous', commodityDescription:'Soap and detergent raw materials', uniformContainers:false, containerCount:'8', containerWeight:'120', containerSize:'40ft', containerType:'Dry'}},
+];
+
+const SHIPMENTS = {};
+SHIPMENT_LIST_BASE.forEach((base, i)=>{
+  const detail = buildShipmentDetail(base, i+3);
+  SHIPMENTS[base.jobRef] = detail;
+});
+
+/* ==========================================================================
+   App state & routing
+   ========================================================================== */
+const state = {
+  currentView: 'shipments',
+  currentShipmentRef: null,
+  searchQuery: '',
+  pendingFiles: [],
+  editingContainerId: null,
+  activeMilestone: null,
+  activeDocUpdate: null,
+  activeDocDelete: null,
+};
+const ownerModalState = { checked: new Set(), primary: null, responsibilities: {}, openRespUid: null };
+
+function el(id){ return document.getElementById(id); }
+function currentShipment(){ return SHIPMENTS[state.currentShipmentRef]; }
+
+function showToast(msg, type='success'){
+  const wrap = el('toast-wrap');
+  const t = document.createElement('div');
+  t.className = 'toast ' + type;
+  t.innerHTML = `<svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.4" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5" stroke-linecap="round" stroke-linejoin="round"></path></svg><span>${msg}</span>`;
+  wrap.appendChild(t);
+  setTimeout(()=>{ t.style.opacity='0'; t.style.transition='opacity .25s'; setTimeout(()=>t.remove(),260); }, 2600);
+}
+
+function navTo(view){
+  state.currentView = view;
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.toggle('active', n.dataset.nav===view));
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  el('view-'+view).classList.add('active');
+  renderBreadcrumbs();
+  window.scrollTo(0,0);
+}
+
+function openShipment(jobRef){
+  state.currentShipmentRef = jobRef;
+  state.currentView = 'shipment-detail';
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  el('view-shipment-detail').classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.toggle('active', n.dataset.nav==='shipments'));
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.toggle('active', b.dataset.tab==='overview'));
+  document.querySelectorAll('.tab-pane').forEach(p=>p.style.display='none');
+  el('tab-overview').style.display='block';
+  renderShipmentDetail();
+  renderBreadcrumbs();
+  window.scrollTo(0,0);
+}
+
+function renderBreadcrumbs(){
+  const bc = el('breadcrumbs');
+  if(state.currentView==='dashboard'){
+    bc.innerHTML = `<span class="crumb">Dashboard</span>`;
+  } else if(state.currentView==='quotes'){
+    bc.innerHTML = `<span class="crumb">Quotes</span>`;
+  } else if(state.currentView==='shipments'){
+    bc.innerHTML = `<span class="crumb">Shipments</span>`;
+  } else if(state.currentView==='shipment-detail'){
+    const s = currentShipment();
+    bc.innerHTML = `<span class="crumb">Shipments</span><span class="sep">/</span><span class="crumb crumb-current">${s.jobRef}</span>`;
+  }
+}
+
+/* ==========================================================================
+   Shipments list render
+   ========================================================================== */
+function ownersOf(s){ return { primary: s.owners.primary, supporting: s.owners.supporting, all: [s.owners.primary, ...s.owners.supporting] }; }
+
+function renderShipmentsList(){
+  const q = state.searchQuery.trim().toLowerCase();
+  const list = Object.values(SHIPMENTS).filter(s=>{
+    if(!q) return true;
+    const names = ownersOf(s).all.map(o=>o.name.toLowerCase()).join(' ');
+    return s.jobRef.toLowerCase().includes(q) || names.includes(q) || s.customer.toLowerCase().includes(q);
+  });
+  el('shipments-count-label').textContent = `${list.length} shipment${list.length!==1?'s':''}${q ? ' matching "'+state.searchQuery.trim()+'"' : ''}`;
+
+  el('shipments-tbody').innerHTML = list.map(s=>{
+    const sla = SLA_CONFIG[s.slaHealth];
+    const primary = s.owners.primary;
+    const cat = categoryOf(s.category);
+    return `
+    <tr class="clickable" data-jobref="${s.jobRef}">
+      <td><b style="color:var(--green-dark);font-family:var(--font-display);font-weight:600">${s.jobRef}</b></td>
+      <td>${s.customer}</td>
+      <td><span class="chip chip-neutral">${cat.icon}${cat.label}</span></td>
+      <td>${s.route}</td>
+      <td>${renderStatusChip(s.status)}</td>
+      <td><span class="badge-sla ${sla.chip}"><span class="sla-icon">${slaIcon(s.slaHealth)}</span>${s.slaHealth}</span></td>
+      <td>
+        <div style="display:flex;align-items:center;gap:8px">
+          <div class="avatar avatar-sm" style="${avatarFillStyle(primary.fill)}">${primary.initials}</div>
+          <span style="font-size:12.5px;color:var(--silver-dark)">${primary.name.split(' ')[0]}</span>
+        </div>
+      </td>
+    </tr>`;
+  }).join('') || `<tr><td colspan="7" style="text-align:center;color:var(--silver-light);padding:40px">No shipments match your search.</td></tr>`;
+}
+
+/* ==========================================================================
+   Shipment Detail render
+   ========================================================================== */
+function renderShipmentDetail(){
+  renderShipHeader();
+  renderShipDetailFields();
+  renderShipmentTeamDisplay();
+  renderContainerCard();
+  renderServiceDelivery();
+  renderShipmentTracking();
+  renderDocuments();
+}
+
+function headerStripDynamicCells(s){
+  if(s.category==='OCEAN') return [['Port of Loading', locodeOf(s.ocean.pol)], ['Port of Discharge', locodeOf(s.ocean.pod)]];
+  if(s.category==='AIR'){
+    const a = s.air;
+    const originIsAirport = a.deliveryType==='Port to Port' || a.deliveryType==='Port to Door';
+    const destIsAirport = a.deliveryType==='Port to Port' || a.deliveryType==='Door to Port';
+    return [
+      [originIsAirport ? 'Airport of Loading' : 'Origin Address', originIsAirport ? airportCodeOf(a.originAirport) : (a.originAddress || '—')],
+      [destIsAirport ? 'Airport of Discharge' : 'Destination Address', destIsAirport ? airportCodeOf(a.destAirport) : (a.destinationAddress || '—')],
+    ];
+  }
+  if(s.category==='HAULAGE'){
+    if(s.direction==='Import') return [['Port of Discharge', locodeOf(s.haulage.portOfDischarge)], ['Destination Address', s.haulage.destinationAddress || '—']];
+    return [['Pickup Address', s.haulage.pickupAddress || '—'], ['Port of Loading', locodeOf(s.haulage.portOfLoading)]];
+  }
+  return [['Port of Loading', locodeOf(s.brokerage.pol)], ['Port of Discharge', locodeOf(s.brokerage.pod)]];
+}
+
+function renderShipHeader(){
+  const s = currentShipment();
+  const sla = SLA_CONFIG[s.slaHealth];
+  const cat = categoryOf(s.category);
+  const dyn = headerStripDynamicCells(s);
+
+  el('ship-header').innerHTML = `
+    <div class="ship-header-row1">
+      <div class="ship-header-id">
+        <h1>${s.jobRef}</h1>
+      </div>
+      <div class="dropdown">
+        <button class="btn btn-solid dropdown-toggle" type="button">
+          Actions
+          <svg class="chevron" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+        </button>
+        <div class="dropdown-menu">
+          <button class="dropdown-item" data-ship-action="assign-owner">
+            <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"></circle><path d="M4 21v-1a8 8 0 0116 0v1"></path></svg>
+            Shipment Team
+          </button>
+          <button class="dropdown-item" data-ship-action="update-status">
+            <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 12l4 4L21 4" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+            Update Shipment Status
+          </button>
+          <button class="dropdown-item" data-ship-action="edit-shipment">
+            <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"></path><path d="M18.5 2.5a2.1 2.1 0 013 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+            Edit Shipment
+          </button>
+        </div>
+      </div>
+    </div>
+    <div class="ship-header-strip">
+      <div class="strip-cell">
+        <div class="k-row">${ICON_BUILDING}<span class="k">Customer</span></div>
+        <div class="v">${s.customer}</div>
+      </div>
+      <span class="strip-divider"></span>
+      <div class="strip-cell"><div class="k">Service Type</div><div class="v">${cat.label}</div></div>
+      <span class="strip-divider"></span>
+      <div class="strip-cell"><div class="k">${dyn[0][0]}</div><div class="v">${dyn[0][1]}</div></div>
+      <span class="strip-divider"></span>
+      <div class="strip-cell"><div class="k">${dyn[1][0]}</div><div class="v">${dyn[1][1]}</div></div>
+      <span class="strip-divider"></span>
+      <div class="strip-cell"><div class="k">Status</div><div class="v">${renderStatusChip(s.status, 'sm')}</div></div>
+      <span class="strip-divider"></span>
+      <div class="strip-cell"><div class="k">SLA</div><div class="v"><span class="badge-sla sm ${sla.chip}"><span class="sla-icon">${slaIcon(s.slaHealth)}</span>${s.slaHealth}</span></div></div>
+    </div>
+  `;
+}
+
+// Shipment Information card — core booking-level reference fields (no commodity,
+// no container, no additional-services data; those live in their own cards below).
+function categorySpecificDetailRows(s){
+  if(s.category==='OCEAN'){
+    const o = s.ocean;
+    const rows = [
+      ['Port of Loading', `${locodeOf(o.pol)}<div class="v-sub">${o.pol}</div>`],
+      ['Port of Discharge', `${locodeOf(o.pod)}<div class="v-sub">${o.pod}</div>`],
+      ['Office/Branch', o.officeBranch || '—'],
+      ['Pickup Date', o.pickupDate || '—'],
+      ['Total Value of Goods', o.totalValue ? `${o.currency} ${o.totalValue}` : '—'],
+      ['Bill of Lading (B/L)', o.bl || '—'],
+    ];
+    if(o.freightType || o.vessel || o.voyage || o.carrier){
+      rows.push(['Freight Type', o.freightType || '—'], ['Vessel / Voyage', (o.vessel||'—') + (o.voyage ? ' · '+o.voyage : '')], ['Carrier', o.carrier || '—']);
+    }
+    return rows;
+  }
+  if(s.category==='AIR'){
+    const a = s.air;
+    const originIsAirport = a.deliveryType==='Port to Port' || a.deliveryType==='Port to Door';
+    const destIsAirport = a.deliveryType==='Port to Port' || a.deliveryType==='Door to Port';
+    const rows = [
+      ['Delivery Type', a.deliveryType || '—'],
+      [originIsAirport ? 'Airport of Loading' : 'Origin Address', originIsAirport ? `${airportCodeOf(a.originAirport)}<div class="v-sub">${a.originAirport}</div>` : (a.originAddress || '—')],
+      [destIsAirport ? 'Airport of Discharge' : 'Destination Address', destIsAirport ? `${airportCodeOf(a.destAirport)}<div class="v-sub">${a.destAirport}</div>` : (a.destinationAddress || '—')],
+      ['Office/Branch', a.officeBranch || '—'],
+    ];
+    if(a.airline || a.flightNo || a.mawb || a.hawb){
+      rows.push(['Airline', a.airline || '—'], ['Flight Number', a.flightNo || '—'], ['MAWB', a.mawb || '—'], ['HAWB', a.hawb || '—']);
+    }
+    return rows;
+  }
+  if(s.category==='HAULAGE'){
+    const h = s.haulage;
+    const rows = [];
+    if(s.direction==='Import'){
+      rows.push(['Port of Discharge', `${locodeOf(h.portOfDischarge)}<div class="v-sub">${h.portOfDischarge}</div>`], ['Destination Address', h.destinationAddress || '—']);
+    } else {
+      rows.push(['Pickup Address', h.pickupAddress || '—'], ['Port of Loading', `${locodeOf(h.portOfLoading)}<div class="v-sub">${h.portOfLoading}</div>`]);
+    }
+    rows.push(
+      ['Office/Branch', h.officeBranch || '—'],
+      ['Total Value of Goods', h.totalValue ? `${h.currency} ${h.totalValue}` : '—'],
+      ['Bill of Lading (B/L)', h.bl || '—'],
+      ['Port ETA', h.portEta || '—'],
+      ['TDO Written Date', h.tdoWrittenDate || '—'],
+      ['TDO Expiry Date', h.tdoExpiryDate || '—'],
+      ['Stuffing Date', h.stuffingDate || '—'],
+    );
+    return rows;
+  }
+  const b = s.brokerage;
+  return [
+    ['Port of Loading', `${locodeOf(b.pol)}<div class="v-sub">${b.pol}</div>`],
+    ['Port of Discharge', `${locodeOf(b.pod)}<div class="v-sub">${b.pod}</div>`],
+    ['Consignee', b.consigneeName || '—'],
+    ['Consignee Address', b.consigneeAddress || '—'],
+    ['Office/Branch', b.officeBranch || '—'],
+    ['Transport Mode', b.transportMode || '—'],
+    ['Bill of Lading (B/L)', b.bl || '—'],
+    ['Port ETA', b.portEta || '—'],
+    ['Total Value of Goods', b.totalValue ? `${b.currency} ${b.totalValue}` : '—'],
+  ];
+}
+
+function fieldRowsHtml(rows){
+  return rows.map(([k,v])=>{
+    const label = String(k).includes('<svg') ? `<div class="k-row">${k}</div>` : `<div class="k">${k}</div>`;
+    return `<div class="detail-field">${label}<div class="v">${v}</div></div>`;
+  }).join('');
+}
+function renderSubsectionHtml(title, rows, gridCols=3){
+  return `
+  <div class="subsection">
+    <div class="subsection-head">${title}</div>
+    <div class="subsection-body">
+      <div class="detail-fields-grid${gridCols===3?' cols-3':''}">${fieldRowsHtml(rows)}</div>
+    </div>
+  </div>`;
+}
+
+// Additional Services rows — checkbox-driven Haulage/Customs Brokerage add-ons on
+// Ocean/Air, native Tracker/Escort/Custom Brokerage fields on Haulage, and nothing
+// on Customs Brokerage (which has no additional services of its own) — an empty
+// array here means the Additional Services subsection is omitted entirely.
+function additionalServicesRows(s){
+  if(s.category==='BROKERAGE') return [];
+  if(s.category==='HAULAGE'){
+    const h = s.haulage;
+    return [
+      ['Haulage Tracker', h.tracker ? 'Included' : 'Not included'],
+      ['Haulage Escort', h.escort ? 'Included' : 'Not included'],
+      ['Custom Brokerage', h.brokerageAddon ? 'Included' : 'Not included'],
+    ];
+  }
+  const as = s.additionalServices;
+  if(!as || (!as.haulage && !as.brokerage)) return [];
+  const rows = [];
+  if(as.haulage){
+    const isAir = s.category==='AIR';
+    const loadLabel = isAir ? 'Airport of Loading' : 'Port of Loading';
+    const dischargeLabel = isAir ? 'Airport of Discharge' : 'Port of Discharge';
+    const formatFn = isAir ? formatAirportDisplay : formatPortDisplay;
+    const legs = [];
+    if(as.haulageType==='At Origin' || as.haulageType==='Origin & Destination') legs.push(`Pickup: ${as.pickupAddress||'—'} → ${loadLabel}: ${formatFn(as.loadingPoint)||'—'}`);
+    if(as.haulageType==='At Destination' || as.haulageType==='Origin & Destination') legs.push(`${dischargeLabel}: ${formatFn(as.dischargePoint)||'—'} → Drop Off: ${as.dropOffAddress||'—'}`);
+    rows.push(['Haulage', `${as.haulageType}${as.tracker?' · Tracker':''}${as.escort?' · Escort':''}<div class="v-sub">${legs.join(' · ')}</div>`]);
+  }
+  if(as.brokerage) rows.push(['Customs Brokerage', 'Included']);
+  return rows;
+}
+
+// Shipment Details card — Basic Information / Commodity Information / Additional
+// Services each render as their own bordered subsection inside this one card.
+// Container Information is intentionally NOT one of these — it stays a fully
+// separate, standalone card below (see renderContainerCard()).
+function renderShipDetailFields(){
+  const s = currentShipment();
+  const cat = categoryOf(s.category);
+  const dl = dateLabelsOf(s.category);
+  const basicRows = [
+    [`${ICON_BUILDING}<span>Customer</span>`, s.customer],
+    ['Quote Reference', `<a href="#" class="quote-link" data-quote-link>${s.quoteRef}</a>`],
+    ['Service Type', `${cat.label} · ${s.direction}`],
+    ['Incoterm', s.incoterm || '—'],
+    ['Origin', s.origin],
+    ['Destination', s.destination],
+    ...categorySpecificDetailRows(s),
+    [dl.start, s.etd],
+    [dl.end, s.eta],
+  ];
+  const commodityRows = commodityInfoRows(s);
+  const addSvcRows = additionalServicesRows(s);
+
+  let html = renderSubsectionHtml('Basic Information', basicRows);
+  html += renderSubsectionHtml('Commodity Information', commodityRows);
+  if(addSvcRows.length) html += renderSubsectionHtml('Additional Services', addSvcRows);
+
+  el('ship-detail-sections').innerHTML = html;
+}
+
+function renderShipmentTeamDisplay(){
+  const s = currentShipment();
+  const primary = s.owners.primary, supporting = s.owners.supporting;
+  let html = `
+    <div class="team-primary-row">
+      <span class="crown-badge">${ICON_CROWN_FILLED}</span>
+      <div class="avatar avatar-md" style="${avatarFillStyle(primary.fill)}">${primary.initials}</div>
+      <div class="team-name">${primary.name}</div>
+    </div>`;
+  if(supporting.length){
+    html += `<div class="team-divider"></div><div class="team-supporting-list">`;
+    html += supporting.map(o=>`
+      <div class="team-member-row">
+        <div class="avatar avatar-sm" style="${avatarFillStyle(o.fill)}">${o.initials}</div>
+        <div class="team-name-sm">${o.name}</div>
+      </div>`).join('');
+    html += `</div>`;
+  }
+  el('shipment-team-display').innerHTML = html;
+}
+
+function renderContainers(){
+  const s = currentShipment();
+  el('container-tbody').innerHTML = s.containers.map(c=>`
+    <tr>
+      <td><b style="color:var(--green-dark)">${c.number}</b></td>
+      <td>${c.size}</td>
+      <td>${c.type}</td>
+      <td>${c.seal || '—'}</td>
+      <td>${c.weight || '—'}</td>
+      <td style="text-align:right"><button class="btn btn-ghost btn-icon" data-cid="${c.id}" title="Edit container"><svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"></path><path d="M18.5 2.5a2.1 2.1 0 013 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg></button></td>
+    </tr>
+  `).join('') || `<tr><td colspan="6" style="text-align:center;color:var(--silver-light);padding:30px">No containers added yet.</td></tr>`;
+}
+
+// Commodity Information card — cargo classification for whichever category is active.
+// Air has no separate Container Information component (it ships by pallet, not
+// container), so its cargo-dimension/volumetric-weight fields live here instead.
+function commodityInfoRows(s){
+  if(s.category==='AIR'){
+    const a = s.air;
+    const vw = volumetricWeightOf(a);
+    return [
+      ['Hazardous Cargo', a.hazardous ? '<span class="chip chip-error">Hazardous</span>' : '<span class="chip chip-neutral">Non-Hazardous</span>'],
+      ['Commodity', a.commodityDescription || a.commodityType || '—'],
+      ['Commodity Type / Category', [a.commodityType, a.commodityCategory].filter(Boolean).join(' · ') || '—'],
+      ['Commodity HS Code', a.hsCode || '—'],
+      ['Number of Pallets', a.numberOfPallets || '—'],
+      ['Uniform Pallets', a.uniformPallets ? 'Yes' : 'No'],
+      ['Dimensions', (a.length && a.width && a.height) ? `${a.length} × ${a.width} × ${a.height} ${a.dimensionUnit}` : '—'],
+      ['Volumetric Weight', vw ? vw + ' kg' : '—'],
+    ];
+  }
+  const c = s[s.category.toLowerCase()];
+  return [
+    ['Hazardous Cargo', c.hazardous ? '<span class="chip chip-error">Hazardous</span>' : '<span class="chip chip-neutral">Non-Hazardous</span>'],
+    ['Commodity', c.commodityDescription || c.commodityType || '—'],
+    ['Commodity Type / Category', [c.commodityType, c.commodityCategory].filter(Boolean).join(' · ') || '—'],
+    ['Commodity HS Code', c.hsCode || '—'],
+  ];
+}
+// Container Information card — its own standalone component, separate from
+// Shipment/Commodity/Additional Services. Air has no containers (pallet-based
+// instead — see commodityInfoRows), so this card is hidden for Air shipments.
+function renderContainerCard(){
+  const s = currentShipment();
+  const card = el('container-card');
+  if(s.category==='AIR'){ card.style.display = 'none'; card.innerHTML = ''; return; }
+  card.style.display = 'block';
+  if(s.category==='OCEAN'){
+    card.innerHTML = `
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:18px;flex-wrap:wrap;gap:12px">
+        <div>
+          <h3 class="section-title">${ICON_SHIP}Container Information</h3>
+          <p class="section-sub" style="margin:0">Booking plan and equipment assigned to this shipment.</p>
+        </div>
+        <button class="btn btn-accent btn-sm" id="btn-add-container">${ICON_PLUS}Add Container</button>
+      </div>
+      ${renderBookingPlanTableHtml(s.ocean)}
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead><tr><th>Container Number</th><th>Size</th><th>Type</th><th>Seal Number</th><th>Weight</th><th style="text-align:right">Actions</th></tr></thead>
+          <tbody id="container-tbody"></tbody>
+        </table>
+      </div>`;
+    renderContainers();
+    return;
+  }
+  const c = s.category==='HAULAGE' ? s.haulage : s.brokerage;
+  card.innerHTML = `
+    <h3 class="section-title">${ICON_TRUCK}Container Information</h3>
+    <p class="section-sub" style="margin:0 0 4px">Booking plan for this job.</p>
+    ${renderBookingPlanTableHtml(c)}`;
+}
+
+// Additional Services card — checkbox-driven Haulage/Customs Brokerage add-ons on
+// Ocean/Air, native Tracker/Escort/Custom Brokerage fields on Haulage, and hidden
+function resolveTaskOwners(s, responsibility){
+  const resp = s.owners.responsibilities || {};
+  return Object.keys(resp).filter(uid => (resp[uid]||[]).includes(responsibility)).map(teamMember);
+}
+
+function renderServiceDelivery(){
+  const s = currentShipment();
+  el('service-delivery-template-pill').textContent = templateLabelOf(s);
+  el('service-delivery-tbody').innerHTML = s.milestones.map(m=>{
+    const owners = resolveTaskOwners(s, m.responsibility);
+    const isDone = m.status==='Completed';
+    const liveHealth = isDone ? null : computeLiveSlaHealth(m.dueDate);
+    const rowClass = !isDone && liveHealth==='Breached' ? 'sla-breached' : !isDone && liveHealth==='At-Risk' ? 'sla-at-risk' : '';
+    const dueLabel = formatDueDateTime(m.dueDate);
+    let historyNote = '';
+    if(isDone && m.completedSlaHealth==='Breached') historyNote = '<div class="sla-history-note breach">⚠ After Breach</div>';
+    else if(isDone && m.completedSlaHealth==='At-Risk') historyNote = '<div class="sla-history-note at-risk">⚠ Completed While At-Risk</div>';
+    const ownerCell = owners.length
+      ? `<div class="task-owner-cell">${owners.map(o=>`<div class="owner-pill"><div class="avatar avatar-sm" style="${avatarFillStyle(o.fill)}">${o.initials}</div><span>${o.name.split(' ')[0]}</span></div>`).join('')}</div>`
+      : `<span class="task-owner-unassigned">Unassigned</span>`;
+    return `
+    <tr class="${rowClass}">
+      <td><b class="task-name">${m.name}</b></td>
+      <td>${ownerCell}</td>
+      <td class="due-cell">${dueLabel}</td>
+      <td>
+        <span class="chip ${isDone?'chip-success':'chip-neutral'}">${m.status}</span>
+        ${historyNote}
+      </td>
+      <td style="text-align:right">${!isDone ? `<button class="btn btn-outline btn-sm" data-complete-ms="${m.id}">Mark Complete</button>` : `<svg width="18" height="18" fill="none" stroke="#1F8A5B" stroke-width="2.4" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5" stroke-linecap="round" stroke-linejoin="round"></path></svg>`}</td>
+    </tr>`;
+  }).join('');
+}
+
+function renderShipmentTracking(){
+  const s = currentShipment();
+  if(!s.physicalTracking.length){
+    el('physical-timeline').innerHTML = `<p style="font-size:13px;color:var(--silver-light);text-align:center;padding:24px 4px;line-height:1.6">Physical tracking isn't applicable for Customs Brokerage services — see the Service Delivery milestones for clearance progress instead.</p>`;
+    return;
+  }
+  el('physical-timeline').innerHTML = s.physicalTracking.map((ev,i)=>`
+    <div class="timeline-item ${ev.done?'':'pending'}">
+      <div class="rail">
+        <span class="timeline-dot">${SOURCE_ICON[ev.source]}</span>
+        ${i < s.physicalTracking.length-1 ? '<span class="timeline-line"></span>' : ''}
+      </div>
+      <div class="timeline-content">
+        <div class="track-top">
+          <span class="track-source-tag ${SOURCE_TAG_CLASS[ev.source]}">${ev.source}</span>
+          <span class="ttitle">${ev.label}</span>
+        </div>
+        <div class="tmeta">${ev.location}${ev.timestamp ? ' · ' + ev.timestamp : ' · Pending'}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function renderDocuments(){
+  const s = currentShipment();
+  el('doc-total-count').textContent = s.documents.length;
+  el('documents-tbody').innerHTML = s.documents.map(d=>`
+    <tr>
+      <td>
+        <div style="display:flex;align-items:center;gap:10px">
+          <svg width="16" height="16" fill="none" stroke="#023819" stroke-width="1.8" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"></path><path d="M14 2v6h6"></path></svg>
+          <b style="color:var(--green-dark);font-weight:600">${d.name}</b>
+        </div>
+      </td>
+      <td>${d.category ? `<span class="chip chip-neutral">${d.category}</span>` : '<span style="color:var(--silver-light)">—</span>'}</td>
+      <td>${d.uploadedBy}</td>
+      <td>${formatDateTime(d.uploadedOn)}</td>
+      <td style="text-align:right">
+        <div class="dropdown">
+          <button class="btn btn-ghost btn-icon dropdown-toggle" title="Actions"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="2"></circle><circle cx="12" cy="12" r="2"></circle><circle cx="19" cy="12" r="2"></circle></svg></button>
+          <div class="dropdown-menu dropdown-menu-sm">
+            <button class="dropdown-item" data-doc-view="${d.id}">View</button>
+            <button class="dropdown-item" data-doc-update="${d.id}">Update File</button>
+            <button class="dropdown-item" data-doc-download="${d.id}">Download</button>
+            <button class="dropdown-item dropdown-item-danger" data-doc-delete="${d.id}">Delete</button>
+          </div>
+        </div>
+      </td>
+    </tr>
+  `).join('') || `<tr><td colspan="5" style="text-align:center;color:var(--silver-light);padding:30px">No documents uploaded yet.</td></tr>`;
+}
+
+/* ==========================================================================
+   Tabs
+   ========================================================================== */
+function switchTab(tab){
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.toggle('active', b.dataset.tab===tab));
+  document.querySelectorAll('.tab-pane').forEach(p=>p.style.display='none');
+  el('tab-'+tab).style.display='block';
+}
+
+/* ==========================================================================
+   Modal helpers
+   ========================================================================== */
+function openModal(id){ el(id).classList.add('open'); }
+function closeModal(id){ el(id).classList.remove('open'); }
+
+/* --- Shipment Team modal --- */
+function openAssignOwnerModal(){
+  const s = currentShipment();
+  ownerModalState.checked = new Set([s.owners.primary.id, ...s.owners.supporting.map(o=>o.id)]);
+  ownerModalState.primary = s.owners.primary.id;
+  ownerModalState.responsibilities = {};
+  Object.keys(s.owners.responsibilities||{}).forEach(uid=>{
+    ownerModalState.responsibilities[uid] = [...s.owners.responsibilities[uid]];
+  });
+  ownerModalState.openRespUid = null;
+  renderOwnerSelectList();
+  openModal('modal-assign-owner');
+}
+function renderOwnerSelectList(){
+  el('owner-select-list').innerHTML = TEAM.map(t=>{
+    const isChecked = ownerModalState.checked.has(t.id);
+    const isPrimary = ownerModalState.primary === t.id;
+    const myResp = ownerModalState.responsibilities[t.id] || [];
+    const respDropdown = isChecked ? `
+      <div class="dropdown">
+        <button type="button" class="resp-toggle-btn dropdown-toggle" data-resp-owner="${t.id}">
+          <span class="resp-summary">${myResp.length ? myResp.join(', ') : 'Add responsibility'}</span>
+          <svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.4" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+        </button>
+        <div class="dropdown-menu dropdown-menu-sm">
+          ${RESPONSIBILITIES.map(r=>`<button type="button" class="resp-option ${myResp.includes(r)?'checked':''}" data-resp-toggle="${t.id}::${r}"><span class="resp-checkbox">${myResp.includes(r)?ICON_CHECK:''}</span>${r}</button>`).join('')}
+        </div>
+      </div>` : `<span class="resp-toggle-btn-placeholder"></span>`;
+    const crownBtn = isChecked
+      ? `<button type="button" class="crown-btn ${isPrimary?'filled':''}" data-owner-primary="${t.id}" title="${isPrimary?'Primary Owner':'Make Primary Owner'}">${isPrimary?ICON_CROWN_FILLED:ICON_CROWN_OUTLINE}</button>`
+      : `<span class="crown-btn-placeholder"></span>`;
+    return `
+    <div class="owner-select-row ${isPrimary?'is-primary':''}">
+      <input type="checkbox" class="owner-checkbox" data-owner-check="${t.id}" ${isChecked?'checked':''}>
+      <div class="avatar avatar-sm" style="${avatarFillStyle(t.fill)}">${t.initials}</div>
+      <div class="who"><div class="nm">${t.name}</div><div class="rl">${t.role}</div></div>
+      ${respDropdown}
+      ${crownBtn}
+    </div>`;
+  }).join('');
+  if(ownerModalState.openRespUid){
+    const toggle = el('owner-select-list').querySelector(`[data-resp-owner="${ownerModalState.openRespUid}"]`);
+    const wrapper = toggle ? toggle.closest('.dropdown') : null;
+    if(wrapper) wrapper.classList.add('open');
+  }
+}
+el('save-assign-owner').addEventListener('click', ()=>{
+  const s = currentShipment();
+  const supporting = [...ownerModalState.checked].filter(id=>id!==ownerModalState.primary).map(teamMember);
+  const finalResp = {};
+  ownerModalState.checked.forEach(uid=>{ finalResp[uid] = ownerModalState.responsibilities[uid] || []; });
+  s.owners = { primary: teamMember(ownerModalState.primary), supporting, responsibilities: finalResp };
+  renderShipHeader(); renderShipDetailFields(); renderShipmentTeamDisplay(); renderShipmentsList(); renderServiceDelivery();
+  closeModal('modal-assign-owner');
+  showToast('Shipment team updated');
+});
+
+/* --- Update Status --- */
+function openUpdateStatusModal(){
+  const s = currentShipment();
+  el('input-update-status').value = s.status;
+  el('input-update-status-notes').value = '';
+  openModal('modal-update-status');
+}
+el('save-update-status').addEventListener('click', ()=>{
+  const s = currentShipment();
+  s.status = el('input-update-status').value;
+  renderShipHeader();
+  renderShipmentsList();
+  closeModal('modal-update-status');
+  showToast('Shipment status updated to "' + s.status + '"');
+});
+
+/* --- Edit Shipment / Create Shipment shared field system --- */
+const DIRECTION_OPTIONS = ['Import','Export'];
+
+function getPath(obj, path){ return path.split('.').reduce((o,k)=> (o && o[k]!==undefined) ? o[k] : '', obj); }
+function setPath(obj, path, value){
+  const parts = path.split('.');
+  let cur = obj;
+  for(let i=0;i<parts.length-1;i++){ if(!cur[parts[i]]) cur[parts[i]] = {}; cur = cur[parts[i]]; }
+  cur[parts[parts.length-1]] = value;
+}
+
+function wireSearchableFieldsIn(container){
+  container.querySelectorAll('.searchable-field').forEach(field=>{
+    const mode = field.dataset.ssMode;
+    const display = field.querySelector('.ss-display');
+    const hidden = field.querySelector('[data-field]');
+    const menu = field.querySelector('.ss-menu');
+    const options = mode==='port'
+      ? PORTS.map(p=>({value:p.name, label:`${p.code} — ${p.name}`, search:`${p.code} ${p.name}`.toLowerCase()}))
+      : mode==='airport'
+      ? AIRPORTS.map(a=>({value:a.name, label:`${a.code} — ${a.name}`, search:`${a.code} ${a.name}`.toLowerCase()}))
+      : LOCATIONS.map(loc=>({value:loc, label:loc, search:loc.toLowerCase()}));
+    function renderMenu(list){
+      menu.innerHTML = list.length ? list.map(o=>`<div class="ss-option" data-value="${o.value}">${o.label}</div>`).join('') : `<div class="ss-empty">No matches</div>`;
+      menu.classList.add('open');
+    }
+    display.addEventListener('focus', ()=> renderMenu(options.slice(0,8)));
+    display.addEventListener('input', ()=>{
+      const q = display.value.toLowerCase();
+      renderMenu(options.filter(o=>o.search.includes(q)).slice(0,8));
+      hidden.value = display.value;
+    });
+    menu.addEventListener('mousedown', (e)=>{
+      const opt = e.target.closest('.ss-option');
+      if(!opt) return;
+      e.preventDefault();
+      hidden.value = opt.dataset.value;
+      display.value = mode==='port' ? formatPortDisplay(opt.dataset.value) : mode==='airport' ? formatAirportDisplay(opt.dataset.value) : opt.dataset.value;
+      menu.classList.remove('open');
+    });
+    display.addEventListener('blur', ()=>{ setTimeout(()=>menu.classList.remove('open'), 120); });
+  });
+}
+
+function readDynFieldsFrom(container, target){
+  container.querySelectorAll('[data-field]').forEach(input=>{
+    const key = input.dataset.field;
+    let value;
+    if(input.type==='checkbox') value = input.checked;
+    else value = input.dataset.fieldType==='date' ? (input.value ? inputDateToDisplay(input.value) : '') : input.value;
+    setPath(target, key, value);
+  });
+}
+
+/* --- Create / Edit Shipment (shared 2-step wizard) ---
+   Edit reuses the exact same Step 2 bespoke renderers as Create — see
+   openEditShipmentModal()/draftFromShipment()/applyDraftToShipment() below,
+   defined after the renderers they depend on. */
+const shipmentFormState = { mode: 'create', category: null, draft: null };
+
+function emptyAdditionalServices(){
+  return {haulage:false, haulageType:'At Origin', pickupAddress:'', loadingPoint:'', dischargePoint:'', dropOffAddress:'', tracker:false, escort:false, brokerage:false};
+}
+function emptyDraftFor(category){
+  const draft = {customer:'', direction:'Import'};
+  if(category==='OCEAN') draft.ocean = {
+    pol:'', pod:'',
+    officeBranch:'', pickupDate:'', currency:'NGN', totalValue:'', bl:'',
+    hazardous:false,
+    hsCode:'', commodityType:'', commodityCategory:'', commodityDescription:'',
+    uniformContainers:false, containerCount:'', containerWeight:'', containerSize:'20ft', containerType:'Dry',
+  };
+  if(category==='AIR') draft.air = {
+    deliveryType:'Port to Port',
+    originAirport:'', destAirport:'', originAddress:'', destinationAddress:'',
+    officeBranch:'',
+    hazardous:false, uniformPallets:true,
+    hsCode:'', commodityType:'', commodityCategory:'', commodityDescription:'',
+    numberOfPallets:'One', dimensionUnit:'cm', length:'', width:'', height:'',
+  };
+  if(category==='HAULAGE') draft.haulage = {
+    portOfDischarge:'', destinationAddress:'', pickupAddress:'', portOfLoading:'',
+    officeBranch:'', currency:'NGN', totalValue:'', bl:'',
+    portEta:'', tdoExpiryDate:'', tdoWrittenDate:'', stuffingDate:'',
+    hazardous:false, hsCode:'', commodityType:'', commodityCategory:'', commodityDescription:'',
+    uniformContainers:true, containerCount:'', containerWeight:'', containerSize:'20ft', containerType:'Dry',
+    tracker:false, escort:false, brokerageAddon:false,
+  };
+  if(category==='BROKERAGE') draft.brokerage = {
+    pol:'', pod:'', consigneeName:'', consigneeAddress:'',
+    officeBranch:'', currency:'NGN', totalValue:'', bl:'', portEta:'', transportMode:'',
+    hazardous:false, hsCode:'', commodityType:'', commodityCategory:'', commodityDescription:'',
+    uniformContainers:false, containerCount:'', containerWeight:'', containerSize:'20ft', containerType:'Dry',
+  };
+  if(category==='OCEAN' || category==='AIR') draft.additionalServices = emptyAdditionalServices();
+  return draft;
+}
+function volumetricWeightOf(air){
+  const toCm = {cm:1, in:2.54, m:100}[air.dimensionUnit] || 1;
+  const l = parseFloat(air.length), w = parseFloat(air.width), h = parseFloat(air.height);
+  if(!l || !w || !h) return '';
+  return ((l*toCm) * (w*toCm) * (h*toCm) / 6000).toFixed(2);
+}
+
+function nextJobRef(){
+  const nums = Object.keys(SHIPMENTS).map(r=>parseInt(r.replace('ZELO',''),10)).filter(n=>!isNaN(n));
+  const next = (nums.length ? Math.max(...nums) : 0) + 1;
+  return 'ZELO' + String(next).padStart(6,'0');
+}
+
+function renderCreateCategoryGrid(){
+  el('create-category-grid').innerHTML = SERVICE_CATEGORIES.map(cat=>{
+    const active = shipmentFormState.category === cat.key;
+    return `
+    <button type="button" class="service-type-card ${active?'active':''}" data-create-category="${cat.key}">
+      <span class="stc-icon">${cat.icon}</span>
+      <span class="stc-label">${cat.label}</span>
+      <span class="stc-blurb">${cat.blurb}</span>
+    </button>`;
+  }).join('');
+}
+function renderCreateFooterStep1(){
+  el('create-modal-foot').innerHTML = `
+    <button class="btn btn-outline" data-close-modal>Cancel</button>
+    <button class="btn btn-accent" id="create-step1-continue" ${shipmentFormState.category ? '' : 'disabled'}>Continue</button>`;
+}
+function renderCreateFooterStep2(){
+  if(shipmentFormState.mode==='edit'){
+    el('create-modal-foot').innerHTML = `
+      <button class="btn btn-outline" data-close-modal>Cancel</button>
+      <button class="btn btn-accent" id="create-shipment-submit">Save Changes</button>`;
+  } else {
+    el('create-modal-foot').innerHTML = `
+      <button class="btn btn-outline" id="create-step2-back">Back</button>
+      <button class="btn btn-accent" id="create-shipment-submit">Create Shipment</button>`;
+  }
+}
+// Re-syncs whatever's currently typed into the visible form back into the draft
+// (so free-typed values survive), applies a targeted mutation, then re-renders
+// Step 2 — needed because toggles/dynamic-field controls trigger a structural
+// re-render of a form that also has plain uncontrolled text/select inputs.
+function reflowCreateStep2(mutate){
+  readDynFieldsFrom(el('create-step-2'), shipmentFormState.draft);
+  mutate(shipmentFormState.draft);
+  renderCreateStep2();
+}
+
+function renderCustomerFieldHtml(value){
+  return `<div class="form-field filled"><label class="field-label">Customer Name</label><input class="field-control" data-field="customer" value="${value||''}" placeholder="Enter customer name"></div>`;
+}
+function renderServiceTypeSelect(direction){
+  return `
+  <select class="direction-select" data-field="direction">
+    <option ${direction==='Import'?'selected':''}>Import</option>
+    <option ${direction==='Export'?'selected':''}>Export</option>
+  </select>`;
+}
+function renderHazardousToggleHtml(prefix, hazardous){
+  return `
+  <div class="form-section-label">Hazardous</div>
+  <p class="section-sub" style="margin:0 0 4px">Is your cargo hazardous</p>
+  <div class="toggle-pair" style="margin-bottom:18px">
+    <button type="button" class="toggle-option ${hazardous?'selected':''}" data-toggle-name="${prefix}.hazardous" data-toggle-value="true"><span class="radio-dot"></span>Yes</button>
+    <button type="button" class="toggle-option ${!hazardous?'selected':''}" data-toggle-name="${prefix}.hazardous" data-toggle-value="false"><span class="radio-dot"></span>No</button>
+  </div>`;
+}
+function renderUniformToggleHtml(prefix, uniform, questionText){
+  return `
+  <p class="section-sub" style="margin:0 0 4px">${questionText}</p>
+  <div class="toggle-pair" style="margin-bottom:18px">
+    <button type="button" class="toggle-option ${uniform?'selected':''}" data-toggle-name="${prefix}.uniformContainers" data-toggle-value="true"><span class="radio-dot"></span>Yes, it is</button>
+    <button type="button" class="toggle-option ${!uniform?'selected':''}" data-toggle-name="${prefix}.uniformContainers" data-toggle-value="false"><span class="radio-dot"></span>No, it isn't</button>
+  </div>`;
+}
+function renderCommodityFieldsHtml(prefix, obj){
+  return `
+  <div class="form-grid">
+    <div class="form-field filled"><label class="field-label">Commodity HS Code (Optional)</label><input class="field-control" data-field="${prefix}.hsCode" value="${obj.hsCode}" placeholder="Enter commodity HS code"></div>
+    <div class="form-field filled"><label class="field-label">Commodity Type</label><select class="field-control" data-field="${prefix}.commodityType"><option value="">Select option...</option>${COMMODITY_TYPES.map(c=>`<option ${c===obj.commodityType?'selected':''}>${c}</option>`).join('')}</select></div>
+    <div class="form-field filled"><label class="field-label">Commodity Category</label><select class="field-control" data-field="${prefix}.commodityCategory"><option value="">Select option...</option>${COMMODITY_CATEGORIES.map(c=>`<option ${c===obj.commodityCategory?'selected':''}>${c}</option>`).join('')}</select></div>
+    <div class="form-field filled"><label class="field-label">Commodity Description</label><input class="field-control" data-field="${prefix}.commodityDescription" value="${obj.commodityDescription}" placeholder="Enter commodity description"></div>
+  </div>`;
+}
+function renderContainerFieldsHtml(prefix, obj){
+  return `
+  <div class="form-grid">
+    <div class="form-field filled"><label class="field-label">Container Count</label><input class="field-control" data-field="${prefix}.containerCount" value="${obj.containerCount}" placeholder="Enter container count"></div>
+    <div class="form-field filled"><label class="field-label">Container Weight (Tons)</label><input class="field-control" data-field="${prefix}.containerWeight" value="${obj.containerWeight}" placeholder="Enter container weight"></div>
+    <div class="form-field filled"><label class="field-label">Container Size</label><select class="field-control" data-field="${prefix}.containerSize">${['20ft','40ft','40ft HC','45ft HC'].map(s=>`<option ${s===obj.containerSize?'selected':''}>${s}</option>`).join('')}</select></div>
+    <div class="form-field filled"><label class="field-label">Container Type</label><select class="field-control" data-field="${prefix}.containerType">${['Dry','Reefer','Open Top','Flat Rack','Tank'].map(s=>`<option ${s===obj.containerType?'selected':''}>${s}</option>`).join('')}</select></div>
+  </div>`;
+}
+function renderBookingPlanTableHtml(obj){
+  if(!obj || (!obj.containerCount && !obj.containerWeight)) return '';
+  return `
+    <div class="form-section-label" style="border-top:none;padding-top:0;margin-bottom:10px">Booking Plan</div>
+    <div class="table-wrap" style="margin-bottom:22px">
+      <table class="data-table">
+        <thead><tr><th>Commodity</th><th>Category</th><th>Count</th><th>Weight (Tons)</th><th>Size</th><th>Type</th></tr></thead>
+        <tbody><tr><td>${obj.commodityDescription || obj.commodityType || '—'}</td><td>${obj.commodityCategory||'—'}</td><td>${obj.containerCount||'—'}</td><td>${obj.containerWeight||'—'}</td><td>${obj.containerSize}</td><td>${obj.containerType}</td></tr></tbody>
+      </table>
+    </div>`;
+}
+
+// Haulage-as-Additional-Service (on Ocean/Air only) — Port terminology under Ocean,
+// Airport terminology under Air, per the Haulage Type toggle (At Origin / At
+// Destination / Origin & Destination). Customs Brokerage as an additional service
+// is a bare checkbox with no further fields, per spec.
+function renderHaulageAddonLocationFields(as, category){
+  const isAir = category==='AIR';
+  const loadLabel = isAir ? 'Airport of Loading' : 'Port of Loading';
+  const dischargeLabel = isAir ? 'Airport of Discharge' : 'Port of Discharge';
+  const ssMode = isAir ? 'airport' : 'port';
+  const formatFn = isAir ? formatAirportDisplay : formatPortDisplay;
+  const showOrigin = as.haulageType==='At Origin' || as.haulageType==='Origin & Destination';
+  const showDest = as.haulageType==='At Destination' || as.haulageType==='Origin & Destination';
+  let html = '';
+  if(showOrigin) html += `
+    <div class="freight-route-row" style="margin-bottom:16px">
+      <div class="form-field filled"><label class="field-label">Pickup Address</label><input class="field-control" data-field="additionalServices.pickupAddress" value="${as.pickupAddress}"></div>
+      <div class="route-arrow">${ICON_ARROW}</div>
+      <div class="form-field filled searchable-field" data-ss-mode="${ssMode}"><label class="field-label">${loadLabel}</label><input type="text" class="field-control ss-display" autocomplete="off" value="${formatFn(as.loadingPoint)}" placeholder="Search..."><input type="hidden" data-field="additionalServices.loadingPoint" value="${as.loadingPoint}"><div class="ss-menu"></div></div>
+    </div>`;
+  if(showDest) html += `
+    <div class="freight-route-row" style="margin-bottom:16px">
+      <div class="form-field filled searchable-field" data-ss-mode="${ssMode}"><label class="field-label">${dischargeLabel}</label><input type="text" class="field-control ss-display" autocomplete="off" value="${formatFn(as.dischargePoint)}" placeholder="Search..."><input type="hidden" data-field="additionalServices.dischargePoint" value="${as.dischargePoint}"><div class="ss-menu"></div></div>
+      <div class="route-arrow">${ICON_ARROW}</div>
+      <div class="form-field filled"><label class="field-label">Drop Off Address</label><input class="field-control" data-field="additionalServices.dropOffAddress" value="${as.dropOffAddress}"></div>
+    </div>`;
+  return html;
+}
+function renderHaulageAddonCard(as, category){
+  return `
+  <div class="repeatable-card" style="margin-bottom:14px">
+    <div class="repeatable-card-head"><span>Haulage configuration</span></div>
+    <div class="repeatable-card-body">
+      <p class="section-sub" style="margin:0 0 8px">Haulage Type</p>
+      <div class="toggle-pair" style="margin-bottom:16px;flex-wrap:wrap">
+        ${['At Origin','At Destination','Origin & Destination'].map(o=>`<button type="button" class="toggle-option ${as.haulageType===o?'selected':''}" data-toggle-haulage-type="${o}"><span class="radio-dot"></span>${o}</button>`).join('')}
+      </div>
+      ${renderHaulageAddonLocationFields(as, category)}
+      <div class="form-section-label" style="margin-top:4px">Haulage Tracker</div>
+      <div class="toggle-pair" style="margin-bottom:16px">
+        <button type="button" class="toggle-option ${as.tracker?'selected':''}" data-toggle-name="additionalServices.tracker" data-toggle-value="true"><span class="radio-dot"></span>Yes</button>
+        <button type="button" class="toggle-option ${!as.tracker?'selected':''}" data-toggle-name="additionalServices.tracker" data-toggle-value="false"><span class="radio-dot"></span>No</button>
+      </div>
+      <div class="form-section-label">Haulage Escort</div>
+      <div class="toggle-pair">
+        <button type="button" class="toggle-option ${as.escort?'selected':''}" data-toggle-name="additionalServices.escort" data-toggle-value="true"><span class="radio-dot"></span>Yes</button>
+        <button type="button" class="toggle-option ${!as.escort?'selected':''}" data-toggle-name="additionalServices.escort" data-toggle-value="false"><span class="radio-dot"></span>No</button>
+      </div>
+    </div>
+  </div>`;
+}
+function renderAdditionalServicesSection(draft, category){
+  const as = draft.additionalServices;
+  return `
+  <div style="display:flex;gap:24px;flex-wrap:wrap;margin-bottom:14px">
+    <label style="display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:var(--green-dark);cursor:pointer">
+      <input type="checkbox" data-additional-service="haulage" ${as.haulage?'checked':''} style="width:16px;height:16px;accent-color:var(--green-dark)">
+      Haulage
+    </label>
+    <label style="display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:var(--green-dark);cursor:pointer">
+      <input type="checkbox" data-additional-service="brokerage" ${as.brokerage?'checked':''} style="width:16px;height:16px;accent-color:var(--green-dark)">
+      Customs Brokerage
+    </label>
+  </div>
+  ${as.haulage ? renderHaulageAddonCard(as, category) : ''}
+  `;
+}
+
+function renderCreateStep2Ocean(){
+  const d = shipmentFormState.draft;
+  const o = d.ocean;
+  return `
+  <div class="create-banner">${ICON_WARN}<span><b>Please Note!</b> Are you shipping over 9,000 KG? Kindly contact support <a href="#" data-toast-only="Support contact isn't wired up in this prototype yet">here</a>.</span></div>
+
+  <div class="freight-card">
+    <div class="freight-card-head">
+      <div><h4>Freight details</h4><p>Please provide the required information</p></div>
+      ${renderServiceTypeSelect(d.direction)}
+    </div>
+    <div class="freight-route-row">
+      <div class="form-field filled searchable-field" data-ss-mode="port"><label class="field-label">Port of Loading</label><input type="text" class="field-control ss-display" autocomplete="off" value="${formatPortDisplay(o.pol)}" placeholder="Search..."><input type="hidden" data-field="ocean.pol" value="${o.pol}"><div class="ss-menu"></div></div>
+      <div class="route-arrow">${ICON_ARROW}</div>
+      <div class="form-field filled searchable-field" data-ss-mode="port"><label class="field-label">Port of Discharge</label><input type="text" class="field-control ss-display" autocomplete="off" value="${formatPortDisplay(o.pod)}" placeholder="Search..."><input type="hidden" data-field="ocean.pod" value="${o.pod}"><div class="ss-menu"></div></div>
+    </div>
+  </div>
+
+  <div class="form-section-label" style="border-top:none;padding-top:0">Shipment details</div>
+  <p class="section-sub" style="margin:0 0 16px">Please provide the shipment details</p>
+  <div class="form-grid">
+    ${renderCustomerFieldHtml(d.customer)}
+    <div class="form-field filled"><label class="field-label">Office/Branch</label><select class="field-control" data-field="ocean.officeBranch"><option value="">Select option...</option>${OFFICES.map(o2=>`<option ${o2===o.officeBranch?'selected':''}>${o2}</option>`).join('')}</select></div>
+    <div class="form-field filled"><label class="field-label">Pickup Date (Optional)</label><input type="date" class="field-control" data-field="ocean.pickupDate" data-field-type="date" value="${o.pickupDate ? displayDateToInputValue(o.pickupDate) : ''}"></div>
+    <div style="margin-bottom:18px"><div style="font-size:11px;color:var(--silver-light);font-weight:600;text-transform:uppercase;letter-spacing:.02em;margin-bottom:6px">Total Value of Goods</div><div style="display:flex;gap:8px"><select class="field-control" style="flex:0 0 84px" data-field="ocean.currency">${CURRENCIES.map(c=>`<option ${c===o.currency?'selected':''}>${c}</option>`).join('')}</select><input class="field-control" style="flex:1" data-field="ocean.totalValue" value="${o.totalValue}" placeholder="0.00"></div></div>
+    <div class="form-field filled"><label class="field-label">BL Number (Optional)</label><input class="field-control" data-field="ocean.bl" value="${o.bl}" placeholder="Enter BL number"></div>
+  </div>
+
+  <div class="form-section-label">Commodity Information</div>
+  ${renderCommodityFieldsHtml('ocean', o)}
+  ${renderHazardousToggleHtml('ocean', o.hazardous)}
+
+  <div class="form-section-label">Container Information</div>
+  ${renderUniformToggleHtml('ocean', o.uniformContainers, 'Is each container of the same size and type?')}
+  ${renderContainerFieldsHtml('ocean', o)}
+
+  <div class="form-section-label">Additional Services</div>
+  <p class="section-sub" style="margin:0 0 14px">Please add all additional services that apply</p>
+  ${renderAdditionalServicesSection(d, 'OCEAN')}
+  `;
+}
+
+function renderCreateStep2Air(){
+  const d = shipmentFormState.draft;
+  const a = d.air;
+  const vw = volumetricWeightOf(a);
+  const showOriginAirport = a.deliveryType==='Port to Port' || a.deliveryType==='Port to Door';
+  const showDestAirport = a.deliveryType==='Port to Port' || a.deliveryType==='Door to Port';
+  return `
+  <div class="create-banner">${ICON_WARN}<span><b>Please Note!</b> Are you shipping over 9,000 KG? Kindly contact support <a href="#" data-toast-only="Support contact isn't wired up in this prototype yet">here</a>.</span></div>
+
+  <div class="delivery-type-tabs">
+    ${['Port to Port','Port to Door','Door to Port','Door to Door'].map(t=>`<button type="button" class="delivery-type-tab ${a.deliveryType===t?'active':''}" data-delivery-type="${t}">${t}</button>`).join('')}
+    ${renderServiceTypeSelect(d.direction)}
+  </div>
+  <div class="freight-route-row" style="margin-bottom:20px">
+    ${showOriginAirport
+      ? `<div class="form-field filled searchable-field" data-ss-mode="airport"><label class="field-label">Airport of Loading</label><input type="text" class="field-control ss-display" autocomplete="off" value="${formatAirportDisplay(a.originAirport)}" placeholder="Search..."><input type="hidden" data-field="air.originAirport" value="${a.originAirport}"><div class="ss-menu"></div></div>`
+      : `<div class="form-field filled"><label class="field-label">Origin Address</label><input class="field-control" data-field="air.originAddress" value="${a.originAddress}" placeholder="Enter origin address"></div>`}
+    <div class="route-arrow">${ICON_ARROW}</div>
+    ${showDestAirport
+      ? `<div class="form-field filled searchable-field" data-ss-mode="airport"><label class="field-label">Airport of Discharge</label><input type="text" class="field-control ss-display" autocomplete="off" value="${formatAirportDisplay(a.destAirport)}" placeholder="Search..."><input type="hidden" data-field="air.destAirport" value="${a.destAirport}"><div class="ss-menu"></div></div>`
+      : `<div class="form-field filled"><label class="field-label">Destination Address</label><input class="field-control" data-field="air.destinationAddress" value="${a.destinationAddress}" placeholder="Enter destination address"></div>`}
+  </div>
+
+  <div class="form-section-label" style="border-top:none;padding-top:0">Shipment details</div>
+  <p class="section-sub" style="margin:0 0 16px">Please provide the shipment details</p>
+  <div class="form-grid">
+    ${renderCustomerFieldHtml(d.customer)}
+    <div class="form-field filled"><label class="field-label">Office/Branch</label><select class="field-control" data-field="air.officeBranch"><option value="">Select option...</option>${OFFICES.map(o=>`<option ${o===a.officeBranch?'selected':''}>${o}</option>`).join('')}</select></div>
+  </div>
+
+  <div class="form-section-label">Commodity Information</div>
+  ${renderCommodityFieldsHtml('air', a)}
+  ${renderHazardousToggleHtml('air', a.hazardous)}
+  <p class="section-sub" style="margin:0 0 4px">Is each pallet of the same size?</p>
+  <div class="toggle-pair" style="margin-bottom:18px">
+    <button type="button" class="toggle-option ${a.uniformPallets?'selected':''}" data-toggle-name="air.uniformPallets" data-toggle-value="true"><span class="radio-dot"></span>Yes, it is</button>
+    <button type="button" class="toggle-option ${!a.uniformPallets?'selected':''}" data-toggle-name="air.uniformPallets" data-toggle-value="false"><span class="radio-dot"></span>No, it isn't</button>
+  </div>
+
+  <div class="form-section-label">Cargo Information</div>
+  <div class="form-grid" style="margin-top:14px">
+    <div class="form-field filled"><label class="field-label">Number of Pallets</label><select class="field-control" data-field="air.numberOfPallets">${PALLET_COUNTS.map(p=>`<option ${p===a.numberOfPallets?'selected':''}>${p}</option>`).join('')}</select></div>
+    <div class="form-field filled"><label class="field-label">Unit for Dimensions</label><select class="field-control" data-field="air.dimensionUnit">${DIMENSION_UNITS.map(u=>`<option ${u===a.dimensionUnit?'selected':''}>${u}</option>`).join('')}</select></div>
+    <div class="form-field filled"><label class="field-label">Length</label><input class="field-control" data-field="air.length" value="${a.length}" placeholder="0"></div>
+    <div class="form-field filled"><label class="field-label">Width</label><input class="field-control" data-field="air.width" value="${a.width}" placeholder="0"></div>
+    <div class="form-field filled"><label class="field-label">Height</label><input class="field-control" data-field="air.height" value="${a.height}" placeholder="0"></div>
+    <div class="form-field filled"><label class="field-label">Calculated Volumetric Weight (kg)</label><input class="field-control" id="air-vw-output" readonly value="${vw ? vw+' kg' : ''}"></div>
+  </div>
+
+  <div class="form-section-label">Additional Services</div>
+  <p class="section-sub" style="margin:0 0 14px">Please add all additional services that apply</p>
+  ${renderAdditionalServicesSection(d, 'AIR')}
+  `;
+}
+
+function renderCreateStep2Haulage(){
+  const d = shipmentFormState.draft;
+  const h = d.haulage;
+  const isImport = d.direction === 'Import';
+  return `
+  <div class="freight-card">
+    <div class="freight-card-head">
+      <div><h4>Haulage details</h4><p>Please provide the required information</p></div>
+      ${renderServiceTypeSelect(d.direction)}
+    </div>
+    <div class="freight-route-row">
+      ${isImport ? `
+      <div class="form-field filled searchable-field" data-ss-mode="port"><label class="field-label">Port of Discharge</label><input type="text" class="field-control ss-display" autocomplete="off" value="${formatPortDisplay(h.portOfDischarge)}" placeholder="Search..."><input type="hidden" data-field="haulage.portOfDischarge" value="${h.portOfDischarge}"><div class="ss-menu"></div></div>
+      <div class="route-arrow">${ICON_ARROW}</div>
+      <div class="form-field filled"><label class="field-label">Destination Address</label><input class="field-control" data-field="haulage.destinationAddress" value="${h.destinationAddress}"></div>
+      ` : `
+      <div class="form-field filled"><label class="field-label">Pickup Address</label><input class="field-control" data-field="haulage.pickupAddress" value="${h.pickupAddress}"></div>
+      <div class="route-arrow">${ICON_ARROW}</div>
+      <div class="form-field filled searchable-field" data-ss-mode="port"><label class="field-label">Port of Loading</label><input type="text" class="field-control ss-display" autocomplete="off" value="${formatPortDisplay(h.portOfLoading)}" placeholder="Search..."><input type="hidden" data-field="haulage.portOfLoading" value="${h.portOfLoading}"><div class="ss-menu"></div></div>
+      `}
+    </div>
+  </div>
+
+  <div class="form-section-label" style="border-top:none;padding-top:0">Shipment details</div>
+  <p class="section-sub" style="margin:0 0 16px">Please provide the shipment details</p>
+  <div class="form-grid">
+    ${renderCustomerFieldHtml(d.customer)}
+    <div class="form-field filled"><label class="field-label">Office/Branch</label><select class="field-control" data-field="haulage.officeBranch"><option value="">Select option...</option>${OFFICES.map(o=>`<option ${o===h.officeBranch?'selected':''}>${o}</option>`).join('')}</select></div>
+    <div style="margin-bottom:18px"><div style="font-size:11px;color:var(--silver-light);font-weight:600;text-transform:uppercase;letter-spacing:.02em;margin-bottom:6px">Total Value of Goods (Optional)</div><div style="display:flex;gap:8px"><select class="field-control" style="flex:0 0 84px" data-field="haulage.currency">${CURRENCIES.map(c=>`<option ${c===h.currency?'selected':''}>${c}</option>`).join('')}</select><input class="field-control" style="flex:1" data-field="haulage.totalValue" value="${h.totalValue}" placeholder="0.00"></div></div>
+    <div class="form-field filled"><label class="field-label">BL Number (Optional)</label><input class="field-control" data-field="haulage.bl" value="${h.bl}" placeholder="Enter BL number"></div>
+    <div class="form-field filled"><label class="field-label">Port ETA (Optional)</label><input type="date" class="field-control" data-field="haulage.portEta" data-field-type="date" value="${h.portEta ? displayDateToInputValue(h.portEta) : ''}"></div>
+    <div class="form-field filled"><label class="field-label">TDO Expiry Date</label><input type="date" class="field-control" data-field="haulage.tdoExpiryDate" data-field-type="date" value="${h.tdoExpiryDate ? displayDateToInputValue(h.tdoExpiryDate) : ''}"></div>
+    <div class="form-field filled"><label class="field-label">TDO Written Date</label><input type="date" class="field-control" data-field="haulage.tdoWrittenDate" data-field-type="date" value="${h.tdoWrittenDate ? displayDateToInputValue(h.tdoWrittenDate) : ''}"></div>
+    <div class="form-field filled"><label class="field-label">Stuffing Date (Optional)</label><input type="date" class="field-control" data-field="haulage.stuffingDate" data-field-type="date" value="${h.stuffingDate ? displayDateToInputValue(h.stuffingDate) : ''}"></div>
+  </div>
+
+  <div class="form-section-label">Commodity Information</div>
+  ${renderCommodityFieldsHtml('haulage', h)}
+  ${renderHazardousToggleHtml('haulage', h.hazardous)}
+
+  <div class="form-section-label">Container Information</div>
+  ${renderUniformToggleHtml('haulage', h.uniformContainers, 'Is each container of the same size?')}
+  ${renderContainerFieldsHtml('haulage', h)}
+
+  <div class="form-section-label">Other Information</div>
+  <div style="margin-top:14px">
+    <p style="font-weight:700;color:var(--green-dark);font-size:13px;margin:0 0 2px">Haulage Tracker</p>
+    <div class="toggle-pair" style="margin-bottom:18px">
+      <button type="button" class="toggle-option ${h.tracker?'selected':''}" data-toggle-name="haulage.tracker" data-toggle-value="true"><span class="radio-dot"></span>Yes</button>
+      <button type="button" class="toggle-option ${!h.tracker?'selected':''}" data-toggle-name="haulage.tracker" data-toggle-value="false"><span class="radio-dot"></span>No</button>
+    </div>
+    <p style="font-weight:700;color:var(--green-dark);font-size:13px;margin:0 0 2px">Haulage Escort</p>
+    <div class="toggle-pair" style="margin-bottom:18px">
+      <button type="button" class="toggle-option ${h.escort?'selected':''}" data-toggle-name="haulage.escort" data-toggle-value="true"><span class="radio-dot"></span>Yes</button>
+      <button type="button" class="toggle-option ${!h.escort?'selected':''}" data-toggle-name="haulage.escort" data-toggle-value="false"><span class="radio-dot"></span>No</button>
+    </div>
+    <p style="font-weight:700;color:var(--green-dark);font-size:13px;margin:0 0 2px">Custom Brokerage</p>
+    <div class="toggle-pair">
+      <button type="button" class="toggle-option ${h.brokerageAddon?'selected':''}" data-toggle-name="haulage.brokerageAddon" data-toggle-value="true"><span class="radio-dot"></span>Yes</button>
+      <button type="button" class="toggle-option ${!h.brokerageAddon?'selected':''}" data-toggle-name="haulage.brokerageAddon" data-toggle-value="false"><span class="radio-dot"></span>No</button>
+    </div>
+  </div>
+  `;
+}
+
+function renderCreateStep2Brokerage(){
+  const d = shipmentFormState.draft;
+  const b = d.brokerage;
+  return `
+  <div class="freight-card">
+    <div class="freight-card-head">
+      <div><h4>Freight details</h4><p>Please provide the required information</p></div>
+      ${renderServiceTypeSelect(d.direction)}
+    </div>
+    <div class="freight-route-row">
+      <div class="form-field filled searchable-field" data-ss-mode="port"><label class="field-label">Port of Loading</label><input type="text" class="field-control ss-display" autocomplete="off" value="${formatPortDisplay(b.pol)}" placeholder="Search..."><input type="hidden" data-field="brokerage.pol" value="${b.pol}"><div class="ss-menu"></div></div>
+      <div class="route-arrow">${ICON_ARROW}</div>
+      <div class="form-field filled searchable-field" data-ss-mode="port"><label class="field-label">Port of Discharge</label><input type="text" class="field-control ss-display" autocomplete="off" value="${formatPortDisplay(b.pod)}" placeholder="Search..."><input type="hidden" data-field="brokerage.pod" value="${b.pod}"><div class="ss-menu"></div></div>
+    </div>
+  </div>
+
+  <div class="form-section-label" style="border-top:none;padding-top:0">Shipment details</div>
+  <p class="section-sub" style="margin:0 0 16px">Please provide the shipment details</p>
+  <div class="form-grid">
+    ${renderCustomerFieldHtml(d.customer)}
+    <div class="form-field filled"><label class="field-label">Consignee's Name (Optional)</label><input class="field-control" data-field="brokerage.consigneeName" value="${b.consigneeName}" placeholder="Enter Consignee's Name"></div>
+    <div class="form-field filled"><label class="field-label">Consignee's Address (Optional)</label><input class="field-control" data-field="brokerage.consigneeAddress" value="${b.consigneeAddress}" placeholder="Enter Consignee's Address"></div>
+    <div class="form-field filled"><label class="field-label">Office/Branch</label><select class="field-control" data-field="brokerage.officeBranch"><option value="">Select option...</option>${OFFICES.map(o=>`<option ${o===b.officeBranch?'selected':''}>${o}</option>`).join('')}</select></div>
+    <div style="margin-bottom:18px"><div style="font-size:11px;color:var(--silver-light);font-weight:600;text-transform:uppercase;letter-spacing:.02em;margin-bottom:6px">Total Value of Goods</div><div style="display:flex;gap:8px"><select class="field-control" style="flex:0 0 84px" data-field="brokerage.currency">${CURRENCIES.map(c=>`<option ${c===b.currency?'selected':''}>${c}</option>`).join('')}</select><input class="field-control" style="flex:1" data-field="brokerage.totalValue" value="${b.totalValue}" placeholder="0.00"></div></div>
+    <div class="form-field filled"><label class="field-label">BL Number (Optional)</label><input class="field-control" data-field="brokerage.bl" value="${b.bl}" placeholder="Enter BL number"></div>
+    <div class="form-field filled"><label class="field-label">Port ETA (Optional)</label><input type="date" class="field-control" data-field="brokerage.portEta" data-field-type="date" value="${b.portEta ? displayDateToInputValue(b.portEta) : ''}"></div>
+    <div class="form-field filled"><label class="field-label">Transport Mode (Optional)</label><select class="field-control" data-field="brokerage.transportMode"><option value="">Select option...</option>${['Sea','Air','Land'].map(o=>`<option ${o===b.transportMode?'selected':''}>${o}</option>`).join('')}</select></div>
+  </div>
+
+  <div class="form-section-label">Commodity Information</div>
+  ${renderCommodityFieldsHtml('brokerage', b)}
+  ${renderHazardousToggleHtml('brokerage', b.hazardous)}
+
+  <div class="form-section-label">Container Information</div>
+  ${renderUniformToggleHtml('brokerage', b.uniformContainers, 'Is each container of the same size and type?')}
+  ${renderContainerFieldsHtml('brokerage', b)}
+  `;
+}
+
+function renderCreateStep2(){
+  const cat = shipmentFormState.category;
+  el('create-step2-category-badge').innerHTML = `${categoryOf(cat).icon}${categoryOf(cat).label}`;
+  const renderers = {OCEAN: renderCreateStep2Ocean, AIR: renderCreateStep2Air, HAULAGE: renderCreateStep2Haulage, BROKERAGE: renderCreateStep2Brokerage};
+  el('create-common-fields').innerHTML = renderers[cat]();
+  wireSearchableFieldsIn(el('create-step-2'));
+}
+
+function openCreateShipmentModal(){
+  shipmentFormState.mode = 'create';
+  shipmentFormState.category = null;
+  shipmentFormState.draft = null;
+  el('create-modal-title').textContent = 'New Shipment — Choose Service Type';
+  el('create-modal-sub').textContent = 'Select the type of service this shipment requires.';
+  el('create-step-1').style.display = 'block';
+  el('create-step-2').style.display = 'none';
+  renderCreateCategoryGrid();
+  renderCreateFooterStep1();
+  openModal('modal-create-shipment');
+}
+
+function validateCreateDraft(){
+  const d = shipmentFormState.draft;
+  const cat = shipmentFormState.category;
+  if(!d.customer.trim()) return 'Customer Name is required';
+  if(cat==='OCEAN'){
+    const o = d.ocean;
+    if(!o.pol || !o.pod) return 'Port of Loading and Port of Discharge are required';
+    if(!o.officeBranch) return 'Office/Branch is required';
+    if(!o.totalValue) return 'Total Value of Goods is required';
+    if(!o.commodityType || !o.commodityCategory || !o.commodityDescription.trim()) return 'Commodity Type, Category, and Description are required';
+    if(!o.containerCount || !o.containerWeight) return 'Container Count and Weight are required';
+    return null;
+  }
+  if(cat==='AIR'){
+    const a = d.air;
+    const originOk = (a.deliveryType==='Port to Port' || a.deliveryType==='Port to Door') ? !!a.originAirport : !!a.originAddress.trim();
+    const destOk = (a.deliveryType==='Port to Port' || a.deliveryType==='Door to Port') ? !!a.destAirport : !!a.destinationAddress.trim();
+    if(!originOk || !destOk) return 'Origin and Destination are required';
+    if(!a.officeBranch) return 'Office/Branch is required';
+    return null;
+  }
+  if(cat==='HAULAGE'){
+    const h = d.haulage;
+    if(d.direction==='Import'){
+      if(!h.portOfDischarge || !h.destinationAddress.trim()) return 'Port of Discharge and Destination Address are required';
+    } else {
+      if(!h.pickupAddress.trim() || !h.portOfLoading) return 'Pickup Address and Port of Loading are required';
+    }
+    if(!h.officeBranch) return 'Office/Branch is required';
+    if(!h.tdoExpiryDate || !h.tdoWrittenDate) return 'TDO Expiry Date and TDO Written Date are required';
+    if(!h.commodityType || !h.commodityCategory || !h.commodityDescription.trim()) return 'Commodity Type, Category, and Description are required';
+    if(!h.containerCount || !h.containerWeight) return 'Container Count and Weight are required';
+    return null;
+  }
+  if(cat==='BROKERAGE'){
+    const b = d.brokerage;
+    if(!b.pol || !b.pod) return 'Port of Loading and Port of Discharge are required';
+    if(!b.officeBranch) return 'Office/Branch is required';
+    if(!b.totalValue) return 'Total Value of Goods is required';
+    if(!b.commodityType || !b.commodityCategory || !b.commodityDescription.trim()) return 'Commodity Type, Category, and Description are required';
+    if(!b.containerCount || !b.containerWeight) return 'Container Count and Weight are required';
+    return null;
+  }
+  return null;
+}
+
+// A target date is still needed (even where the bespoke forms don't collect ETD/ETA
+// directly) to interpolate the milestone schedule — derived here from whichever
+// dates the form does collect, or "today" as a last resort.
+function addDaysToDisplayDate(displayDate, days){
+  const d = parseDisplayDate(displayDate);
+  d.setDate(d.getDate() + days);
+  return formatDate(d);
+}
+function todayDisplay(){ return formatDate(new Date()); }
+
+// Clears whichever Air origin/destination fields are NOT applicable to the current
+// Delivery Type, and whichever Haulage origin/destination fields are NOT applicable
+// to the current Service Type — so a controlling-field change never leaves a stale,
+// inapplicable value to be read back out (and saved) later.
+function sanitizeAirDirectionalFields(a){
+  const originIsAirport = a.deliveryType==='Port to Port' || a.deliveryType==='Port to Door';
+  const destIsAirport = a.deliveryType==='Port to Port' || a.deliveryType==='Door to Port';
+  if(originIsAirport) a.originAddress = ''; else a.originAirport = '';
+  if(destIsAirport) a.destinationAddress = ''; else a.destAirport = '';
+}
+function sanitizeHaulageDirectionalFields(direction, h){
+  if(direction==='Import'){ h.pickupAddress = ''; h.portOfLoading = ''; }
+  else { h.portOfDischarge = ''; h.destinationAddress = ''; }
+}
+function originDestinationOf(category, direction, catDraft){
+  if(category==='OCEAN') return {origin: catDraft.pol, destination: catDraft.pod};
+  if(category==='AIR') return {
+    origin: catDraft.originAirport || catDraft.originAddress,
+    destination: catDraft.destAirport || catDraft.destinationAddress,
+  };
+  if(category==='HAULAGE') return direction==='Import'
+    ? {origin: catDraft.portOfDischarge, destination: catDraft.destinationAddress}
+    : {origin: catDraft.pickupAddress, destination: catDraft.portOfLoading};
+  return {origin: catDraft.pol, destination: catDraft.pod};
+}
+
+function buildManualShipmentDetail(draft, category, jobRef){
+  const seed = Object.keys(SHIPMENTS).length + 3;
+  const primary = TEAM[0];
+  const responsibilities = assignResponsibilities([primary.id], seed);
+
+  if(category==='AIR') sanitizeAirDirectionalFields(draft.air);
+  if(category==='HAULAGE') sanitizeHaulageDirectionalFields(draft.direction, draft.haulage);
+
+  const catDraft = draft[category.toLowerCase()];
+  const {origin, destination} = originDestinationOf(category, draft.direction, catDraft);
+  let etd, eta;
+  if(category==='OCEAN'){
+    etd = draft.ocean.pickupDate || todayDisplay(); eta = addDaysToDisplayDate(etd, 21);
+  } else if(category==='AIR'){
+    etd = todayDisplay(); eta = addDaysToDisplayDate(etd, 3);
+  } else if(category==='HAULAGE'){
+    etd = draft.haulage.tdoWrittenDate || todayDisplay();
+    eta = draft.haulage.portEta || addDaysToDisplayDate(etd, 7);
+  } else {
+    etd = todayDisplay();
+    eta = draft.brokerage.portEta || addDaysToDisplayDate(etd, 14);
+  }
+
+  const base = {
+    jobRef, category, direction: draft.direction, customer: draft.customer.trim(),
+    origin: (origin||'').trim(), destination: (destination||'').trim(),
+    route: `${(origin||'').trim()} → ${(destination||'').trim()}`,
+    status: 'Active', slaHealth: 'Healthy',
+    ownerId: primary.id, supportingOwnerIds: [],
+    completedMilestones: 0, quoteRef: '—',
+    incoterm: '', etd, eta,
+  };
+  if(category==='OCEAN'){ base.ocean = {...draft.ocean}; base.additionalServices = {...draft.additionalServices}; }
+  if(category==='AIR'){ base.air = {...draft.air}; base.additionalServices = {...draft.additionalServices}; }
+  if(category==='HAULAGE') base.haulage = {...draft.haulage};
+  if(category==='BROKERAGE') base.brokerage = {...draft.brokerage};
+
+  const template = milestoneTemplateOf(base);
+  const etdDate = parseDisplayDate(base.etd);
+  const etaDate = parseDisplayDate(base.eta);
+  const span = etaDate.getTime() - etdDate.getTime();
+  const milestones = template.map((t,i)=>{
+    const frac = template.length>1 ? i/(template.length-1) : 0;
+    const dueDate = new Date(etdDate.getTime() + Math.max(span,0)*frac);
+    dueDate.setHours(9 + ((i*3)%8), (i%2)*30, 0, 0);
+    return {id:makeId('ms'), name:t.name, responsibility:t.responsibility, status:'Not Started', dueDate, completedBy:'', completedAt:null, completedSlaHealth:null, comment:''};
+  });
+
+  const trackingTemplate = buildTrackingTemplateFor(base);
+  const physicalTracking = trackingTemplate.map(t=>({label:t.label, location:t.loc, source:t.source, timestamp:null, done:false}));
+
+  return {
+    ...base,
+    owners: {primary, supporting: [], responsibilities},
+    containers: [],
+    milestones,
+    physicalTracking,
+    documents: [],
+  };
+}
+
+/* --- Edit Shipment: reuses the same Step 2 bespoke renderers as Create — see
+   shipmentFormState.mode above, checked by renderCreateFooterStep2() and the
+   #create-shipment-submit handler. --- */
+function draftFromShipment(s){
+  const draft = {customer: s.customer, direction: s.direction};
+  draft[s.category.toLowerCase()] = {...s[s.category.toLowerCase()]};
+  if(s.category==='OCEAN' || s.category==='AIR') draft.additionalServices = {...emptyAdditionalServices(), ...(s.additionalServices||{})};
+  return draft;
+}
+function applyDraftToShipment(s, draft, category){
+  if(category==='AIR') sanitizeAirDirectionalFields(draft.air);
+  if(category==='HAULAGE') sanitizeHaulageDirectionalFields(draft.direction, draft.haulage);
+  const catDraft = draft[category.toLowerCase()];
+  const {origin, destination} = originDestinationOf(category, draft.direction, catDraft);
+  s.direction = draft.direction;
+  s.customer = draft.customer.trim();
+  s.origin = (origin||'').trim();
+  s.destination = (destination||'').trim();
+  s.route = `${s.origin} → ${s.destination}`;
+  s[category.toLowerCase()] = {...catDraft};
+  if(category==='OCEAN' || category==='AIR') s.additionalServices = {...draft.additionalServices};
+}
+function openEditShipmentModal(){
+  const s = currentShipment();
+  shipmentFormState.mode = 'edit';
+  shipmentFormState.category = s.category;
+  shipmentFormState.draft = draftFromShipment(s);
+  el('create-modal-title').textContent = `Edit Shipment — ${s.jobRef}`;
+  el('create-modal-sub').textContent = `Update the ${categoryOf(s.category).label.toLowerCase()} details for this job.`;
+  el('create-step-1').style.display = 'none';
+  el('create-step-2').style.display = 'block';
+  renderCreateStep2();
+  renderCreateFooterStep2();
+  openModal('modal-create-shipment');
+}
+
+/* --- Add / Edit Container --- */
+function openContainerModal(containerId){
+  state.editingContainerId = containerId || null;
+  const s = currentShipment();
+  const c = containerId ? s.containers.find(x=>x.id===containerId) : null;
+  el('container-modal-title').textContent = c ? 'Edit Container' : 'Add Container';
+  el('input-container-number').value = c ? c.number : '';
+  el('input-container-size').value = c ? c.size : '20ft';
+  el('input-container-type').value = c ? c.type : 'Dry';
+  el('input-container-seal').value = c ? c.seal : '';
+  el('input-container-weight').value = c ? c.weight : '';
+  openModal('modal-container');
+}
+el('save-container').addEventListener('click', ()=>{
+  const s = currentShipment();
+  const num = el('input-container-number').value.trim();
+  if(!num){ showToast('Container number is required', 'error'); return; }
+  const data = {
+    number:num,
+    size:el('input-container-size').value,
+    type:el('input-container-type').value,
+    seal:el('input-container-seal').value.trim(),
+    weight:el('input-container-weight').value.trim(),
+  };
+  if(state.editingContainerId){
+    const c = s.containers.find(x=>x.id===state.editingContainerId);
+    Object.assign(c, data);
+    showToast('Container updated');
+  } else {
+    s.containers.push({id: makeId('cnt'), ...data});
+    showToast('Container added');
+  }
+  renderContainers();
+  closeModal('modal-container');
+});
+
+/* --- Milestone completion --- */
+function openMilestoneModal(msId){
+  state.activeMilestone = msId;
+  const s = currentShipment();
+  const m = s.milestones.find(x=>x.id===msId);
+  el('milestone-modal-sub').textContent = m.name;
+  el('input-milestone-comment').value = '';
+  openModal('modal-milestone');
+}
+el('save-milestone').addEventListener('click', ()=>{
+  const s = currentShipment();
+  const m = s.milestones.find(x=>x.id===state.activeMilestone);
+  m.status = 'Completed';
+  m.completedBy = CURRENT_USER;
+  m.completedAt = new Date();
+  m.completedSlaHealth = computeLiveSlaHealth(m.dueDate);
+  m.comment = el('input-milestone-comment').value.trim();
+  renderServiceDelivery();
+  closeModal('modal-milestone');
+  showToast('Milestone marked complete');
+});
+
+/* ==========================================================================
+   Documents — upload / view / download / update / delete
+   ========================================================================== */
+const MAX_FILE_SIZE_MB = 25;
+
+function formatBytes(bytes){
+  if(bytes < 1024) return bytes + ' B';
+  if(bytes < 1024*1024) return (bytes/1024).toFixed(1) + ' KB';
+  return (bytes/(1024*1024)).toFixed(1) + ' MB';
+}
+
+function openUploadDocsModal(){
+  state.pendingFiles = [];
+  el('input-doc-category').value = '';
+  renderFilePillList();
+  openModal('modal-upload-docs');
+}
+
+const dropzone = el('dropzone');
+const fileInput = el('file-input');
+dropzone.addEventListener('click', ()=> fileInput.click());
+dropzone.addEventListener('dragover', (e)=>{ e.preventDefault(); dropzone.classList.add('dragover'); });
+dropzone.addEventListener('dragleave', ()=> dropzone.classList.remove('dragover'));
+dropzone.addEventListener('drop', (e)=>{
+  e.preventDefault(); dropzone.classList.remove('dragover');
+  addPendingFiles(e.dataTransfer.files);
+});
+fileInput.addEventListener('change', ()=>{ addPendingFiles(fileInput.files); fileInput.value=''; });
+
+function addPendingFiles(fileList){
+  Array.from(fileList).forEach(f=>{
+    if(f.size > MAX_FILE_SIZE_MB*1024*1024){
+      showToast(`"${f.name}" exceeds the ${MAX_FILE_SIZE_MB}MB limit`, 'error');
+      return;
+    }
+    state.pendingFiles.push(f);
+  });
+  renderFilePillList();
+}
+
+function renderFilePillList(){
+  el('file-pill-list').innerHTML = state.pendingFiles.map((f,i)=>`
+    <div class="file-pill">
+      <svg width="14" height="14" fill="none" stroke="#023819" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"></path><path d="M14 2v6h6"></path></svg>
+      <span class="fname">${f.name}</span>
+      <span class="fsize">${formatBytes(f.size)}</span>
+      <button class="frm" data-remove-file="${i}"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18" stroke-linecap="round"></path></svg></button>
+    </div>
+  `).join('');
+  el('save-upload-docs').disabled = state.pendingFiles.length===0;
+}
+
+el('save-upload-docs').addEventListener('click', ()=>{
+  const s = currentShipment();
+  const category = el('input-doc-category').value;
+  state.pendingFiles.forEach(f=>{
+    s.documents.push({
+      id: makeId('doc'),
+      name: f.name,
+      category: category,
+      uploadedBy: CURRENT_USER,
+      uploadedOn: new Date(),
+      isMock:false,
+      fileUrl: URL.createObjectURL(f),
+      size: f.size,
+    });
+  });
+  const count = state.pendingFiles.length;
+  renderDocuments();
+  closeModal('modal-upload-docs');
+  showToast(`${count} document${count!==1?'s':''} uploaded`);
+});
+
+function findDoc(id){ return currentShipment().documents.find(d=>d.id===id); }
+
+function viewDocument(id){
+  const d = findDoc(id);
+  if(d.fileUrl){ window.open(d.fileUrl, '_blank'); }
+  else { showToast('Preview unavailable — this is a mock document with no attached file', 'error'); }
+}
+function downloadDocument(id){
+  const d = findDoc(id);
+  if(d.fileUrl){
+    const a = document.createElement('a'); a.href = d.fileUrl; a.download = d.name; a.click();
+  } else {
+    showToast('Download unavailable — this is a mock document with no attached file', 'error');
+  }
+}
+
+function openUpdateFileModal(id){
+  state.activeDocUpdate = id;
+  const d = findDoc(id);
+  el('update-file-sub').textContent = `Replacing file for "${d.name}"`;
+  el('update-file-name').textContent = 'Select a replacement file';
+  el('save-update-file').disabled = true;
+  pendingReplacementFile = null;
+  openModal('modal-update-file');
+}
+const dropzoneUpdate = el('dropzone-update');
+const fileInputUpdate = el('file-input-update');
+dropzoneUpdate.addEventListener('click', ()=> fileInputUpdate.click());
+dropzoneUpdate.addEventListener('dragover', (e)=>{ e.preventDefault(); dropzoneUpdate.classList.add('dragover'); });
+dropzoneUpdate.addEventListener('dragleave', ()=> dropzoneUpdate.classList.remove('dragover'));
+dropzoneUpdate.addEventListener('drop', (e)=>{ e.preventDefault(); dropzoneUpdate.classList.remove('dragover'); handleUpdateFile(e.dataTransfer.files[0]); });
+fileInputUpdate.addEventListener('change', ()=> handleUpdateFile(fileInputUpdate.files[0]));
+
+let pendingReplacementFile = null;
+function handleUpdateFile(file){
+  if(!file) return;
+  if(file.size > MAX_FILE_SIZE_MB*1024*1024){ showToast(`File exceeds the ${MAX_FILE_SIZE_MB}MB limit`, 'error'); return; }
+  pendingReplacementFile = file;
+  el('update-file-name').textContent = file.name;
+  el('save-update-file').disabled = false;
+}
+el('save-update-file').addEventListener('click', ()=>{
+  const d = findDoc(state.activeDocUpdate);
+  if(!pendingReplacementFile) return;
+  d.name = pendingReplacementFile.name;
+  d.fileUrl = URL.createObjectURL(pendingReplacementFile);
+  d.size = pendingReplacementFile.size;
+  d.uploadedOn = new Date();
+  d.uploadedBy = CURRENT_USER;
+  pendingReplacementFile = null;
+  renderDocuments();
+  closeModal('modal-update-file');
+  showToast('File replaced successfully');
+});
+
+function openDeleteDocModal(id){
+  state.activeDocDelete = id;
+  el('delete-doc-name').textContent = findDoc(id).name;
+  openModal('modal-delete-doc');
+}
+el('confirm-delete-doc').addEventListener('click', ()=>{
+  const s = currentShipment();
+  s.documents = s.documents.filter(d=>d.id!==state.activeDocDelete);
+  renderDocuments();
+  closeModal('modal-delete-doc');
+  showToast('Document deleted');
+});
+
+/* ==========================================================================
+   Global delegated click handling
+   (covers all elements that get recreated by innerHTML re-renders)
+   ========================================================================== */
+document.body.addEventListener('click', (e)=>{
+  const t = e.target;
+
+  // responsibility checklist option — must stay open across multiple toggles,
+  // so handle before the generic dropdown-close logic below
+  const respOption = t.closest('[data-resp-toggle]');
+  if(respOption){
+    const [uid, respName] = respOption.dataset.respToggle.split('::');
+    if(!ownerModalState.responsibilities[uid]) ownerModalState.responsibilities[uid] = [];
+    const arr = ownerModalState.responsibilities[uid];
+    const idx = arr.indexOf(respName);
+    if(idx>=0) arr.splice(idx,1); else arr.push(respName);
+    ownerModalState.openRespUid = uid;
+    renderOwnerSelectList();
+    return;
+  }
+
+  // dropdown toggle (Actions button, row overflow menus, responsibility selector)
+  const toggle = t.closest('.dropdown-toggle');
+  if(toggle){
+    const wrapper = toggle.closest('.dropdown');
+    const wasOpen = wrapper.classList.contains('open');
+    document.querySelectorAll('.dropdown.open').forEach(w=>w.classList.remove('open'));
+    if(!wasOpen) wrapper.classList.add('open');
+    return;
+  }
+  const dropdownItem = t.closest('.dropdown-item');
+  if(dropdownItem){
+    document.querySelectorAll('.dropdown.open').forEach(w=>w.classList.remove('open'));
+  } else if(!t.closest('.dropdown-menu')){
+    document.querySelectorAll('.dropdown.open').forEach(w=>w.classList.remove('open'));
+  }
+
+  const backLink = t.closest('.back-link');
+  if(backLink){ e.preventDefault(); navTo('shipments'); return; }
+
+  const navItem = t.closest('.nav-item');
+  if(navItem){ e.preventDefault(); navTo(navItem.dataset.nav); return; }
+
+  const row = t.closest('tr.clickable');
+  if(row){ openShipment(row.dataset.jobref); return; }
+
+  const tabBtn = t.closest('.tab-btn');
+  if(tabBtn){ switchTab(tabBtn.dataset.tab); return; }
+
+  const closeBtn = t.closest('[data-close-modal]');
+  if(closeBtn){ closeModal(closeBtn.closest('.modal-overlay').id); return; }
+
+  if(t.classList && t.classList.contains('modal-overlay')){ closeModal(t.id); return; }
+
+  const addShipment = t.closest('[data-add-shipment]');
+  if(addShipment){
+    if(addShipment.dataset.addShipment==='manual') openCreateShipmentModal();
+    else showToast('Creating from a Quote isn\'t wired up in this prototype yet');
+    return;
+  }
+
+  const createCatCard = t.closest('[data-create-category]');
+  if(createCatCard){
+    shipmentFormState.category = createCatCard.dataset.createCategory;
+    renderCreateCategoryGrid();
+    renderCreateFooterStep1();
+    return;
+  }
+  if(t.closest('#create-step1-continue')){
+    shipmentFormState.draft = emptyDraftFor(shipmentFormState.category);
+    el('create-modal-title').textContent = 'New Shipment — Details';
+    el('create-modal-sub').textContent = `Fill out the ${categoryOf(shipmentFormState.category).label.toLowerCase()} details for this job.`;
+    el('create-step-1').style.display = 'none';
+    el('create-step-2').style.display = 'block';
+    renderCreateStep2();
+    renderCreateFooterStep2();
+    return;
+  }
+  if(t.closest('#create-step2-back')){
+    el('create-modal-title').textContent = 'New Shipment — Choose Service Type';
+    el('create-modal-sub').textContent = 'Select the type of service this shipment requires.';
+    el('create-step-1').style.display = 'block';
+    el('create-step-2').style.display = 'none';
+    renderCreateFooterStep1();
+    return;
+  }
+
+  // --- Bespoke creation/edit form interactions ---
+  const toastOnlyLink = t.closest('[data-toast-only]');
+  if(toastOnlyLink){ e.preventDefault(); showToast(toastOnlyLink.dataset.toastOnly); return; }
+
+  const genericToggle = t.closest('[data-toggle-name]');
+  if(genericToggle){
+    const path = genericToggle.dataset.toggleName;
+    const val = genericToggle.dataset.toggleValue === 'true';
+    reflowCreateStep2(d=>{ setPath(d, path, val); });
+    return;
+  }
+  const haulageTypeBtn = t.closest('[data-toggle-haulage-type]');
+  if(haulageTypeBtn){
+    const val = haulageTypeBtn.dataset.toggleHaulageType;
+    reflowCreateStep2(d=>{ d.additionalServices.haulageType = val; });
+    return;
+  }
+  const deliveryTypeTab = t.closest('[data-delivery-type]');
+  if(deliveryTypeTab){
+    const val = deliveryTypeTab.dataset.deliveryType;
+    reflowCreateStep2(d=>{ d.air.deliveryType = val; sanitizeAirDirectionalFields(d.air); });
+    return;
+  }
+
+  if(t.closest('#create-shipment-submit')){
+    readDynFieldsFrom(el('create-step-2'), shipmentFormState.draft);
+    const err = validateCreateDraft();
+    if(err){ showToast(err, 'error'); return; }
+    if(shipmentFormState.mode==='edit'){
+      const s = currentShipment();
+      applyDraftToShipment(s, shipmentFormState.draft, shipmentFormState.category);
+      closeModal('modal-create-shipment');
+      renderShipHeader(); renderShipDetailFields(); renderContainerCard(); renderShipmentsList(); renderServiceDelivery(); renderShipmentTracking();
+      showToast('Shipment details saved');
+    } else {
+      const jobRef = nextJobRef();
+      const detail = buildManualShipmentDetail(shipmentFormState.draft, shipmentFormState.category, jobRef);
+      SHIPMENTS[jobRef] = detail;
+      closeModal('modal-create-shipment');
+      renderShipmentsList();
+      showToast(`Shipment ${jobRef} created`);
+      openShipment(jobRef);
+    }
+    return;
+  }
+
+  if(t.closest('#btn-add-container')){ openContainerModal(null); return; }
+  const cEdit = t.closest('[data-cid]');
+  if(cEdit){ openContainerModal(cEdit.dataset.cid); return; }
+
+  const msBtn = t.closest('[data-complete-ms]');
+  if(msBtn){ openMilestoneModal(msBtn.dataset.completeMs); return; }
+
+  const shipAction = t.closest('[data-ship-action]');
+  if(shipAction){
+    const action = shipAction.dataset.shipAction;
+    if(action==='assign-owner') openAssignOwnerModal();
+    else if(action==='update-status') openUpdateStatusModal();
+    else if(action==='edit-shipment') openEditShipmentModal();
+    return;
+  }
+
+  const ownerCheckEl = t.closest('[data-owner-check]');
+  if(ownerCheckEl){
+    const uid = ownerCheckEl.dataset.ownerCheck;
+    const wantsChecked = ownerCheckEl.checked;
+    if(!wantsChecked && uid === ownerModalState.primary){
+      const remaining = [...ownerModalState.checked].filter(id=>id!==uid);
+      if(remaining.length){
+        ownerModalState.checked.delete(uid);
+        ownerModalState.primary = remaining[0];
+      } else {
+        showToast('A primary owner is required', 'error');
+      }
+    } else if(wantsChecked){
+      ownerModalState.checked.add(uid);
+    } else {
+      ownerModalState.checked.delete(uid);
+    }
+    renderOwnerSelectList();
+    return;
+  }
+  const ownerPrimaryBtn = t.closest('[data-owner-primary]');
+  if(ownerPrimaryBtn){
+    const uid = ownerPrimaryBtn.dataset.ownerPrimary;
+    ownerModalState.primary = uid;
+    ownerModalState.checked.add(uid);
+    renderOwnerSelectList();
+    return;
+  }
+
+  const quoteLink = t.closest('[data-quote-link]');
+  if(quoteLink){ e.preventDefault(); showToast('Quote navigation isn\'t wired up in this prototype yet'); return; }
+
+  if(t.closest('#btn-upload-docs')){ openUploadDocsModal(); return; }
+  const docView = t.closest('[data-doc-view]');
+  if(docView){ viewDocument(docView.dataset.docView); return; }
+  const docDl = t.closest('[data-doc-download]');
+  if(docDl){ downloadDocument(docDl.dataset.docDownload); return; }
+  const docUpd = t.closest('[data-doc-update]');
+  if(docUpd){ openUpdateFileModal(docUpd.dataset.docUpdate); return; }
+  const docDel = t.closest('[data-doc-delete]');
+  if(docDel){ openDeleteDocModal(docDel.dataset.docDelete); return; }
+});
+
+el('shipment-search').addEventListener('input', (e)=>{
+  state.searchQuery = e.target.value;
+  renderShipmentsList();
+});
+
+// Haulage's Service Type (direction) controls which Origin/Destination fields are
+// shown — sanitize the inapplicable pair before re-rendering so a stale address/port
+// value is never carried forward into the newly-shown field set or saved later.
+document.body.addEventListener('change', (e)=>{
+  const f = e.target.dataset && e.target.dataset.field;
+  if(f === 'direction' && shipmentFormState.category === 'HAULAGE'){
+    reflowCreateStep2(d=>{ sanitizeHaulageDirectionalFields(d.direction, d.haulage); });
+  }
+  const asCheckbox = e.target.closest && e.target.closest('[data-additional-service]');
+  if(asCheckbox){
+    const key = asCheckbox.dataset.additionalService;
+    const checked = asCheckbox.checked;
+    reflowCreateStep2(d=>{ d.additionalServices[key] = checked; });
+  }
+});
+
+// Live volumetric-weight calculation for the Air Freight form — updates the readonly
+// output directly (no full re-render) so typing digits doesn't lose focus/cursor.
+function recomputeVolumetricWeight(){
+  if(!shipmentFormState.draft || !shipmentFormState.draft.air) return;
+  const container = el('create-step-2');
+  const out = el('air-vw-output');
+  if(!out) return;
+  const val = {
+    length: container.querySelector('[data-field="air.length"]')?.value,
+    width: container.querySelector('[data-field="air.width"]')?.value,
+    height: container.querySelector('[data-field="air.height"]')?.value,
+    dimensionUnit: container.querySelector('[data-field="air.dimensionUnit"]')?.value || 'cm',
+  };
+  const vw = volumetricWeightOf(val);
+  out.value = vw ? `${vw} kg` : '';
+}
+document.body.addEventListener('input', (e)=>{
+  const f = e.target.dataset && e.target.dataset.field;
+  if(f==='air.length' || f==='air.width' || f==='air.height') recomputeVolumetricWeight();
+});
+document.body.addEventListener('change', (e)=>{
+  if(e.target.dataset && e.target.dataset.field==='air.dimensionUnit') recomputeVolumetricWeight();
+});
+
+/* ==========================================================================
+   Init
+   ========================================================================== */
+renderShipmentsList();
+renderBreadcrumbs();
+</script>
+</body>
+</html>
