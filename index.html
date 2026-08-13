@@ -304,6 +304,18 @@ textarea.field-control{resize:vertical;min-height:70px}
 .quote-link{color:var(--green-dark);font-weight:700;text-decoration:underline;text-decoration-color:rgba(2,56,25,.35);text-underline-offset:2px;cursor:pointer}
 .quote-link:hover{text-decoration-color:var(--green-dark)}
 
+/* Shipment Details — Basic/Commodity/Additional Services grouped as subsections
+   within one card, each its own bordered block (Container Info stays a separate
+   standalone card, not one of these subsections). */
+.subsection{border:1px solid var(--border-tint);border-radius:var(--radius-lg);margin-bottom:18px}
+.subsection:last-child{margin-bottom:0}
+.subsection-head{padding:14px 20px;font-weight:700;color:var(--green-dark);font-size:14px;border-bottom:1px solid var(--border-tint)}
+.subsection-body{padding:20px}
+.detail-fields-grid.cols-3{grid-template-columns:repeat(3,1fr)}
+@media (max-width:700px){
+  .detail-fields-grid.cols-3{grid-template-columns:1fr}
+}
+
 .overview-layout{display:grid;grid-template-columns:4fr 1fr;gap:22px;align-items:stretch}
 @media (max-width:1100px){
   .overview-layout{grid-template-columns:1fr}
@@ -614,9 +626,9 @@ textarea.field-control{resize:vertical;min-height:70px}
         <div class="tab-pane" id="tab-overview">
           <div class="overview-layout" style="margin-bottom:22px">
             <div class="card card-pad">
-              <h3 class="section-title">Shipment Information</h3>
-              <p class="section-sub" style="margin:0 0 18px">Core reference data for this job.</p>
-              <div class="detail-fields-grid" id="ship-detail-fields"></div>
+              <h3 class="section-title">Shipment Details</h3>
+              <p class="section-sub" style="margin:0 0 18px">Everything captured for this job, grouped by section.</p>
+              <div id="ship-detail-sections"></div>
             </div>
             <div class="card card-pad shipment-team-card">
               <h3 class="section-title">Shipment Team</h3>
@@ -625,9 +637,7 @@ textarea.field-control{resize:vertical;min-height:70px}
             </div>
           </div>
 
-          <div class="card card-pad" id="commodity-card" style="margin-bottom:22px"></div>
-          <div class="card card-pad" id="container-card" style="margin-bottom:22px"></div>
-          <div class="card card-pad" id="additional-services-card"></div>
+          <div class="card card-pad" id="container-card"></div>
         </div>
 
         <!-- Tab: Progress -->
@@ -1477,9 +1487,7 @@ function renderShipmentDetail(){
   renderShipHeader();
   renderShipDetailFields();
   renderShipmentTeamDisplay();
-  renderCommodityCard();
   renderContainerCard();
-  renderAdditionalServicesCard();
   renderServiceDelivery();
   renderShipmentTracking();
   renderDocuments();
@@ -1620,11 +1628,62 @@ function categorySpecificDetailRows(s){
   ];
 }
 
+function fieldRowsHtml(rows){
+  return rows.map(([k,v])=>{
+    const label = String(k).includes('<svg') ? `<div class="k-row">${k}</div>` : `<div class="k">${k}</div>`;
+    return `<div class="detail-field">${label}<div class="v">${v}</div></div>`;
+  }).join('');
+}
+function renderSubsectionHtml(title, rows, gridCols=3){
+  return `
+  <div class="subsection">
+    <div class="subsection-head">${title}</div>
+    <div class="subsection-body">
+      <div class="detail-fields-grid${gridCols===3?' cols-3':''}">${fieldRowsHtml(rows)}</div>
+    </div>
+  </div>`;
+}
+
+// Additional Services rows — checkbox-driven Haulage/Customs Brokerage add-ons on
+// Ocean/Air, native Tracker/Escort/Custom Brokerage fields on Haulage, and nothing
+// on Customs Brokerage (which has no additional services of its own) — an empty
+// array here means the Additional Services subsection is omitted entirely.
+function additionalServicesRows(s){
+  if(s.category==='BROKERAGE') return [];
+  if(s.category==='HAULAGE'){
+    const h = s.haulage;
+    return [
+      ['Haulage Tracker', h.tracker ? 'Included' : 'Not included'],
+      ['Haulage Escort', h.escort ? 'Included' : 'Not included'],
+      ['Custom Brokerage', h.brokerageAddon ? 'Included' : 'Not included'],
+    ];
+  }
+  const as = s.additionalServices;
+  if(!as || (!as.haulage && !as.brokerage)) return [];
+  const rows = [];
+  if(as.haulage){
+    const isAir = s.category==='AIR';
+    const loadLabel = isAir ? 'Airport of Loading' : 'Port of Loading';
+    const dischargeLabel = isAir ? 'Airport of Discharge' : 'Port of Discharge';
+    const formatFn = isAir ? formatAirportDisplay : formatPortDisplay;
+    const legs = [];
+    if(as.haulageType==='At Origin' || as.haulageType==='Origin & Destination') legs.push(`Pickup: ${as.pickupAddress||'—'} → ${loadLabel}: ${formatFn(as.loadingPoint)||'—'}`);
+    if(as.haulageType==='At Destination' || as.haulageType==='Origin & Destination') legs.push(`${dischargeLabel}: ${formatFn(as.dischargePoint)||'—'} → Drop Off: ${as.dropOffAddress||'—'}`);
+    rows.push(['Haulage', `${as.haulageType}${as.tracker?' · Tracker':''}${as.escort?' · Escort':''}<div class="v-sub">${legs.join(' · ')}</div>`]);
+  }
+  if(as.brokerage) rows.push(['Customs Brokerage', 'Included']);
+  return rows;
+}
+
+// Shipment Details card — Basic Information / Commodity Information / Additional
+// Services each render as their own bordered subsection inside this one card.
+// Container Information is intentionally NOT one of these — it stays a fully
+// separate, standalone card below (see renderContainerCard()).
 function renderShipDetailFields(){
   const s = currentShipment();
   const cat = categoryOf(s.category);
   const dl = dateLabelsOf(s.category);
-  const fields = [
+  const basicRows = [
     [`${ICON_BUILDING}<span>Customer</span>`, s.customer],
     ['Quote Reference', `<a href="#" class="quote-link" data-quote-link>${s.quoteRef}</a>`],
     ['Service Type', `${cat.label} · ${s.direction}`],
@@ -1635,10 +1694,14 @@ function renderShipDetailFields(){
     [dl.start, s.etd],
     [dl.end, s.eta],
   ];
-  el('ship-detail-fields').innerHTML = fields.map(([k,v])=>{
-    const label = k.includes('<svg') ? `<div class="k-row">${k}</div>` : `<div class="k">${k}</div>`;
-    return `<div class="detail-field">${label}<div class="v">${v}</div></div>`;
-  }).join('');
+  const commodityRows = commodityInfoRows(s);
+  const addSvcRows = additionalServicesRows(s);
+
+  let html = renderSubsectionHtml('Basic Information', basicRows);
+  html += renderSubsectionHtml('Commodity Information', commodityRows);
+  if(addSvcRows.length) html += renderSubsectionHtml('Additional Services', addSvcRows);
+
+  el('ship-detail-sections').innerHTML = html;
 }
 
 function renderShipmentTeamDisplay(){
@@ -1702,15 +1765,6 @@ function commodityInfoRows(s){
     ['Commodity HS Code', c.hsCode || '—'],
   ];
 }
-function renderCommodityCard(){
-  const s = currentShipment();
-  const rows = commodityInfoRows(s);
-  el('commodity-card').innerHTML = `
-    <h3 class="section-title">Commodity Information</h3>
-    <p class="section-sub" style="margin:0 0 18px">What's being shipped, and how it's classified.</p>
-    <div class="detail-fields-grid">${rows.map(([k,v])=>`<div class="detail-field"><div class="k">${k}</div><div class="v">${v}</div></div>`).join('')}</div>`;
-}
-
 // Container Information card — its own standalone component, separate from
 // Shipment/Commodity/Additional Services. Air has no containers (pallet-based
 // instead — see commodityInfoRows), so this card is hidden for Air shipments.
@@ -1747,48 +1801,6 @@ function renderContainerCard(){
 
 // Additional Services card — checkbox-driven Haulage/Customs Brokerage add-ons on
 // Ocean/Air, native Tracker/Escort/Custom Brokerage fields on Haulage, and hidden
-// entirely on Customs Brokerage (which has no additional services of its own).
-function renderAdditionalServicesCard(){
-  const s = currentShipment();
-  const card = el('additional-services-card');
-  if(s.category==='BROKERAGE'){ card.style.display = 'none'; card.innerHTML = ''; return; }
-  if(s.category==='HAULAGE'){
-    const h = s.haulage;
-    card.style.display = 'block';
-    card.innerHTML = `
-      <h3 class="section-title">Additional Services</h3>
-      <p class="section-sub" style="margin:0 0 18px">Native Haulage add-ons for this job.</p>
-      <div class="detail-fields-grid">
-        <div class="detail-field"><div class="k">Haulage Tracker</div><div class="v">${h.tracker ? 'Included' : 'Not included'}</div></div>
-        <div class="detail-field"><div class="k">Haulage Escort</div><div class="v">${h.escort ? 'Included' : 'Not included'}</div></div>
-        <div class="detail-field"><div class="k">Custom Brokerage</div><div class="v">${h.brokerageAddon ? 'Included' : 'Not included'}</div></div>
-      </div>`;
-    return;
-  }
-  // Ocean / Air
-  const as = s.additionalServices;
-  if(!as || (!as.haulage && !as.brokerage)){ card.style.display = 'none'; card.innerHTML = ''; return; }
-  card.style.display = 'block';
-  let fieldsHtml = '';
-  if(as.haulage){
-    const isAir = s.category==='AIR';
-    const loadLabel = isAir ? 'Airport of Loading' : 'Port of Loading';
-    const dischargeLabel = isAir ? 'Airport of Discharge' : 'Port of Discharge';
-    const formatFn = isAir ? formatAirportDisplay : formatPortDisplay;
-    const legs = [];
-    if(as.haulageType==='At Origin' || as.haulageType==='Origin & Destination') legs.push(`Pickup: ${as.pickupAddress||'—'} → ${loadLabel}: ${formatFn(as.loadingPoint)||'—'}`);
-    if(as.haulageType==='At Destination' || as.haulageType==='Origin & Destination') legs.push(`${dischargeLabel}: ${formatFn(as.dischargePoint)||'—'} → Drop Off: ${as.dropOffAddress||'—'}`);
-    fieldsHtml += `<div class="detail-field"><div class="k">Haulage</div><div class="v">${as.haulageType}${as.tracker?' · Tracker':''}${as.escort?' · Escort':''}<div class="v-sub">${legs.join(' · ')}</div></div></div>`;
-  }
-  if(as.brokerage){
-    fieldsHtml += `<div class="detail-field"><div class="k">Customs Brokerage</div><div class="v">Included</div></div>`;
-  }
-  card.innerHTML = `
-    <h3 class="section-title">Additional Services</h3>
-    <p class="section-sub" style="margin:0 0 18px">Add-on services attached at booking time.</p>
-    <div class="detail-fields-grid">${fieldsHtml}</div>`;
-}
-
 function resolveTaskOwners(s, responsibility){
   const resp = s.owners.responsibilities || {};
   return Object.keys(resp).filter(uid => (resp[uid]||[]).includes(responsibility)).map(teamMember);
@@ -2953,7 +2965,7 @@ document.body.addEventListener('click', (e)=>{
       const s = currentShipment();
       applyDraftToShipment(s, shipmentFormState.draft, shipmentFormState.category);
       closeModal('modal-create-shipment');
-      renderShipHeader(); renderShipDetailFields(); renderCommodityCard(); renderContainerCard(); renderAdditionalServicesCard(); renderShipmentsList(); renderServiceDelivery(); renderShipmentTracking();
+      renderShipHeader(); renderShipDetailFields(); renderContainerCard(); renderShipmentsList(); renderServiceDelivery(); renderShipmentTracking();
       showToast('Shipment details saved');
     } else {
       const jobRef = nextJobRef();
