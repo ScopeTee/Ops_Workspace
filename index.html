@@ -1298,10 +1298,15 @@ function buildShipmentDetail(base, seed){
       completedAt = new Date(Date.now() - (template.length-i)*86400000);
       comment = (i%3===0) ? 'Cleared without exceptions.' : '';
     }
+    // Deterministic id (jobRef+index, not random) so the Field Channel's
+    // localStorage-backed FIELD_STORE can key completion/assignment overrides
+    // against the exact same milestone across reloads and across the two apps.
+    const resolvedAssignee = shipTeamIds.find(uid => (responsibilities[uid]||[]).includes(t.responsibility));
     return {
-      id: makeId('ms'),
+      id: `${base.jobRef}-ms-${i}`,
       name: t.name,
       responsibility: t.responsibility,
+      assignedToId: resolvedAssignee || base.ownerId,
       status: isDone ? 'Completed' : 'Not Started',
       dueDate,
       completedBy,
@@ -1378,6 +1383,83 @@ const SHIPMENTS = {};
 SHIPMENT_LIST_BASE.forEach((base, i)=>{
   const detail = buildShipmentDetail(base, i+3);
   SHIPMENTS[base.jobRef] = detail;
+});
+
+/* ==========================================================================
+   Field Channel shared store — the Admin Portal and the mobile Field Channel
+   (field-channel.html) are two separate documents with no shared JS runtime,
+   so a real backend's "single authoritative milestone record" is simulated
+   here with localStorage (the shared record) plus a BroadcastChannel (for
+   instant push between tabs on the same device/browser). Only the fields
+   that can change post-creation — status, assignee, completion metadata —
+   live in the store; milestone identity/name/shipment context is derived
+   identically by both documents from the same deterministic seed data, and
+   keyed by the same deterministic milestone id (see buildShipmentDetail).
+   ========================================================================== */
+const FIELD_STORE_KEY = 'oneport365_field_store_v1';
+const FIELD_CHANNEL_NAME = 'oneport365_field_channel';
+const fieldChannel = ('BroadcastChannel' in window) ? new BroadcastChannel(FIELD_CHANNEL_NAME) : null;
+
+function fieldStoreRead(){
+  try {
+    const raw = localStorage.getItem(FIELD_STORE_KEY);
+    return raw ? JSON.parse(raw) : { overrides: {} };
+  } catch(e){ return { overrides: {} }; }
+}
+function fieldStoreWrite(store, {broadcast = true} = {}){
+  localStorage.setItem(FIELD_STORE_KEY, JSON.stringify(store));
+  if(broadcast && fieldChannel) fieldChannel.postMessage({type:'update'});
+}
+// Merges a change into the shared record for one milestone — the same helper
+// used whether the change originates from a Mark Complete click here in the
+// Admin Portal or (conceptually) from the Field Channel.
+function fieldStoreSetOverride(msId, patch){
+  const store = fieldStoreRead();
+  store.overrides[msId] = { ...(store.overrides[msId]||{}), ...patch, updatedAt: new Date().toISOString() };
+  fieldStoreWrite(store);
+  return store.overrides[msId];
+}
+// Applies the shared record on top of the freshly-generated (deterministic)
+// milestone defaults for every shipment currently held in memory — this is
+// the "revalidate" step, re-run on load and whenever another tab/device may
+// have changed something (BroadcastChannel message, storage event, tab
+// refocus, switching into the Progress tab).
+function applyFieldStoreOverrides(){
+  const store = fieldStoreRead();
+  Object.values(SHIPMENTS).forEach(s=>{
+    s.milestones.forEach(m=>{
+      const o = store.overrides[m.id];
+      if(!o) return;
+      if(o.status) m.status = o.status;
+      if(o.assignedToId) m.assignedToId = o.assignedToId;
+      if(o.completedBy !== undefined) m.completedBy = o.completedBy;
+      if(o.completedAt !== undefined) m.completedAt = o.completedAt ? new Date(o.completedAt) : null;
+      if(o.completedNote !== undefined) m.comment = o.completedNote;
+    });
+  });
+}
+applyFieldStoreOverrides();
+if(fieldChannel){
+  fieldChannel.onmessage = (e)=>{
+    if(e.data && e.data.type==='update'){
+      applyFieldStoreOverrides();
+      if(state.currentView==='shipment-detail') renderServiceDelivery();
+    }
+  };
+}
+// Cross-tab fallback for browsers/contexts without BroadcastChannel — the
+// storage event only fires in OTHER tabs, which is exactly the case we need.
+window.addEventListener('storage', (e)=>{
+  if(e.key===FIELD_STORE_KEY){
+    applyFieldStoreOverrides();
+    if(state.currentView==='shipment-detail') renderServiceDelivery();
+  }
+});
+document.addEventListener('visibilitychange', ()=>{
+  if(document.visibilityState==='visible'){
+    applyFieldStoreOverrides();
+    if(state.currentView==='shipment-detail') renderServiceDelivery();
+  }
 });
 
 /* ==========================================================================
@@ -1806,11 +1888,14 @@ function resolveTaskOwners(s, responsibility){
   return Object.keys(resp).filter(uid => (resp[uid]||[]).includes(responsibility)).map(teamMember);
 }
 
+// Milestone assignment is a single Operations Staff member (m.assignedToId) —
+// this is the field the Field Channel filters "my To-Dos" against, distinct
+// from the broader responsibility-based Shipment Team roster above.
 function renderServiceDelivery(){
   const s = currentShipment();
   el('service-delivery-template-pill').textContent = templateLabelOf(s);
   el('service-delivery-tbody').innerHTML = s.milestones.map(m=>{
-    const owners = resolveTaskOwners(s, m.responsibility);
+    const assignee = teamMember(m.assignedToId);
     const isDone = m.status==='Completed';
     const liveHealth = isDone ? null : computeLiveSlaHealth(m.dueDate);
     const rowClass = !isDone && liveHealth==='Breached' ? 'sla-breached' : !isDone && liveHealth==='At-Risk' ? 'sla-at-risk' : '';
@@ -1818,9 +1903,15 @@ function renderServiceDelivery(){
     let historyNote = '';
     if(isDone && m.completedSlaHealth==='Breached') historyNote = '<div class="sla-history-note breach">⚠ After Breach</div>';
     else if(isDone && m.completedSlaHealth==='At-Risk') historyNote = '<div class="sla-history-note at-risk">⚠ Completed While At-Risk</div>';
-    const ownerCell = owners.length
-      ? `<div class="task-owner-cell">${owners.map(o=>`<div class="owner-pill"><div class="avatar avatar-sm" style="${avatarFillStyle(o.fill)}">${o.initials}</div><span>${o.name.split(' ')[0]}</span></div>`).join('')}</div>`
-      : `<span class="task-owner-unassigned">Unassigned</span>`;
+    const ownerCell = `
+      <div class="dropdown">
+        <button type="button" class="task-owner-cell dropdown-toggle" style="border:none;background:none;padding:0;cursor:pointer" title="Reassign">
+          ${assignee ? `<div class="owner-pill"><div class="avatar avatar-sm" style="${avatarFillStyle(assignee.fill)}">${assignee.initials}</div><span>${assignee.name.split(' ')[0]}</span></div>` : `<span class="task-owner-unassigned">Unassigned</span>`}
+        </button>
+        <div class="dropdown-menu">
+          ${TEAM.map(t2=>`<button type="button" class="dropdown-item" data-set-assignee="${m.id}" data-assignee-id="${t2.id}">${t2.name}</button>`).join('')}
+        </div>
+      </div>`;
     return `
     <tr class="${rowClass}">
       <td><b class="task-name">${m.name}</b></td>
@@ -1894,6 +1985,9 @@ function switchTab(tab){
   document.querySelectorAll('.tab-btn').forEach(b=>b.classList.toggle('active', b.dataset.tab===tab));
   document.querySelectorAll('.tab-pane').forEach(p=>p.style.display='none');
   el('tab-'+tab).style.display='block';
+  // Revalidate against the shared Field Channel store on entry, in case an
+  // Operations Staff member completed/was reassigned a milestone elsewhere.
+  if(tab==='progress'){ applyFieldStoreOverrides(); renderServiceDelivery(); }
 }
 
 /* ==========================================================================
@@ -2595,7 +2689,7 @@ function buildManualShipmentDetail(draft, category, jobRef){
     const frac = template.length>1 ? i/(template.length-1) : 0;
     const dueDate = new Date(etdDate.getTime() + Math.max(span,0)*frac);
     dueDate.setHours(9 + ((i*3)%8), (i%2)*30, 0, 0);
-    return {id:makeId('ms'), name:t.name, responsibility:t.responsibility, status:'Not Started', dueDate, completedBy:'', completedAt:null, completedSlaHealth:null, comment:''};
+    return {id:`${jobRef}-ms-${i}`, name:t.name, responsibility:t.responsibility, assignedToId:primary.id, status:'Not Started', dueDate, completedBy:'', completedAt:null, completedSlaHealth:null, comment:''};
   });
 
   const trackingTemplate = buildTrackingTemplateFor(base);
@@ -2700,6 +2794,9 @@ el('save-milestone').addEventListener('click', ()=>{
   m.completedAt = new Date();
   m.completedSlaHealth = computeLiveSlaHealth(m.dueDate);
   m.comment = el('input-milestone-comment').value.trim();
+  // Write through to the shared Field Channel record so a signed-in Operations
+  // Staff member sees this completion the next time their app revalidates.
+  fieldStoreSetOverride(m.id, {status:'Completed', completedBy:m.completedBy, completedAt:m.completedAt.toISOString(), completedNote:m.comment});
   renderServiceDelivery();
   closeModal('modal-milestone');
   showToast('Milestone marked complete');
@@ -2985,6 +3082,23 @@ document.body.addEventListener('click', (e)=>{
 
   const msBtn = t.closest('[data-complete-ms]');
   if(msBtn){ openMilestoneModal(msBtn.dataset.completeMs); return; }
+
+  const setAssigneeBtn = t.closest('[data-set-assignee]');
+  if(setAssigneeBtn){
+    const msId = setAssigneeBtn.dataset.setAssignee;
+    const newId = setAssigneeBtn.dataset.assigneeId;
+    const s = currentShipment();
+    const m = s.milestones.find(x=>x.id===msId);
+    if(m && m.assignedToId !== newId){
+      // Reassignment must not reset milestone status — only the assignee changes.
+      m.assignedToId = newId;
+      fieldStoreSetOverride(msId, {assignedToId: newId});
+      renderServiceDelivery();
+      showToast(`Reassigned to ${teamMember(newId).name}`);
+    }
+    document.querySelectorAll('.dropdown.open').forEach(w=>w.classList.remove('open'));
+    return;
+  }
 
   const shipAction = t.closest('[data-ship-action]');
   if(shipAction){

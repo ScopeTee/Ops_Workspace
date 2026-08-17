@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>OnePort 365 · Field Channel</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Open+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ==========================================================================
+   OnePort 365 — Design tokens (kept identical to the Admin Portal's index.html
+   so the two channels feel like one product, just on two different surfaces)
+   ========================================================================== */
+:root{
+  --green-dark:#023819;
+  --green-dark-hover:#03571f;
+  --green-accent:#BFFB4F;
+  --green-accent-hover:#a9e83a;
+  --green-light:#D1DBBD;
+  --green-light-surface:#F4F6EF;
+  --gold:#FFCC1A;
+  --gold-bg:#FFF3CC;
+  --gold-text:#8a6a00;
+  --success:#1F8A5B;
+  --success-bg:#E1F1E8;
+  --error:#FF1A1A;
+  --error-bg:#FDE0E0;
+  --error-text:#cc1414;
+  --cream:#FDFBF1;
+  --white:#FFFFFF;
+  --silver-light:#808080;
+  --silver-dark:#383838;
+  --border-tint: rgba(2,56,25,.12);
+  --radius-sm:6px;
+  --radius-md:8px;
+  --radius-lg:12px;
+  --radius-xl:16px;
+  --shadow-e2: 0 2px 4px rgba(2,56,25,.05), 0 8px 20px -8px rgba(2,56,25,.14);
+  --font-display:'Poppins', system-ui, sans-serif;
+  --font-body:'Open Sans', system-ui, sans-serif;
+}
+*{box-sizing:border-box; -webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0}
+body{
+  font-family:var(--font-body);
+  color:var(--silver-dark);
+  background:var(--green-light-surface);
+  font-size:15px;
+  line-height:1.5;
+  -webkit-font-smoothing:antialiased;
+}
+h1,h2,h3{font-family:var(--font-display);color:var(--green-dark);margin:0}
+button{font-family:var(--font-body)}
+input,textarea{font-family:var(--font-body)}
+
+.fc-shell{max-width:480px;margin:0 auto;min-height:100vh;background:var(--cream);display:flex;flex-direction:column;position:relative;box-shadow:var(--shadow-e2)}
+.screen{display:none;flex-direction:column;min-height:100vh}
+.screen.active{display:flex}
+
+/* --- App bar --- */
+.fc-appbar{position:sticky;top:0;z-index:20;background:var(--green-dark);color:var(--white);padding:16px 18px;display:flex;align-items:center;justify-content:space-between;gap:10px}
+.fc-appbar h1{color:var(--white);font-size:17px}
+.fc-appbar .fc-sub{color:var(--green-light);font-size:12px;margin-top:2px}
+.fc-back-btn{background:none;border:none;color:var(--white);display:flex;align-items:center;gap:6px;padding:10px 4px;font-size:14px;font-weight:600;cursor:pointer;font-family:var(--font-body)}
+.fc-signout-btn{background:rgba(255,255,255,.12);border:none;color:var(--white);padding:9px 14px;border-radius:var(--radius-md);font-size:12.5px;font-weight:600;cursor:pointer}
+
+/* --- Sign-in screen --- */
+.fc-signin-body{flex:1;display:flex;flex-direction:column;justify-content:center;padding:32px 24px}
+.fc-signin-logo{width:56px;height:56px;border-radius:14px;background:var(--green-dark);color:var(--green-accent);display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-weight:700;font-size:20px;margin:0 auto 18px}
+.fc-signin-title{text-align:center;font-size:19px;margin-bottom:4px}
+.fc-signin-sub{text-align:center;color:var(--silver-light);font-size:13px;margin-bottom:28px}
+.fc-staff-row{display:flex;align-items:center;gap:12px;width:100%;background:var(--white);border:1.5px solid var(--border-tint);border-radius:var(--radius-lg);padding:14px 16px;margin-bottom:10px;cursor:pointer;font-family:var(--font-body);text-align:left;transition:.12s}
+.fc-staff-row:active{background:var(--green-light-surface);border-color:var(--green-accent-hover)}
+.fc-avatar{width:38px;height:38px;border-radius:50%;background:var(--green-dark);color:var(--green-accent);display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-weight:700;font-size:13px;flex-shrink:0}
+.fc-staff-name{font-weight:700;color:var(--green-dark);font-size:14.5px}
+.fc-staff-role{color:var(--silver-light);font-size:12px;margin-top:1px}
+
+/* --- Filter chips --- */
+.fc-filter-row{display:flex;gap:8px;padding:14px 16px 4px;overflow-x:auto}
+.fc-chip{flex-shrink:0;background:var(--white);border:1.5px solid var(--border-tint);color:var(--silver-dark);padding:9px 16px;border-radius:999px;font-size:13px;font-weight:600;cursor:pointer;font-family:var(--font-body);display:flex;align-items:center;gap:6px}
+.fc-chip.active{background:var(--green-dark);border-color:var(--green-dark);color:var(--white)}
+.fc-chip .fc-chip-count{opacity:.75;font-weight:700}
+
+/* --- To-Do list --- */
+.fc-list{padding:12px 16px 32px;flex:1}
+.fc-card{display:block;width:100%;text-align:left;background:var(--white);border:1px solid var(--border-tint);border-radius:var(--radius-lg);padding:16px;margin-bottom:12px;cursor:pointer;font-family:var(--font-body);box-shadow:var(--shadow-e2)}
+.fc-card:active{background:var(--green-light-surface)}
+.fc-card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:8px}
+.fc-card-title{font-family:var(--font-display);font-weight:700;color:var(--green-dark);font-size:15.5px;line-height:1.3}
+.fc-card-meta{font-size:12.5px;color:var(--silver-light);display:flex;flex-direction:column;gap:3px}
+.fc-card-meta b{color:var(--silver-dark);font-weight:600}
+.fc-card-foot{display:flex;align-items:center;justify-content:space-between;margin-top:10px;padding-top:10px;border-top:1px solid var(--border-tint)}
+.fc-due{font-size:12px;font-weight:700;color:var(--silver-dark)}
+.fc-due.overdue{color:var(--error-text)}
+
+.fc-status-badge{display:inline-flex;align-items:center;gap:5px;padding:5px 11px;border-radius:999px;font-size:11.5px;font-weight:700;letter-spacing:.02em;flex-shrink:0}
+.fc-status-badge.not-started{background:var(--gold-bg);color:var(--gold-text)}
+.fc-status-badge.completed{background:var(--success-bg);color:var(--success)}
+.fc-status-badge svg{flex-shrink:0}
+
+/* --- Empty state --- */
+.fc-empty{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:40px 30px;color:var(--silver-light)}
+.fc-empty-icon{width:56px;height:56px;border-radius:50%;background:var(--green-light-surface);display:flex;align-items:center;justify-content:center;margin-bottom:16px;color:var(--green-dark)}
+.fc-empty h3{color:var(--green-dark);font-size:16px;margin-bottom:6px}
+.fc-empty p{font-size:13px;margin:0;max-width:260px}
+
+/* --- Milestone detail --- */
+.fc-detail-body{flex:1;padding:18px 16px 110px}
+.fc-detail-block{background:var(--white);border:1px solid var(--border-tint);border-radius:var(--radius-lg);padding:18px;margin-bottom:16px}
+.fc-detail-block-head{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--silver-light);margin-bottom:14px}
+.fc-detail-milestone-name{font-size:20px;margin-bottom:10px}
+.fc-field-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px 14px}
+.fc-field-grid .full{grid-column:1 / -1}
+.fc-field .k{font-size:11px;letter-spacing:.05em;text-transform:uppercase;color:var(--silver-light);font-weight:700;margin-bottom:5px}
+.fc-field .v{font-size:14px;font-weight:600;color:var(--green-dark)}
+.fc-instruction{font-size:13.5px;color:var(--silver-dark);line-height:1.6;background:var(--green-light-surface);border-radius:var(--radius-md);padding:12px 14px}
+.fc-completed-meta{font-size:12.5px;color:var(--silver-light);margin-top:10px}
+
+.fc-primary-action{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;background:var(--cream);border-top:1px solid var(--border-tint);padding:14px 16px calc(14px + env(safe-area-inset-bottom));z-index:15}
+.fc-btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;border:none;border-radius:var(--radius-lg);padding:15px;font-family:var(--font-display);font-weight:600;font-size:15px;cursor:pointer}
+.fc-btn-accent{background:var(--green-accent);color:var(--green-dark)}
+.fc-btn-accent:active{background:var(--green-accent-hover)}
+.fc-btn-outline{background:var(--white);color:var(--green-dark);border:1.5px solid var(--border-tint)}
+.fc-btn-danger-text{background:none;color:var(--error-text);font-weight:600}
+.fc-note-textarea{width:100%;border:1.5px solid var(--border-tint);border-radius:var(--radius-md);padding:11px 13px;font-size:13.5px;resize:vertical;min-height:64px;margin-top:8px}
+
+.fc-inline-banner{display:flex;gap:10px;align-items:flex-start;background:var(--error-bg);color:var(--error-text);border-radius:var(--radius-md);padding:12px 14px;font-size:13px;margin-bottom:14px}
+
+/* --- Confirmation sheet --- */
+.fc-sheet-overlay{position:fixed;inset:0;background:rgba(2,56,25,.45);z-index:40;display:none;align-items:flex-end;justify-content:center}
+.fc-sheet-overlay.open{display:flex}
+.fc-sheet{width:100%;max-width:480px;background:var(--white);border-radius:20px 20px 0 0;padding:22px 20px calc(22px + env(safe-area-inset-bottom));box-shadow:var(--shadow-e2)}
+.fc-sheet h3{font-size:17px;margin-bottom:4px}
+.fc-sheet p.fc-sheet-sub{color:var(--silver-light);font-size:13px;margin:0 0 16px}
+.fc-sheet-chip{display:inline-block;background:var(--green-light-surface);color:var(--green-dark);font-weight:700;font-size:12.5px;padding:5px 10px;border-radius:999px;margin-bottom:14px}
+.fc-sheet-actions{display:flex;gap:10px;margin-top:18px}
+.fc-sheet-actions .fc-btn{flex:1}
+
+.fc-toast-wrap{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);z-index:60;display:flex;flex-direction:column;gap:8px;width:calc(100% - 40px);max-width:420px}
+.fc-toast{background:var(--green-dark);color:var(--white);padding:12px 16px;border-radius:var(--radius-md);font-size:13px;display:flex;align-items:center;gap:8px;box-shadow:var(--shadow-e2)}
+.fc-toast.error{background:var(--error)}
+</style>
+</head>
+<body>
+
+<div class="fc-shell" id="fc-shell">
+
+  <!-- Screen: Sign in (mock auth — see the session notes in the script block below) -->
+  <div class="screen active" id="screen-signin">
+    <div class="fc-signin-body">
+      <div class="fc-signin-logo">OP</div>
+      <h2 class="fc-signin-title">OnePort 365 Field Channel</h2>
+      <p class="fc-signin-sub">Select your name to see the milestones assigned to you.</p>
+      <div id="staff-list"></div>
+    </div>
+  </div>
+
+  <!-- Screen: To-Dos -->
+  <div class="screen" id="screen-todos">
+    <div class="fc-appbar">
+      <div>
+        <h1 id="todos-staff-name">To-Dos</h1>
+        <div class="fc-sub" id="todos-staff-sub"></div>
+      </div>
+      <button class="fc-signout-btn" id="btn-sign-out">Sign Out</button>
+    </div>
+    <div class="fc-filter-row" id="filter-row"></div>
+    <div id="todos-list-wrap"></div>
+  </div>
+
+  <!-- Screen: Milestone Detail -->
+  <div class="screen" id="screen-detail">
+    <div class="fc-appbar">
+      <button class="fc-back-btn" id="btn-back-to-todos">
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.4" viewBox="0 0 24 24"><path d="M19 12H5M11 18l-6-6 6-6" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+        To-Dos
+      </button>
+    </div>
+    <div class="fc-detail-body" id="detail-body"></div>
+  </div>
+
+  <!-- Completion confirmation sheet -->
+  <div class="fc-sheet-overlay" id="confirm-overlay">
+    <div class="fc-sheet">
+      <span class="fc-sheet-chip" id="confirm-shipment-chip"></span>
+      <h3>Mark milestone as complete?</h3>
+      <p class="fc-sheet-sub" id="confirm-milestone-name"></p>
+      <label class="fc-field"><span class="k" style="display:block;margin-bottom:6px">Completion note (optional)</span></label>
+      <textarea class="fc-note-textarea" id="confirm-note" placeholder="Add a note about this completion..."></textarea>
+      <div class="fc-sheet-actions">
+        <button class="fc-btn fc-btn-outline" id="confirm-cancel">Cancel</button>
+        <button class="fc-btn fc-btn-accent" id="confirm-complete">Complete</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="fc-toast-wrap" id="toast-wrap"></div>
+</div>
+
+<script>
+/* ==========================================================================
+   Shared deterministic seed data — copied verbatim (same values, same
+   formulas) from the Admin Portal's index.html, so both documents compute
+   the identical milestone id, name, due date, and default assignee for
+   every seed shipment. This is the "template/shipment-service" half of the
+   milestone record; the mutable half (status/assignee/completion) lives in
+   the shared FIELD_STORE below, which is the actual source of truth once a
+   real assignment/reassignment/completion happens from either channel.
+   ========================================================================== */
+const TEAM = [
+  {id:'u1', name:'James Adewale', role:'Sales Lead', initials:'JA'},
+  {id:'u2', name:'Sarah Adeyemi', role:'Ops Executive', initials:'SA'},
+  {id:'u3', name:'Michael Ibe', role:'Quotes Manager', initials:'MI'},
+  {id:'u4', name:'Titi Aluko', role:'Customs Coordinator', initials:'TA'},
+  {id:'u5', name:'Chidi Eze', role:'Documentation', initials:'CE'},
+  {id:'u6', name:'Ada Nwosu', role:'Finance', initials:'AN'},
+];
+function teamMember(id){ return TEAM.find(t=>t.id===id); }
+
+const RESPONSIBILITIES = ['Operations Manager','Operations Officer','Documentation Officer','Finance Officer','QA Officer','CX Officer','Clearing Officer','Transport Coordinator'];
+const RESPONSIBILITY_INSTRUCTION = {
+  'Operations Manager': 'Confirm the operational status of this step and sign off before the shipment proceeds.',
+  'Operations Officer': 'Coordinate directly with the carrier/agent to move this step forward and log the outcome.',
+  'Documentation Officer': 'Prepare, verify, and file the documents required for this step.',
+  'Finance Officer': 'Confirm the relevant payment or invoice has been processed for this step.',
+  'QA Officer': 'Inspect the cargo/paperwork for this step and flag any exceptions immediately.',
+  'CX Officer': 'Keep the customer informed and release any information they are waiting on for this step.',
+  'Clearing Officer': 'Handle the customs clearance action required for this step.',
+  'Transport Coordinator': 'Arrange and confirm the physical movement of cargo required for this step.',
+};
+
+const SERVICE_CATEGORIES = {
+  OCEAN: {label:'Ocean Freight'},
+  AIR: {label:'Air Freight'},
+  HAULAGE: {label:'Haulage'},
+  BROKERAGE: {label:'Customs Brokerage'},
+};
+function templateLabelOf(s){
+  if(s.category==='OCEAN') return s.direction==='Export' ? 'OneExport' : 'OneImport';
+  if(s.category==='AIR') return s.direction==='Export' ? 'OneAir Export' : 'OneAir Import';
+  if(s.category==='HAULAGE') return 'OneHaulage';
+  return 'OneClear';
+}
+// The Nigeria-based side of the move is where field execution actually happens —
+// destination for an Import, origin for an Export — used as the milestone's
+// "location" per the spec's To-Dos example ("Apapa Port").
+function localLocationOf(s){ return s.direction==='Import' ? s.destination : s.origin; }
+
+const OCEAN_EXPORT_TEMPLATE = [
+  {name:'Booking Placement', responsibility:'Operations Officer'},
+  {name:'Empty Container', responsibility:'Transport Coordinator'},
+  {name:'Clean CCI', responsibility:'Documentation Officer'},
+  {name:'Draft BL to Customer', responsibility:'Documentation Officer'},
+  {name:'Gate-In', responsibility:'Transport Coordinator'},
+  {name:'Inspection', responsibility:'QA Officer'},
+  {name:'Vessel Confirmation', responsibility:'Operations Manager'},
+  {name:'Sailing Confirmation', responsibility:'Operations Manager'},
+  {name:'OBL Issuance', responsibility:'Documentation Officer'},
+  {name:'Document Release', responsibility:'CX Officer'},
+];
+const OCEAN_IMPORT_TEMPLATE = [
+  {name:'Pre-Alert Receipt', responsibility:'CX Officer'},
+  {name:'Form M Validation', responsibility:'Documentation Officer'},
+  {name:'PAAR Application', responsibility:'Clearing Officer'},
+  {name:'Draft Assessment', responsibility:'Clearing Officer'},
+  {name:'Final Assessment', responsibility:'Clearing Officer'},
+  {name:'THC Payment', responsibility:'Finance Officer'},
+  {name:'Delivery', responsibility:'Transport Coordinator'},
+  {name:'Empty Return', responsibility:'Transport Coordinator'},
+  {name:'Post Delivery Docs', responsibility:'Documentation Officer'},
+  {name:'Document Release', responsibility:'CX Officer'},
+];
+const AIR_EXPORT_TEMPLATE = [
+  {name:'Booking Confirmation', responsibility:'Operations Officer'},
+  {name:'Cargo Received at Origin', responsibility:'Transport Coordinator'},
+  {name:'Screening & Documentation', responsibility:'Documentation Officer'},
+  {name:'MAWB Issuance', responsibility:'Documentation Officer'},
+  {name:'Export Customs Clearance', responsibility:'Clearing Officer'},
+  {name:'Flight Departure', responsibility:'Operations Manager'},
+  {name:'Flight Arrival Confirmation', responsibility:'Operations Manager'},
+  {name:'Document Release', responsibility:'CX Officer'},
+];
+const AIR_IMPORT_TEMPLATE = [
+  {name:'Pre-Alert Receipt', responsibility:'CX Officer'},
+  {name:'Flight Arrival Confirmation', responsibility:'Operations Manager'},
+  {name:'Cargo Received at Destination', responsibility:'Transport Coordinator'},
+  {name:'Import Customs Clearance', responsibility:'Clearing Officer'},
+  {name:'Duty Payment', responsibility:'Finance Officer'},
+  {name:'Delivery', responsibility:'Transport Coordinator'},
+  {name:'Document Release', responsibility:'CX Officer'},
+];
+const HAULAGE_TEMPLATE = [
+  {name:'Pickup Scheduled', responsibility:'Operations Officer'},
+  {name:'Vehicle Assigned', responsibility:'Transport Coordinator'},
+  {name:'Cargo Loaded', responsibility:'Transport Coordinator'},
+  {name:'In Transit', responsibility:'Transport Coordinator'},
+  {name:'Delivered', responsibility:'Transport Coordinator'},
+  {name:'Proof of Delivery Signed', responsibility:'CX Officer'},
+];
+const BROKERAGE_TEMPLATE = [
+  {name:'Documents Received', responsibility:'Documentation Officer'},
+  {name:'Form M / PAAR Validation', responsibility:'Documentation Officer'},
+  {name:'Declaration Lodged (SGD)', responsibility:'Clearing Officer'},
+  {name:'Customs Assessment', responsibility:'Clearing Officer'},
+  {name:'Duty Payment', responsibility:'Finance Officer'},
+  {name:'Examination / Inspection', responsibility:'QA Officer'},
+  {name:'Release Order Issued', responsibility:'Clearing Officer'},
+];
+function milestoneTemplateOf(s){
+  if(s.category==='OCEAN') return s.direction==='Export' ? OCEAN_EXPORT_TEMPLATE : OCEAN_IMPORT_TEMPLATE;
+  if(s.category==='AIR') return s.direction==='Export' ? AIR_EXPORT_TEMPLATE : AIR_IMPORT_TEMPLATE;
+  if(s.category==='HAULAGE') return HAULAGE_TEMPLATE;
+  return BROKERAGE_TEMPLATE;
+}
+
+const MONTH_MAP = {Jan:0,Feb:1,Mar:2,Apr:3,May:4,Jun:5,Jul:6,Aug:7,Sep:8,Oct:9,Nov:10,Dec:11};
+function parseDisplayDate(str){
+  const [d,mon,y] = str.split(' ');
+  return new Date(parseInt(y,10), MONTH_MAP[mon], parseInt(d,10));
+}
+function formatDueDateTime(date){
+  if(!date) return 'No due date';
+  const now = new Date();
+  const startOfDay = d => new Date(d.getFullYear(), d.getMonth(), d.getDate());
+  const diffDays = Math.round((startOfDay(date) - startOfDay(now)) / 86400000);
+  const timeStr = date.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit',hour12:false});
+  const dateStr = date.toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'});
+  if(diffDays === 0) return `Due Today · ${timeStr}`;
+  if(diffDays === 1) return `Due Tomorrow · ${timeStr}`;
+  if(diffDays < 0) return `Overdue · ${dateStr}`;
+  return `Due ${dateStr} · ${timeStr}`;
+}
+function isOverdue(date, status){ return status!=='Completed' && !!date && date.getTime() < Date.now(); }
+
+// Lite shipment records — same jobRef/category/direction/customer/origin/
+// destination/etd/eta/ownerId/supportingOwnerIds/completedMilestones values as
+// SHIPMENT_LIST_BASE in index.html. Commodity/container/document detail is
+// deliberately not duplicated here — the Field Channel doesn't need it (see
+// spec §19, "should not become a complete shipment-management application").
+const SHIPMENT_LIST_BASE = [
+  {jobRef:'ZELO000001', category:'OCEAN', direction:'Import', customer:'Dangote Industries', origin:'Shanghai, China', destination:'Lagos, Nigeria', eta:'02 Aug 2026', etd:'12 Jul 2026', ownerId:'u1', supportingOwnerIds:['u5','u6'], completedMilestones:4},
+  {jobRef:'ZELO000002', category:'OCEAN', direction:'Import', customer:'Nestlé West Africa', origin:'Rotterdam, Netherlands', destination:'Tema, Ghana', eta:'29 Jul 2026', etd:'05 Jul 2026', ownerId:'u2', supportingOwnerIds:['u4'], completedMilestones:6},
+  {jobRef:'ZELO000003', category:'OCEAN', direction:'Import', customer:'Julius Berger Nigeria', origin:'Hamburg, Germany', destination:'Lagos, Nigeria', eta:'20 Jul 2026', etd:'01 Jul 2026', ownerId:'u3', supportingOwnerIds:[], completedMilestones:1},
+  {jobRef:'ZELO000004', category:'AIR', direction:'Import', customer:'MTN Nigeria', origin:'Shenzhen, China', destination:'Lagos, Nigeria', eta:'31 Jul 2026', etd:'27 Jul 2026', ownerId:'u4', supportingOwnerIds:['u1'], completedMilestones:2},
+  {jobRef:'ZELO000005', category:'OCEAN', direction:'Export', customer:'Dufil Prima Foods', origin:'Lagos, Nigeria', destination:'Douala, Cameroon', eta:'26 Jul 2026', etd:'14 Jul 2026', ownerId:'u5', supportingOwnerIds:['u2','u3'], completedMilestones:7},
+  {jobRef:'ZELO000006', category:'OCEAN', direction:'Import', customer:'Nigerian Breweries', origin:'Antwerp, Belgium', destination:'Lagos, Nigeria', eta:'10 Jul 2026', etd:'20 Jun 2026', ownerId:'u6', supportingOwnerIds:[], completedMilestones:10},
+  {jobRef:'ZELO000007', category:'HAULAGE', direction:'Import', customer:'Flour Mills of Nigeria', origin:'Apapa Port, Lagos', destination:'Bompai Industrial Estate, Kano', eta:'21 Jul 2026', etd:'18 Jul 2026', ownerId:'u3', supportingOwnerIds:['u4'], completedMilestones:3},
+  {jobRef:'ZELO000008', category:'BROKERAGE', direction:'Import', customer:'Unilever Nigeria', origin:'Port of Rotterdam', destination:'Apapa Port, Lagos', eta:'22 Jul 2026', etd:'08 Jul 2026', ownerId:'u4', supportingOwnerIds:['u6'], completedMilestones:4},
+];
+
+// Identical formula to index.html's assignResponsibilities — same seed, same
+// shipTeamIds order, so the same responsibility→uid pool rotation results.
+function assignResponsibilities(shipTeamIds, seed){
+  const resp = {};
+  resp[shipTeamIds[0]] = ['Operations Manager'];
+  const pool = RESPONSIBILITIES.filter(r=>r!=='Operations Manager');
+  let poolIdx = seed % pool.length;
+  for(let i=1;i<shipTeamIds.length;i++){
+    const id = shipTeamIds[i];
+    if(!resp[id]) resp[id] = [];
+    resp[id].push(pool[poolIdx % pool.length]); poolIdx++;
+    resp[id].push(pool[poolIdx % pool.length]); poolIdx++;
+  }
+  if(seed===7){
+    Object.keys(resp).forEach(id=>{ resp[id] = resp[id].filter(r=>r!=='QA Officer'); });
+  }
+  return resp;
+}
+
+// Builds the deterministic milestone base list for one shipment — same id
+// scheme, due-date formula, and default-assignee resolution as
+// buildShipmentDetail() in index.html, so both documents agree on every
+// milestone's identity before any FIELD_STORE override is applied.
+function buildMilestonesFor(base, seed){
+  const shipTeamIds = [base.ownerId, ...(base.supportingOwnerIds||[])];
+  const responsibilities = assignResponsibilities(shipTeamIds, seed);
+  const template = milestoneTemplateOf(base);
+  const etdDate = parseDisplayDate(base.etd);
+  const etaDate = parseDisplayDate(base.eta);
+  const span = etaDate.getTime() - etdDate.getTime();
+  const completedCount = base.completedMilestones;
+
+  return template.map((t,i)=>{
+    let dueDate = new Date(etdDate.getTime() + span*(template.length>1 ? i/(template.length-1) : 0));
+    dueDate.setHours(9 + ((i*3)%8), (i%2)*30, 0, 0);
+    if(i === template.length-1 && seed % 3 === 0) dueDate = null;
+    if(seed===3 && i===4){ dueDate = new Date(); dueDate.setHours(14,30,0,0); }
+    if(seed===4 && i===6){ dueDate = new Date(); dueDate.setDate(dueDate.getDate()+1); dueDate.setHours(10,0,0,0); }
+    const isDone = i < completedCount;
+    const resolvedAssignee = shipTeamIds.find(uid => (responsibilities[uid]||[]).includes(t.responsibility));
+    return {
+      id: `${base.jobRef}-ms-${i}`,
+      shipmentJobRef: base.jobRef,
+      customer: base.customer,
+      category: base.category,
+      direction: base.direction,
+      origin: base.origin,
+      destination: base.destination,
+      name: t.name,
+      responsibility: t.responsibility,
+      assignedToId: resolvedAssignee || base.ownerId,
+      status: isDone ? 'Completed' : 'Not Started',
+      dueDate,
+      completedBy: isDone ? teamMember(shipTeamIds[(i+seed+1)%shipTeamIds.length]).name : '',
+      completedAt: isDone ? new Date(Date.now() - (template.length-i)*86400000).toISOString() : null,
+      completedNote: '',
+    };
+  });
+}
+
+/* ==========================================================================
+   Field Channel shared store — same key, same schema, same BroadcastChannel
+   name as index.html's FIELD_STORE. This is the one authoritative record for
+   everything that can change after a milestone is created (status, assignee,
+   completion metadata); everything else about a milestone is recomputed
+   identically above from the shared seed data.
+   ========================================================================== */
+const FIELD_STORE_KEY = 'oneport365_field_store_v1';
+const FIELD_CHANNEL_NAME = 'oneport365_field_channel';
+const fieldChannel = ('BroadcastChannel' in window) ? new BroadcastChannel(FIELD_CHANNEL_NAME) : null;
+
+function fieldStoreRead(){
+  try {
+    const raw = localStorage.getItem(FIELD_STORE_KEY);
+    return raw ? JSON.parse(raw) : { overrides: {} };
+  } catch(e){ return { overrides: {} }; }
+}
+function fieldStoreWrite(store, {broadcast = true} = {}){
+  localStorage.setItem(FIELD_STORE_KEY, JSON.stringify(store));
+  if(broadcast && fieldChannel) fieldChannel.postMessage({type:'update'});
+}
+function fieldStoreSetOverride(msId, patch){
+  const store = fieldStoreRead();
+  store.overrides[msId] = { ...(store.overrides[msId]||{}), ...patch, updatedAt: new Date().toISOString() };
+  fieldStoreWrite(store);
+  return store.overrides[msId];
+}
+function fieldStoreGetOverride(msId){ return fieldStoreRead().overrides[msId]; }
+
+// Rebuilds the full milestone list from scratch, base defaults + current
+// FIELD_STORE overrides on top — called on every "revalidate" moment (load,
+// returning to To-Dos, before completing, after completing, cross-tab push).
+function loadMilestones(){
+  const store = fieldStoreRead();
+  const all = [];
+  SHIPMENT_LIST_BASE.forEach((base, i)=>{
+    const seed = i + 3; // identical seed formula to index.html (i+3)
+    buildMilestonesFor(base, seed).forEach(m=>{
+      const o = store.overrides[m.id];
+      if(o){
+        if(o.status) m.status = o.status;
+        if(o.assignedToId) m.assignedToId = o.assignedToId;
+        if(o.completedBy !== undefined) m.completedBy = o.completedBy;
+        if(o.completedAt !== undefined) m.completedAt = o.completedAt;
+        if(o.completedNote !== undefined) m.completedNote = o.completedNote;
+      }
+      all.push(m);
+    });
+  });
+  return all;
+}
+
+/* ==========================================================================
+   Session — mock sign-in. There is no real backend/identity provider behind
+   this static prototype, so "authentication" here is a device-local staff
+   picker; the chosen id is what a real deployment's authenticated session
+   would supply. Kept in its own localStorage key, separate from the shared
+   FIELD_STORE, since it is per-device, not part of the operational record.
+   ========================================================================== */
+const SESSION_KEY = 'oneport365_field_session_v1';
+function getSession(){
+  try { return JSON.parse(localStorage.getItem(SESSION_KEY) || 'null'); } catch(e){ return null; }
+}
+function setSession(staffId){ localStorage.setItem(SESSION_KEY, JSON.stringify({staffId})); }
+function clearSession(){ localStorage.removeItem(SESSION_KEY); }
+
+/* ==========================================================================
+   App state & rendering
+   ========================================================================== */
+const state = { filter: 'ALL', activeMilestoneId: null };
+
+function el(id){ return document.getElementById(id); }
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  el(id).classList.add('active');
+  window.scrollTo(0,0);
+}
+function showToast(msg, type='success'){
+  const wrap = el('toast-wrap');
+  const t = document.createElement('div');
+  t.className = 'fc-toast ' + type;
+  t.textContent = msg;
+  wrap.appendChild(t);
+  setTimeout(()=>{ t.style.opacity='0'; t.style.transition='opacity .25s'; setTimeout(()=>t.remove(),260); }, 2600);
+}
+
+function renderSignIn(){
+  el('staff-list').innerHTML = TEAM.map(t=>`
+    <button type="button" class="fc-staff-row" data-signin="${t.id}">
+      <div class="fc-avatar">${t.initials}</div>
+      <div>
+        <div class="fc-staff-name">${t.name}</div>
+        <div class="fc-staff-role">${t.role}</div>
+      </div>
+    </button>`).join('');
+}
+
+function currentStaff(){
+  const session = getSession();
+  return session ? teamMember(session.staffId) : null;
+}
+
+function myMilestones(){
+  const staff = currentStaff();
+  if(!staff) return [];
+  return loadMilestones().filter(m=>m.assignedToId===staff.id);
+}
+
+const FILTERS = [
+  {key:'ALL', label:'All'},
+  {key:'Not Started', label:'Not Started'},
+  {key:'Completed', label:'Completed'},
+];
+
+function renderFilterRow(mine){
+  el('filter-row').innerHTML = FILTERS.map(f=>{
+    const count = f.key==='ALL' ? mine.length : mine.filter(m=>m.status===f.key).length;
+    return `<button type="button" class="fc-chip ${state.filter===f.key?'active':''}" data-filter="${f.key}">${f.label} <span class="fc-chip-count">${count}</span></button>`;
+  }).join('');
+}
+
+function renderTodoCard(m){
+  const isDone = m.status==='Completed';
+  const dueLabel = formatDueDateTime(m.dueDate);
+  const overdue = isOverdue(m.dueDate, m.status);
+  return `
+  <button type="button" class="fc-card" data-open-ms="${m.id}">
+    <div class="fc-card-top">
+      <div>
+        <div class="fc-card-title">${m.name}</div>
+        <div class="fc-card-meta" style="margin-top:6px">
+          <span><b>${m.shipmentJobRef}</b> · ${SERVICE_CATEGORIES[m.category].label} · ${templateLabelOf(m)}</span>
+          <span>${localLocationOf(m)}</span>
+        </div>
+      </div>
+      <span class="fc-status-badge ${isDone?'completed':'not-started'}">${isDone?'Completed':'Not Started'}</span>
+    </div>
+    <div class="fc-card-foot">
+      <span class="fc-due ${overdue?'overdue':''}">${dueLabel}</span>
+      <span style="font-size:12px;color:var(--silver-light)">${m.customer}</span>
+    </div>
+  </button>`;
+}
+
+function renderTodos(){
+  const staff = currentStaff();
+  if(!staff){ showScreen('screen-signin'); return; }
+  el('todos-staff-name').textContent = `Hi, ${staff.name.split(' ')[0]}`;
+  el('todos-staff-sub').textContent = staff.role;
+
+  const mine = myMilestones();
+  renderFilterRow(mine);
+
+  const filtered = state.filter==='ALL' ? mine : mine.filter(m=>m.status===state.filter);
+  // Not Started first, soonest due date first, within each group.
+  filtered.sort((a,b)=>{
+    if(a.status!==b.status) return a.status==='Completed' ? 1 : -1;
+    if(!a.dueDate) return 1; if(!b.dueDate) return -1;
+    return new Date(a.dueDate) - new Date(b.dueDate);
+  });
+
+  const wrap = el('todos-list-wrap');
+  if(!mine.length){
+    wrap.innerHTML = `
+      <div class="fc-empty">
+        <div class="fc-empty-icon"><svg width="26" height="26" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5" stroke-linecap="round" stroke-linejoin="round"></path></svg></div>
+        <h3>You're all caught up.</h3>
+        <p>There are no milestones assigned to you right now.</p>
+      </div>`;
+    return;
+  }
+  if(!filtered.length){
+    wrap.innerHTML = `
+      <div class="fc-empty">
+        <div class="fc-empty-icon"><svg width="26" height="26" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"></circle><path d="M12 8v4M12 16h.01" stroke-linecap="round"></path></svg></div>
+        <h3>No completed milestones yet.</h3>
+        <p>Milestones you mark complete will show up here.</p>
+      </div>`;
+    return;
+  }
+  wrap.innerHTML = `<div class="fc-list">${filtered.map(renderTodoCard).join('')}</div>`;
+}
+
+function renderDetail(){
+  const staff = currentStaff();
+  const m = loadMilestones().find(x=>x.id===state.activeMilestoneId);
+  if(!staff || !m){ showScreen('screen-todos'); renderTodos(); return; }
+
+  const isDone = m.status==='Completed';
+  const isMine = m.assignedToId===staff.id;
+  const instruction = RESPONSIBILITY_INSTRUCTION[m.responsibility] || 'No additional instructions provided for this milestone.';
+
+  // isPrimaryAction: the "Mark as Complete" bar is sticky-positioned outside
+  // the scrollable body (appended directly to #screen-detail below), while
+  // the other two cases are plain inline content within detail-body.
+  let actionHtml = '';
+  let isPrimaryAction = false;
+  if(isDone){
+    actionHtml = `
+      <div class="fc-detail-block">
+        <div class="fc-detail-block-head">Status</div>
+        <span class="fc-status-badge completed" style="margin-bottom:8px">Completed</span>
+        <div class="fc-completed-meta">
+          ${m.completedBy ? `Completed by <b>${m.completedBy}</b>` : ''}
+          ${m.completedAt ? ` on ${new Date(m.completedAt).toLocaleString('en-GB',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'})}` : ''}
+        </div>
+        ${m.completedNote ? `<div class="fc-instruction" style="margin-top:10px">${m.completedNote}</div>` : ''}
+      </div>`;
+  } else if(!isMine){
+    actionHtml = `<div class="fc-inline-banner">This milestone is no longer assigned to you.</div>`;
+  } else {
+    isPrimaryAction = true;
+    actionHtml = `
+      <div class="fc-primary-action">
+        <button class="fc-btn fc-btn-accent" id="btn-mark-complete">
+          <svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="2.6" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+          Mark as Complete
+        </button>
+      </div>`;
+  }
+
+  el('detail-body').innerHTML = `
+    <div class="fc-detail-block">
+      <div class="fc-detail-block-head">Milestone</div>
+      <h2 class="fc-detail-milestone-name">${m.name}</h2>
+      <span class="fc-status-badge ${isDone?'completed':'not-started'}">${isDone?'Completed':'Not Started'}</span>
+      <div class="fc-instruction" style="margin-top:14px">${instruction}</div>
+    </div>
+    <div class="fc-detail-block">
+      <div class="fc-detail-block-head">Shipment</div>
+      <div class="fc-field-grid">
+        <div class="fc-field"><div class="k">Shipment Reference</div><div class="v">${m.shipmentJobRef}</div></div>
+        <div class="fc-field"><div class="k">Customer</div><div class="v">${m.customer}</div></div>
+        <div class="fc-field"><div class="k">Service Type</div><div class="v">${SERVICE_CATEGORIES[m.category].label} · ${m.direction}</div></div>
+        <div class="fc-field"><div class="k">Template</div><div class="v">${templateLabelOf(m)}</div></div>
+        <div class="fc-field full"><div class="k">Location</div><div class="v">${localLocationOf(m)}</div></div>
+        <div class="fc-field full"><div class="k">Route</div><div class="v">${m.origin} → ${m.destination}</div></div>
+        <div class="fc-field"><div class="k">Due</div><div class="v">${formatDueDateTime(m.dueDate)}</div></div>
+      </div>
+    </div>
+  `;
+  if(!isPrimaryAction) el('detail-body').insertAdjacentHTML('beforeend', actionHtml);
+  // The sticky primary action lives outside the scrollable body, appended to
+  // the screen directly so it stays pinned to the bottom of the viewport.
+  const existing = document.getElementById('detail-primary-action');
+  if(existing) existing.remove();
+  if(isPrimaryAction){
+    const holder = document.createElement('div');
+    holder.id = 'detail-primary-action';
+    holder.innerHTML = actionHtml;
+    el('screen-detail').appendChild(holder);
+  }
+}
+
+function openDetail(msId){
+  state.activeMilestoneId = msId;
+  showScreen('screen-detail');
+  renderDetail();
+}
+
+/* ==========================================================================
+   Completion flow — always revalidates against the live FIELD_STORE right
+   before applying the mutation, per the spec's concurrency requirements:
+   the milestone may have been completed or reassigned by the Admin Portal
+   (or another device) since this screen was opened.
+   ========================================================================== */
+function openConfirmSheet(){
+  const m = loadMilestones().find(x=>x.id===state.activeMilestoneId);
+  if(!m) return;
+  el('confirm-shipment-chip').textContent = m.shipmentJobRef;
+  el('confirm-milestone-name').textContent = m.name;
+  el('confirm-note').value = '';
+  el('confirm-overlay').classList.add('open');
+}
+function closeConfirmSheet(){ el('confirm-overlay').classList.remove('open'); }
+
+function submitCompletion(){
+  const staff = currentStaff();
+  const msId = state.activeMilestoneId;
+  // Revalidate: re-read the authoritative store right before writing.
+  const fresh = loadMilestones().find(x=>x.id===msId);
+  closeConfirmSheet();
+  if(!fresh){ showToast('This milestone is no longer available.', 'error'); showScreen('screen-todos'); renderTodos(); return; }
+  if(fresh.status==='Completed'){ showToast('This milestone has already been completed.'); renderDetail(); return; }
+  if(fresh.assignedToId !== staff.id){ showToast('This milestone is no longer assigned to you.', 'error'); renderDetail(); return; }
+
+  const note = el('confirm-note').value.trim();
+  fieldStoreSetOverride(msId, {
+    status: 'Completed',
+    completedBy: staff.name,
+    completedAt: new Date().toISOString(),
+    completedNote: note,
+  });
+  showToast('Milestone marked complete');
+  renderDetail();
+}
+
+/* ==========================================================================
+   Data freshness — revalidate on load, on return to To-Dos, on cross-tab
+   push (BroadcastChannel + storage event fallback), and on tab refocus.
+   ========================================================================== */
+function revalidateVisible(){
+  const activeScreen = document.querySelector('.screen.active');
+  if(!activeScreen) return;
+  if(activeScreen.id==='screen-todos') renderTodos();
+  else if(activeScreen.id==='screen-detail') renderDetail();
+}
+if(fieldChannel) fieldChannel.onmessage = (e)=>{ if(e.data && e.data.type==='update') revalidateVisible(); };
+window.addEventListener('storage', (e)=>{ if(e.key===FIELD_STORE_KEY) revalidateVisible(); });
+document.addEventListener('visibilitychange', ()=>{ if(document.visibilityState==='visible') revalidateVisible(); });
+
+/* ==========================================================================
+   Event wiring
+   ========================================================================== */
+document.body.addEventListener('click', (e)=>{
+  const t = e.target;
+
+  const signinBtn = t.closest('[data-signin]');
+  if(signinBtn){
+    setSession(signinBtn.dataset.signin);
+    state.filter = 'ALL';
+    showScreen('screen-todos');
+    renderTodos();
+    return;
+  }
+  if(t.closest('#btn-sign-out')){
+    clearSession();
+    showScreen('screen-signin');
+    return;
+  }
+  const filterBtn = t.closest('[data-filter]');
+  if(filterBtn){
+    state.filter = filterBtn.dataset.filter;
+    renderTodos();
+    return;
+  }
+  const cardBtn = t.closest('[data-open-ms]');
+  if(cardBtn){ openDetail(cardBtn.dataset.openMs); return; }
+
+  if(t.closest('#btn-back-to-todos')){ showScreen('screen-todos'); renderTodos(); return; }
+  if(t.closest('#btn-mark-complete')){ openConfirmSheet(); return; }
+  if(t.closest('#confirm-cancel')){ closeConfirmSheet(); return; }
+  if(t.closest('#confirm-complete')){ submitCompletion(); return; }
+  if(t.target===el('confirm-overlay')){ closeConfirmSheet(); return; }
+});
+
+/* ==========================================================================
+   Init
+   ========================================================================== */
+renderSignIn();
+if(currentStaff()){ showScreen('screen-todos'); renderTodos(); }
+else { showScreen('screen-signin'); }
+</script>
+</body>
+</html>
