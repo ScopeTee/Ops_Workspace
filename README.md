@@ -97,20 +97,25 @@ sequence (section 43):
 - **To-Dos** — milestones assigned to the signed-in user, sorted by due
   date (earliest first). A completed milestone is not shown here at all —
   once done, it's off the Field Channel, so there's no separate
-  "Completed" filter. Each card shows the customer, the shipment's
-  transport type, the execution location, and an SLA indicator
-  (Healthy / At Risk / Breached, derived from the due date) alongside a
-  "Mark Complete" action, so a milestone can be completed straight from
-  the list without opening it. The "You're all caught up" empty state is
-  from spec section 35.
-- **Milestone Detail** — a compact, single-screen view (no scrolling
-  needed to reach the action button): an SLA/status banner, the milestone
-  name, and the shipment context needed to execute it (reference,
-  customer, transport, route, location). Opened only for a milestone that
-  is still `NOT_STARTED` and assigned to the signed-in user; if it's
-  already been completed or reassigned elsewhere by the time the screen
-  loads, the app shows the message and returns to To-Dos rather than
-  rendering a dead page.
+  "Completed" filter. A search box filters the list by shipment number,
+  customer name, or task name. Each card shows the customer, the
+  shipment's transport type, the route, and an SLA indicator (Healthy /
+  At Risk / Breached, both date and time, derived from the due date)
+  alongside a "Mark Complete" action, so a milestone can be completed
+  straight from the list without opening it. The "You're all caught up"
+  empty state is from spec section 35. There's no manual refresh button —
+  the list already revalidates on load, on return to this screen, and
+  whenever the store notifies of a change elsewhere (spec section 36), so
+  a button that does the same thing on demand was redundant.
+- **Milestone Detail** — an SLA/status banner, the milestone name, and the
+  shipment context needed to execute it (reference, customer, shipment
+  type, transport, B/L or AWB number, route, location). The primary
+  action always stays reachable without scrolling — it's pinned below the
+  (independently scrollable) content, never the page itself. Opened only
+  for a milestone that is still `NOT_STARTED` and assigned to the
+  signed-in user; if it's already been completed or reassigned elsewhere
+  by the time the screen loads, the app shows the message and returns to
+  To-Dos rather than rendering a dead page.
 - **Completion confirmation** — a bottom sheet with an optional note,
   requiring a deliberate second action before the mutation fires (spec
   section 16.2). Reachable from either the To-Dos card or the Detail
@@ -191,9 +196,17 @@ migration on this shape.
     manual, one-shot copy for testing convenience — not live sync, so
     re-copy the link any time you want the two devices to match again.
 - `MilestoneStore` seeds fresh demo data on first load per browser and
-  keeps mutations after that. The seed itself is fully deterministic (no
-  `Date.now()`/`Math.random()` in it), so two devices that have never
-  synced still start from byte-identical data — divergence only comes
-  from mutations made independently on each device. Call
-  `MilestoneStore.resetDemoData()` from either app's console to start
-  over.
+  keeps mutations after that. There's no `Math.random()` anywhere in the
+  seed, and most of it is fully fixed — but a not-started milestone's due
+  date is deliberately generated relative to *today* (cycling through a
+  fixed spread of day-offsets), not pinned to a fixed calendar date. A
+  demo whose due dates are hardcoded to specific 2026 dates eventually
+  drifts entirely into the past as real time moves on — which is exactly
+  what caused every single milestone to show as Breached before this was
+  fixed. The trade-off: two devices seeding fresh on different calendar
+  days will get different due dates for "the same" milestone, but two
+  devices seeding on the same day (the overwhelmingly common case in
+  practice) still get identical data, and the sync-link feature above
+  transfers actual values rather than re-deriving them, so it's
+  unaffected either way. Call `MilestoneStore.resetDemoData()` from either
+  app's console to start over.

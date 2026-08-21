@@ -35,16 +35,21 @@
   --font-body:'Open Sans', system-ui, sans-serif;
 }
 *{box-sizing:border-box; -webkit-tap-highlight-color:transparent}
-html,body{margin:0;padding:0}
+html,body{margin:0;padding:0; height:100%; overflow:hidden;}
 body{
   font-family:var(--font-body); color:var(--silver-dark); background:var(--green-light-surface);
-  font-size:15px; line-height:1.5; min-height:100vh;
+  font-size:15px; line-height:1.5;
 }
 h1,h2,h3{font-family:var(--font-display); color:var(--green-dark); margin:0}
 button{font-family:var(--font-body); cursor:pointer}
 input,textarea{font-family:var(--font-body)}
 
-.app{ max-width:520px; margin:0 auto; height:100vh; background:var(--cream); display:flex; flex-direction:column; box-shadow:var(--shadow-e2); position:relative; overflow:hidden; }
+/* height set twice deliberately: 100vh is the fallback for browsers
+   without dvh support; 100dvh (where supported) tracks the real visible
+   viewport so mobile browser chrome (address bar) can't leave a sliver
+   of extra document height that drags the whole page into scrolling —
+   which is what was pulling the bottom nav and action bar along with it. */
+.app{ max-width:520px; margin:0 auto; height:100vh; height:100dvh; background:var(--cream); display:flex; flex-direction:column; box-shadow:var(--shadow-e2); position:relative; overflow:hidden; }
 
 /* ---- Top bar ---- */
 .topbar{
@@ -58,15 +63,18 @@ input,textarea{font-family:var(--font-body)}
 
 .identity-row{ display:flex; align-items:center; justify-content:space-between; margin-bottom:12px; }
 .brand-mark{ width:30px; height:30px; border-radius:8px; background:var(--green-accent); color:var(--green-dark); display:grid; place-items:center; font-family:var(--font-display); font-weight:700; font-size:12px; flex-shrink:0; }
-.page-head{ display:flex; align-items:center; justify-content:space-between; gap:10px; }
+.page-head{ display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:10px; }
 .page-head h1{ color:var(--cream); font-size:20px; flex:1; }
+
+.search-bar{ display:flex; align-items:center; gap:8px; background:rgba(253,251,241,.12); border-radius:999px; padding:9px 14px; color:rgba(253,251,241,.65); }
+.search-bar svg{ flex-shrink:0; }
+.search-bar input{ background:none; border:none; outline:none; color:var(--cream); font-size:13.5px; width:100%; }
+.search-bar input::placeholder{ color:rgba(253,251,241,.55); }
 
 .user-chip{ display:flex; align-items:center; gap:7px; background:rgba(253,251,241,.1); border:none; color:var(--cream); padding:6px 10px 6px 6px; border-radius:999px; font-size:12.5px; font-weight:600; }
 .avatar{ width:24px; height:24px; border-radius:50%; background:var(--green-accent); color:var(--green-dark); display:grid; place-items:center; font-family:var(--font-display); font-weight:700; font-size:11px; flex-shrink:0 }
-.refresh-btn{ background:none; border:none; color:var(--cream); padding:6px; margin:-6px; border-radius:var(--radius-sm); display:flex; }
 .sync-link-btn{ background:none; border:none; color:rgba(253,251,241,.6); padding:6px; display:flex; border-radius:var(--radius-sm); }
 .sync-link-btn:active{ background:rgba(255,255,255,.12); color:var(--cream); }
-.refresh-btn.spinning svg{ animation: spin .8s linear infinite; }
 @keyframes spin{ to{ transform:rotate(360deg); } }
 
 /* ---- Screens ---- */
@@ -114,7 +122,7 @@ input,textarea{font-family:var(--font-body)}
 .info-row .v{ color:var(--silver-dark); font-weight:600; text-align:right; }
 
 /* ---- Bottom action bar (per-screen primary action) ---- */
-.bottom-bar{ background:var(--cream); border-top:1px solid var(--border-tint); padding:14px 18px; flex-shrink:0; }
+.bottom-bar{ position:sticky; bottom:0; z-index:15; background:var(--cream); border-top:1px solid var(--border-tint); padding:14px 18px; flex-shrink:0; }
 .btn{ font-family:var(--font-display); font-weight:600; font-size:15px; border-radius:var(--radius-md); border:none; padding:14px 18px; width:100%; display:flex; align-items:center; justify-content:center; gap:8px; }
 .btn-primary{ background:var(--green-dark); color:var(--green-accent); }
 .btn-primary:active{ background:var(--green-dark-hover); }
@@ -122,7 +130,7 @@ input,textarea{font-family:var(--font-body)}
 .btn-outline{ background:var(--white); color:var(--green-dark); border:1.5px solid var(--border-tint); }
 
 /* ---- Bottom tab navigation ---- */
-.bottom-nav{ display:flex; background:var(--white); border-top:1px solid var(--border-tint); flex-shrink:0; padding:4px 6px calc(4px + env(safe-area-inset-bottom)); }
+.bottom-nav{ position:sticky; bottom:0; z-index:15; display:flex; background:var(--white); border-top:1px solid var(--border-tint); flex-shrink:0; padding:4px 6px calc(4px + env(safe-area-inset-bottom)); }
 .bottom-nav.hidden{ display:none; }
 .nav-item{ flex:1; display:flex; flex-direction:column; align-items:center; gap:2px; background:none; border:none; padding:8px 4px 6px; color:var(--silver-light); }
 .nav-item svg{ stroke:var(--silver-light); }
@@ -205,9 +213,10 @@ input,textarea{font-family:var(--font-body)}
       </div>
       <div class="page-head">
         <h1>My To-Dos</h1>
-        <button class="refresh-btn" id="btn-refresh" title="Refresh">
-          <svg width="19" height="19" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M21 12a9 9 0 11-3-6.7" stroke-linecap="round"></path><path d="M21 3v6h-6" stroke-linecap="round" stroke-linejoin="round"></path></svg>
-        </button>
+      </div>
+      <div class="search-bar">
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="M21 21l-4.3-4.3" stroke-linecap="round"></path></svg>
+        <input type="search" id="todos-search" placeholder="Search shipment, customer, or task">
       </div>
     </div>
     <div id="todos-banner"></div>
@@ -299,6 +308,7 @@ const SLA_ICON = { healthy: ICON_CLOCK, 'at-risk': ICON_WARN, breached: ICON_WAR
 const state = {
   me: null,
   todos: [],
+  searchQuery: '',
   currentMilestoneId: null,
   confirmTarget: null, // { id, source: 'todos' | 'detail' }
   completing: false,
@@ -330,8 +340,15 @@ function bannerHtml(kind, msg){
 function transportLabelOf(s){
   return s.mode.includes('Ocean') ? 'Ocean Freight' : s.mode.includes('Air') ? 'Air Freight' : s.mode;
 }
+function shipmentTypeOf(s){
+  return s.mode.includes('Export') ? 'Export' : 'Import';
+}
+function transportDocLabel(s){
+  return s.mode.includes('Air') ? 'AWB Number' : 'B/L Number';
+}
 // SLA is derived client-side from the due date, the same way the Admin
 // Portal computes it — not a stored field, so both surfaces always agree.
+// Date and time are always shown together, on every tier.
 function slaMeta(dueDateIso){
   if(!dueDateIso) return { tier:'healthy', label:'No due date' };
   const due = new Date(dueDateIso);
@@ -340,11 +357,10 @@ function slaMeta(dueDateIso){
   const diffDays = Math.round((startOfDay(due) - startOfDay(now)) / 86400000);
   const time = due.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit',hour12:false});
   const dateStr = due.toLocaleDateString('en-GB',{day:'2-digit',month:'short'});
-  if(diffDays < 0) return { tier:'breached', label:`Overdue · ${dateStr}` };
-  if(diffDays === 0) return { tier:'at-risk', label:`Due Today · ${time}` };
-  if(diffDays === 1) return { tier:'at-risk', label:`Due Tomorrow · ${time}` };
-  if(diffDays <= 2) return { tier:'at-risk', label:`Due ${dateStr}` };
-  return { tier:'healthy', label:`Due ${dateStr}` };
+  const when = diffDays === 0 ? `Today · ${time}` : diffDays === 1 ? `Tomorrow · ${time}` : `${dateStr} · ${time}`;
+  if(diffDays < 0) return { tier:'breached', label:`Breached · ${when}` };
+  if(diffDays <= 2) return { tier:'at-risk', label:`Due ${when}` };
+  return { tier:'healthy', label:`Due ${when}` };
 }
 
 /* ==========================================================================
@@ -424,21 +440,27 @@ function goToTodos(){
 }
 
 function loadTodos(){
-  el('btn-refresh').classList.add('spinning');
   el('todos-banner').innerHTML = '';
   MilestoneStore.getMyMilestones(state.me.id).then(items=>{
     state.todos = items.filter(({milestone}) => milestone.status === 'NOT_STARTED');
     renderTodosList();
   }).catch(()=>{
     el('todos-banner').innerHTML = bannerHtml('error', 'Unable to load your To-Dos. Please check your connection and try again.');
-  }).finally(()=>{
-    el('btn-refresh').classList.remove('spinning');
   });
 }
-el('btn-refresh').addEventListener('click', loadTodos);
 document.addEventListener('visibilitychange', ()=>{
   if(document.visibilityState==='visible' && state.me && el('screen-todos').classList.contains('active')) loadTodos();
 });
+
+el('todos-search').addEventListener('input', (e)=>{
+  state.searchQuery = e.target.value;
+  renderTodosList();
+});
+function matchesSearch({milestone:m, shipment:s}){
+  const q = state.searchQuery.trim().toLowerCase();
+  if(!q) return true;
+  return s.jobRef.toLowerCase().includes(q) || s.customer.toLowerCase().includes(q) || m.name.toLowerCase().includes(q);
+}
 
 function renderTodosList(){
   if(!state.todos.length){
@@ -451,7 +473,18 @@ function renderTodosList(){
     return;
   }
 
-  el('todos-list').innerHTML = state.todos.map(({milestone:m, shipment:s})=>{
+  const filtered = state.todos.filter(matchesSearch);
+  if(!filtered.length){
+    el('todos-list').innerHTML = `
+      <div class="empty-state">
+        <div class="icon">${ICON_CLOCK}</div>
+        <h3>No matches</h3>
+        <p>No assigned milestones match "${state.searchQuery.trim()}".</p>
+      </div>`;
+    return;
+  }
+
+  el('todos-list').innerHTML = filtered.map(({milestone:m, shipment:s})=>{
     const sla = slaMeta(m.dueDate);
     return `
     <div class="ms-card" data-open-ms="${m.id}">
@@ -463,7 +496,7 @@ function renderTodosList(){
       <div class="meta-row">
         <span>${transportLabelOf(s)}</span>
         <span>·</span>
-        <span>${ICON_PIN}${m.location}</span>
+        <span>${ICON_PIN}${s.route}</span>
       </div>
       <span class="sla-pill ${sla.tier}">${SLA_ICON[sla.tier]}${sla.label}</span>
       <button class="btn btn-outline btn-card-complete" data-complete-ms="${m.id}">${ICON_CHECK} Mark Complete</button>
@@ -534,7 +567,9 @@ function renderMilestoneDetail(m, s){
     <div class="info-card">
       <div class="info-row"><span class="k">Reference</span><span class="v">${s.jobRef}</span></div>
       <div class="info-row"><span class="k">Customer</span><span class="v">${s.customer}</span></div>
+      <div class="info-row"><span class="k">Shipment Type</span><span class="v">${shipmentTypeOf(s)}</span></div>
       <div class="info-row"><span class="k">Transport</span><span class="v">${transportLabelOf(s)}</span></div>
+      <div class="info-row"><span class="k">${transportDocLabel(s)}</span><span class="v">${s.transportDocNumber}</span></div>
       <div class="info-row"><span class="k">Route</span><span class="v">${s.route}</span></div>
       <div class="info-row"><span class="k">Location</span><span class="v">${m.location}</span></div>
     </div>

@@ -64,12 +64,12 @@
   // Reference data — shipments + service delivery templates
   // ------------------------------------------------------------------
   const SHIPMENTS_SEED = [
-    { jobRef: 'ZELO000001', customer: 'Dangote Industries', route: 'Shanghai → Lagos', mode: 'Ocean Import', status: 'Active', eta: '2026-08-02', etd: '2026-07-12', ownerId: 'u1', supportingOwnerIds: ['u5', 'u6'], completedMilestones: 4, incoterm: 'CIF', origin: 'Shanghai, China', destination: 'Lagos, Nigeria', pol: 'Shanghai Yangshan Port', pod: 'Apapa Port, Lagos', serviceType: 'Full Container Load' },
-    { jobRef: 'ZELO000002', customer: 'Nestlé West Africa', route: 'Rotterdam → Tema', mode: 'Ocean Import', status: 'Active', eta: '2026-07-29', etd: '2026-07-05', ownerId: 'u2', supportingOwnerIds: ['u4'], completedMilestones: 6, incoterm: 'FOB', origin: 'Rotterdam, Netherlands', destination: 'Tema, Ghana', pol: 'Port of Rotterdam', pod: 'Tema Port', serviceType: 'Full Container Load' },
-    { jobRef: 'ZELO000003', customer: 'Julius Berger Nigeria', route: 'Hamburg → Lagos', mode: 'Ocean Import', status: 'Active', eta: '2026-07-20', etd: '2026-07-01', ownerId: 'u3', supportingOwnerIds: [], completedMilestones: 1, incoterm: 'CFR', origin: 'Hamburg, Germany', destination: 'Lagos, Nigeria', pol: 'Port of Hamburg', pod: 'Apapa Port, Lagos', serviceType: 'Break Bulk' },
-    { jobRef: 'ZELO000004', customer: 'MTN Nigeria', route: 'Shenzhen → Lagos', mode: 'Air Import', status: 'Cancelled', eta: '2026-07-31', etd: '2026-07-27', ownerId: 'u4', supportingOwnerIds: ['u1'], completedMilestones: 2, incoterm: 'FCA', origin: 'Shenzhen, China', destination: 'Lagos, Nigeria', pol: "Shenzhen Bao'an Airport", pod: 'Murtala Muhammed Airport', serviceType: 'Air Freight' },
-    { jobRef: 'ZELO000005', customer: 'Dufil Prima Foods', route: 'Lagos → Douala', mode: 'Ocean Export', status: 'Active', eta: '2026-07-26', etd: '2026-07-14', ownerId: 'u5', supportingOwnerIds: ['u2', 'u3'], completedMilestones: 7, incoterm: 'CIF', origin: 'Lagos, Nigeria', destination: 'Douala, Cameroon', pol: 'Apapa Port, Lagos', pod: 'Port of Douala', serviceType: 'Full Container Load' },
-    { jobRef: 'ZELO000006', customer: 'Nigerian Breweries', route: 'Antwerp → Lagos', mode: 'Ocean Import', status: 'Completed', eta: '2026-07-10', etd: '2026-06-20', ownerId: 'u6', supportingOwnerIds: [], completedMilestones: 10, incoterm: 'CIF', origin: 'Antwerp, Belgium', destination: 'Lagos, Nigeria', pol: 'Port of Antwerp', pod: 'Apapa Port, Lagos', serviceType: 'Full Container Load' },
+    { jobRef: 'ZELO000001', customer: 'Dangote Industries', route: 'Shanghai → Lagos', mode: 'Ocean Import', status: 'Active', eta: '2026-08-02', etd: '2026-07-12', ownerId: 'u1', supportingOwnerIds: ['u5', 'u6'], completedMilestones: 4, incoterm: 'CIF', origin: 'Shanghai, China', destination: 'Lagos, Nigeria', pol: 'Shanghai Yangshan Port', pod: 'Apapa Port, Lagos', serviceType: 'Full Container Load', transportDocNumber: 'MSCUBL8821047' },
+    { jobRef: 'ZELO000002', customer: 'Nestlé West Africa', route: 'Rotterdam → Tema', mode: 'Ocean Import', status: 'Active', eta: '2026-07-29', etd: '2026-07-05', ownerId: 'u2', supportingOwnerIds: ['u4'], completedMilestones: 6, incoterm: 'FOB', origin: 'Rotterdam, Netherlands', destination: 'Tema, Ghana', pol: 'Port of Rotterdam', pod: 'Tema Port', serviceType: 'Full Container Load', transportDocNumber: 'OOLUBL8790112' },
+    { jobRef: 'ZELO000003', customer: 'Julius Berger Nigeria', route: 'Hamburg → Lagos', mode: 'Ocean Import', status: 'Active', eta: '2026-07-20', etd: '2026-07-01', ownerId: 'u3', supportingOwnerIds: [], completedMilestones: 1, incoterm: 'CFR', origin: 'Hamburg, Germany', destination: 'Lagos, Nigeria', pol: 'Port of Hamburg', pod: 'Apapa Port, Lagos', serviceType: 'Break Bulk', transportDocNumber: 'HLCUBL8744093' },
+    { jobRef: 'ZELO000004', customer: 'MTN Nigeria', route: 'Shenzhen → Lagos', mode: 'Air Import', status: 'Cancelled', eta: '2026-07-31', etd: '2026-07-27', ownerId: 'u4', supportingOwnerIds: ['u1'], completedMilestones: 2, incoterm: 'FCA', origin: 'Shenzhen, China', destination: 'Lagos, Nigeria', pol: "Shenzhen Bao'an Airport", pod: 'Murtala Muhammed Airport', serviceType: 'Air Freight', transportDocNumber: '176-88213047' },
+    { jobRef: 'ZELO000005', customer: 'Dufil Prima Foods', route: 'Lagos → Douala', mode: 'Ocean Export', status: 'Active', eta: '2026-07-26', etd: '2026-07-14', ownerId: 'u5', supportingOwnerIds: ['u2', 'u3'], completedMilestones: 7, incoterm: 'CIF', origin: 'Lagos, Nigeria', destination: 'Douala, Cameroon', pol: 'Apapa Port, Lagos', pod: 'Port of Douala', serviceType: 'Full Container Load', transportDocNumber: 'CMAUBL8650081' },
+    { jobRef: 'ZELO000006', customer: 'Nigerian Breweries', route: 'Antwerp → Lagos', mode: 'Ocean Import', status: 'Completed', eta: '2026-07-10', etd: '2026-06-20', ownerId: 'u6', supportingOwnerIds: [], completedMilestones: 10, incoterm: 'CIF', origin: 'Antwerp, Belgium', destination: 'Lagos, Nigeria', pol: 'Port of Antwerp', pod: 'Apapa Port, Lagos', serviceType: 'Full Container Load', transportDocNumber: 'MAEUBL8590066' },
   ];
 
   // OneImport / OneExport service-delivery templates (spec section 6).
@@ -108,23 +108,38 @@
     return shipment.destination;
   }
 
-  function addDays(dateStr, days) {
-    const d = new Date(dateStr + 'T09:00:00');
+  // Not-started milestones deliberately anchor their due date to TODAY,
+  // not to the shipment's fixed 2026 etd/eta — otherwise every date is a
+  // fixed point on the calendar that the real world eventually passes,
+  // and months later every single milestone reads as "Breached" (as
+  // happened here). Cycling through this offset spread means the demo
+  // always shows a realistic mix of Breached / At Risk / Healthy, no
+  // matter what day it's actually opened.
+  const DUE_OFFSET_DAYS_CYCLE = [-9, -5, -2, -1, 0, 1, 2, 4, 6, 10, 16, 24];
+  function addDaysFromToday(days, hour, minute) {
+    const d = new Date();
+    d.setHours(0, 0, 0, 0);
     d.setDate(d.getDate() + days);
+    d.setHours(hour, minute, 0, 0);
     return d;
   }
 
-  function seedMilestonesForShipment(shipment) {
+  function seedMilestonesForShipment(shipment, shipmentIndex) {
     const template = shipment.mode.includes('Export') ? ONE_EXPORT_TEMPLATE : ONE_IMPORT_TEMPLATE;
     const templateType = shipment.mode.includes('Export') ? 'OneExport' : 'OneImport';
     const teamIds = [shipment.ownerId, ...(shipment.supportingOwnerIds || [])];
     const etd = new Date(shipment.etd + 'T00:00:00');
-    const eta = new Date(shipment.eta + 'T00:00:00');
-    const spanDays = Math.max(1, Math.round((eta - etd) / 86400000));
 
     return template.map((step, i) => {
       const isDone = i < shipment.completedMilestones;
-      const dueDate = addDays(shipment.etd, Math.round((spanDays * i) / (template.length - 1)));
+      const hour = 9 + (i * 3) % 8;
+      const minute = (i % 2) * 30;
+      // Completed milestones already happened, so their due date sits
+      // safely in the past — otherwise a milestone could end up
+      // "completed" before its own (today-relative) due date arrives.
+      const dueDate = isDone
+        ? addDaysFromToday(-(14 + i * 2), hour, minute)
+        : addDaysFromToday(DUE_OFFSET_DAYS_CYCLE[(shipmentIndex * 5 + i * 3) % DUE_OFFSET_DAYS_CYCLE.length], hour, minute);
       const assignedTo = teamIds[i % teamIds.length];
       const milestone = {
         id: `${shipment.jobRef}-M${i + 1}`,
@@ -141,9 +156,11 @@
         completedBy: isDone ? teamIds[(i + 1) % teamIds.length] : null,
         completedAt: isDone ? new Date(dueDate.getTime() - 3600000).toISOString() : null,
         completionNote: isDone && i % 3 === 0 ? 'Cleared without exceptions.' : '',
-        // Deliberately derived from dueDate, not `new Date()` — the seed
-        // must be byte-identical across devices/browsers with no shared
-        // storage, so nothing here may depend on wall-clock "now".
+        // Deliberately derived from dueDate, not a fresh `new Date()` call
+        // — this field isn't part of the demo's day-relative narrative, so
+        // it should stay byte-identical across two devices seeding fresh
+        // on the same day rather than drift by however many milliseconds
+        // apart their page loads happened to land.
         updatedAt: dueDate.toISOString(),
       };
       return milestone;
@@ -153,9 +170,9 @@
   function buildInitialState() {
     const shipments = {};
     const milestones = {};
-    SHIPMENTS_SEED.forEach((s) => {
+    SHIPMENTS_SEED.forEach((s, shipmentIndex) => {
       shipments[s.jobRef] = { ...s };
-      seedMilestonesForShipment(s).forEach((m) => { milestones[m.id] = m; });
+      seedMilestonesForShipment(s, shipmentIndex).forEach((m) => { milestones[m.id] = m; });
     });
     return { shipments, milestones, version: 1 };
   }
