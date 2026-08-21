@@ -1000,6 +1000,17 @@ textarea.field-control{resize:vertical;min-height:70px}
       <div class="field-hint" id="sim-watchlist-hint" style="margin-bottom:16px"></div>
       <div class="form-grid">
         <div class="form-field filled">
+          <label class="field-label">Message Type</label>
+          <select class="field-control" id="sim-mode">
+            <option value="new">New Conversation</option>
+            <option value="reply">Reply to Existing Conversation</option>
+          </select>
+        </div>
+        <div class="form-field filled" id="sim-reply-thread-field" style="display:none">
+          <label class="field-label">Existing Conversation</label>
+          <select class="field-control" id="sim-reply-thread"></select>
+        </div>
+        <div class="form-field filled">
           <label class="field-label">Source</label>
           <select class="field-control" id="sim-source">
             <option value="OUTLOOK">Outlook (Email)</option>
@@ -1358,6 +1369,20 @@ const COMMUNICATIONS_MOCK = [
     timestamp:new Date(2026,6,13,9,20), sourceMessageId:'MSG-OUT-10021', sourceThreadId:'THREAD-OUT-771',
     attachments:[{name:'Vessel_Departure_Confirmation.pdf', sizeBytes:184320}]},
 
+  // Reply chain on the same thread (THREAD-OUT-771) — neither reply repeats the
+  // ZELO ID, demonstrating that a conversation's shipment match is inherited by
+  // its later replies rather than requiring every message to restate it.
+  {id:'c1b', source:'OUTLOOK', sender:'sarah.adeyemi@oneport365.com', recipients:['ops@maersklogistics.com'],
+    subject:'RE: ZELO000001 — Vessel Departure Confirmation',
+    content:'Thanks for confirming the departure. Could you also share the estimated transit time to Lagos?',
+    timestamp:new Date(2026,6,13,15,10), sourceMessageId:'MSG-OUT-10023', sourceThreadId:'THREAD-OUT-771',
+    attachments:[]},
+  {id:'c1c', source:'OUTLOOK', sender:'ops@maersklogistics.com', recipients:['sarah.adeyemi@oneport365.com','ops@oneport365.com'],
+    subject:'RE: ZELO000001 — Vessel Departure Confirmation',
+    content:'Estimated transit time is 21 days, so an arrival around early August is expected, weather permitting.',
+    timestamp:new Date(2026,6,14,8,30), sourceMessageId:'MSG-OUT-10027', sourceThreadId:'THREAD-OUT-771',
+    attachments:[]},
+
   {id:'c2', source:'WATI', sender:'Chinedu Okafor', groupName:'OnePort Ops — Dangote Team', recipients:['Ops Desk'], phone:'+2348020001122',
     content:'Good morning, kindly confirm ETA for ZELO000001. Customer is asking for an update.',
     timestamp:new Date(2026,6,15,11,5), sourceMessageId:'WATI-55210', sourceThreadId:'WATI-CONV-4471',
@@ -1374,6 +1399,18 @@ const COMMUNICATIONS_MOCK = [
     timestamp:new Date(2026,6,16,9,50), sourceMessageId:'WATI-55298', sourceThreadId:'WATI-CONV-4488',
     attachments:[]},
 
+  // Reply chain on the same WhatsApp DM thread (WATI-CONV-4488) — again, neither
+  // reply repeats the ZELO ID, exercising the same inheritance behaviour on the
+  // WhatsApp channel.
+  {id:'c4b', source:'WATI', sender:'Chidi Eze', recipients:['+234 803 221 9087'],
+    content:'Good morning — yes, gate-in was completed this morning. I\'ll share the seal number shortly.',
+    timestamp:new Date(2026,6,16,10,15), sourceMessageId:'WATI-55301', sourceThreadId:'WATI-CONV-4488',
+    attachments:[]},
+  {id:'c4c', source:'WATI', sender:'+234 803 221 9087', recipients:['Chidi Eze'],
+    content:'Perfect, thank you for the quick update!',
+    timestamp:new Date(2026,6,16,10,20), sourceMessageId:'WATI-55303', sourceThreadId:'WATI-CONV-4488',
+    attachments:[]},
+
   {id:'c5', source:'OUTLOOK', sender:'consolidation@oneport365.com', recipients:['ops@oneport365.com','finance@oneport365.com'],
     subject:'Consolidated Customs Update — ZELO000001 & ZELO000005',
     content:'Hi team,\n\nSharing a consolidated customs status update covering ZELO000001 and ZELO000005. Both shipments have cleared the first inspection stage.\n\nThanks,\nCustoms Desk',
@@ -1383,6 +1420,19 @@ const COMMUNICATIONS_MOCK = [
   {id:'c6', source:'WATI', sender:'Amaka (MTN Nigeria)', groupName:'MTN Nigeria — Air Freight Updates', recipients:['Titi Aluko','James Adewale'], phone:'+2348020001122',
     content:'Hi team, noting that ZELO000004 has been cancelled on our end per our last call. Please confirm no further action is needed.',
     timestamp:new Date(2026,6,22,13,30), sourceMessageId:'WATI-55402', sourceThreadId:'WATI-CONV-4520',
+    attachments:[]},
+
+  // Same WhatsApp GROUP (matched by group name, not sourceThreadId — see
+  // commThreadKey) continuing across three distinct participants: the original
+  // MTN contact, an internal reply, and a second, different MTN contact —
+  // demonstrating a group trail with all involved parties, not just a DM.
+  {id:'c6b', source:'WATI', sender:'Titi Aluko', groupName:'MTN Nigeria — Air Freight Updates', recipients:['Amaka (MTN Nigeria)'], phone:'+2348020001122',
+    content:'Confirmed — we\'ve closed this out on our end as well, no further action needed.',
+    timestamp:new Date(2026,6,22,14,0), sourceMessageId:'WATI-55405', sourceThreadId:'WATI-CONV-4523',
+    attachments:[]},
+  {id:'c6c', source:'WATI', sender:'Emeka (MTN Nigeria)', groupName:'MTN Nigeria — Air Freight Updates', recipients:['Titi Aluko','James Adewale'], phone:'+2348020001122',
+    content:'Thank you for confirming, appreciate the quick turnaround.',
+    timestamp:new Date(2026,6,22,14,20), sourceMessageId:'WATI-55409', sourceThreadId:'WATI-CONV-4524',
     attachments:[]},
 
   {id:'c7', source:'OUTLOOK', sender:'random-vendor@example.com', recipients:['ops@oneport365.com'],
@@ -1416,6 +1466,10 @@ const COMMUNICATIONS_MOCK = [
   {id:'c12', source:'WATI', sender:'Nigerian Breweries Finance', recipients:['Ada Nwosu'], phone:'+2348020001122',
     content:'Confirmed — payment for ZELO000006 was settled this morning. Thank you.',
     timestamp:new Date(2026,5,25,14,30), sourceMessageId:'WATI-55015', sourceThreadId:'WATI-CONV-4200',
+    attachments:[]},
+  {id:'c12b', source:'WATI', sender:'Ada Nwosu', recipients:['Nigerian Breweries Finance'], phone:'+2348020001122',
+    content:'Perfect, thank you for confirming so quickly!',
+    timestamp:new Date(2026,5,25,14,45), sourceMessageId:'WATI-55017', sourceThreadId:'WATI-CONV-4200',
     attachments:[]},
 
   // Deliberately NOT on the watch-list (external sender + external distribution list) —
@@ -1502,15 +1556,55 @@ function resolveShipmentMatches(comm){
   return { matches: [...new Set([...zeloMatches, ...blMatches])], conflict: false, zeloMatches, blMatches, invalidZelo };
 }
 
+function normalizeLabel(s){ return String(s||'').trim().toLowerCase(); }
+
+// The key used to group communications into one conversation "trail" — for both
+// UI threading (groupIntoThreads) and match inheritance (below). A WhatsApp
+// group is identified by its name (any participant posting under the same
+// group name is the same conversation, mirroring how a real WhatsApp group
+// works); everything else (email, WhatsApp DMs) is identified by the
+// channel's own conversation id, exactly as a real Outlook Conversation ID
+// or WATI conversation id would group replies.
+function commThreadKey(comm){
+  if(comm.source==='WATI' && comm.groupName){
+    return 'WAGROUP::' + normalizeLabel(comm.groupName);
+  }
+  return comm.sourceThreadId || comm.id;
+}
+
+// Cumulative record of which shipment(s) each conversation trail has already
+// been matched to — populated as messages are ingested, so a later reply that
+// carries no ZELO ID/B-L number of its own can still be recognized as part of
+// an already-matched conversation instead of being silently dropped.
+const THREAD_SHIPMENT_INDEX = {};
+
 function ingestCommunication(comm){
   if(!matchesTriggerPolicy(comm)){
     console.info(`[Communications] Not ingested — ${comm.id} sender/recipients are not on the watched email/number list (customer engagement trigger policy).`);
     comm.matchedShipments = [];
-    return { triggered:false, matches:[], conflict:false, zeloMatches:[], blMatches:[], invalidZelo:[] };
+    return { triggered:false, matches:[], conflict:false, zeloMatches:[], blMatches:[], invalidZelo:[], inherited:false };
   }
+  const key = commThreadKey(comm);
   const result = resolveShipmentMatches(comm);
+  result.inherited = false;
+  // No explicit reference in THIS message, and no contradiction either — if its
+  // conversation trail already has an established shipment match, inherit it.
+  // An explicit conflict (§ resolveShipmentMatches) is never overridden by
+  // inheritance: a message that contradicts itself stays flagged, not guessed.
+  if(!result.matches.length && !result.conflict){
+    const prior = THREAD_SHIPMENT_INDEX[key];
+    if(prior && prior.size){
+      result.matches = [...prior];
+      result.inherited = true;
+      console.info(`[Communications] ${comm.id} has no ZELO ID/B-L Number of its own — inherited shipment match from its conversation trail (${key}): ${result.matches.join(', ')}`);
+    }
+  }
   result.triggered = true;
   comm.matchedShipments = result.matches;
+  if(result.matches.length){
+    if(!THREAD_SHIPMENT_INDEX[key]) THREAD_SHIPMENT_INDEX[key] = new Set();
+    result.matches.forEach(jobRef=>THREAD_SHIPMENT_INDEX[key].add(jobRef));
+  }
   result.matches.forEach(jobRef=>{
     const s = SHIPMENTS[jobRef];
     s.communications.push(comm);
@@ -1864,7 +1958,7 @@ function commTypeIcon(source){ return source==='OUTLOOK' ? ICON_MAIL : ICON_CHAT
 function groupIntoThreads(comms){
   const order = [], byThread = {};
   comms.forEach(c=>{
-    const key = c.sourceThreadId || c.id;
+    const key = commThreadKey(c);
     if(!byThread[key]){ byThread[key] = []; order.push(key); }
     byThread[key].push(c);
   });
@@ -1901,7 +1995,7 @@ function timeAgo(date){
   if(days < 7) return `${days}d ago`;
   return formatDate(date);
 }
-function threadKey(thread){ return thread[0].sourceThreadId || thread[0].id; }
+function threadKey(thread){ return commThreadKey(thread[0]); }
 function threadContact(thread){
   const first = thread[0];
   const name = first.groupName || first.sender;
@@ -2402,7 +2496,60 @@ function renderWatchlistHint(){
   const phoneBits = PHONE_WATCHLIST.map(r=>`${r.number} — ${r.label}`).join(', ');
   el('sim-watchlist-hint').innerHTML = `<b>Active watch-list</b> (customer engagement trigger policy) — only messages sent or received by these are ingested at all.<br>Emails: ${emailBits}<br>Numbers: ${phoneBits}`;
 }
+
+// All conversations across every shipment, deduplicated (the same message can
+// be pushed into two shipments' communications lists when it matched both —
+// e.g. a consolidated update — and should still only appear once here).
+function allThreadsGlobal(){
+  const seen = new Map();
+  Object.values(SHIPMENTS).forEach(s=>{
+    (s.communications||[]).forEach(c=>{ if(!seen.has(c.id)) seen.set(c.id, c); });
+  });
+  return groupIntoThreads([...seen.values()]);
+}
+function threadShipmentRefs(thread){
+  const set = new Set();
+  thread.forEach(c=>(c.matchedShipments||[]).forEach(r=>set.add(r)));
+  return [...set];
+}
+function stripReplyPrefix(subject){ return String(subject||'').replace(/^\s*(re|fwd?)\s*:\s*/i, '').trim(); }
+
+function updateSourceFieldVisibility(){
+  const isEmail = el('sim-source').value === 'OUTLOOK';
+  el('sim-subject-field').style.display = isEmail ? '' : 'none';
+  el('sim-group-field').style.display = isEmail ? 'none' : '';
+  el('sim-phone-field').style.display = isEmail ? 'none' : '';
+}
+
+function populateReplyThreadOptions(){
+  const threads = allThreadsGlobal().sort((a,b)=> b[b.length-1].timestamp - a[a.length-1].timestamp);
+  el('sim-reply-thread').innerHTML = threads.map(t=>{
+    const key = threadKey(t);
+    const refs = threadShipmentRefs(t).join('/') || 'Unmatched';
+    const contact = threadContact(t);
+    const channel = t[0].source==='OUTLOOK' ? 'Email' : (t[0].groupName ? 'WhatsApp Group' : 'WhatsApp');
+    return `<option value="${escapeHtml(key)}">[${escapeHtml(refs)}] ${escapeHtml(contact.name)} — ${channel}</option>`;
+  }).join('');
+}
+// Reusing an existing conversation's channel/subject/group/phone is what makes
+// the new message join the SAME trail (see commThreadKey) instead of starting
+// a disconnected one — the whole point of "reply" mode.
+function applyReplyThreadPrefill(){
+  const threads = allThreadsGlobal();
+  const thread = threads.find(t=>threadKey(t)===el('sim-reply-thread').value);
+  if(!thread) return;
+  const first = thread[0];
+  el('sim-source').value = first.source;
+  el('sim-source').disabled = true;
+  updateSourceFieldVisibility();
+  el('sim-subject').value = first.source==='OUTLOOK' ? `RE: ${stripReplyPrefix(first.subject)}` : '';
+  el('sim-group').value = first.groupName || '';
+  el('sim-phone').value = first.phone || '';
+}
 function openSimulateModal(){
+  el('sim-mode').value = 'new';
+  el('sim-reply-thread-field').style.display = 'none';
+  el('sim-source').disabled = false;
   el('sim-source').value = 'OUTLOOK';
   el('sim-sender').value = '';
   el('sim-subject').value = '';
@@ -2411,19 +2558,26 @@ function openSimulateModal(){
   el('sim-recipients').value = '';
   el('sim-content').value = '';
   el('sim-attachments').value = '';
-  el('sim-subject-field').style.display = '';
-  el('sim-group-field').style.display = 'none';
-  el('sim-phone-field').style.display = 'none';
+  updateSourceFieldVisibility();
   el('sim-result').style.display = 'none';
   renderWatchlistHint();
   openModal('modal-simulate-comm');
 }
-el('sim-source').addEventListener('change', ()=>{
-  const isEmail = el('sim-source').value === 'OUTLOOK';
-  el('sim-subject-field').style.display = isEmail ? '' : 'none';
-  el('sim-group-field').style.display = isEmail ? 'none' : '';
-  el('sim-phone-field').style.display = isEmail ? 'none' : '';
+el('sim-mode').addEventListener('change', ()=>{
+  const isReply = el('sim-mode').value === 'reply';
+  el('sim-reply-thread-field').style.display = isReply ? '' : 'none';
+  el('sim-source').disabled = isReply;
+  if(isReply){
+    populateReplyThreadOptions();
+    applyReplyThreadPrefill();
+  } else {
+    el('sim-group').value = '';
+    el('sim-phone').value = '';
+    el('sim-subject').value = '';
+  }
 });
+el('sim-reply-thread').addEventListener('change', applyReplyThreadPrefill);
+el('sim-source').addEventListener('change', updateSourceFieldVisibility);
 function renderSimResult(html, isError){
   const box = el('sim-result');
   box.className = 'sim-result-box ' + (isError ? 'error' : 'success');
@@ -2431,16 +2585,28 @@ function renderSimResult(html, isError){
   box.innerHTML = html;
 }
 el('save-simulate-comm').addEventListener('click', ()=>{
+  const isReply = el('sim-mode').value === 'reply';
   const source = el('sim-source').value;
   const sender = el('sim-sender').value.trim();
   const content = el('sim-content').value.trim();
   if(!sender || !content){ showToast('Sender and message content are required', 'error'); return; }
+  if(isReply && !el('sim-reply-thread').value){ showToast('Choose an existing conversation to reply to', 'error'); return; }
   const recipients = el('sim-recipients').value.split(',').map(r=>r.trim()).filter(Boolean);
   const subject = source==='OUTLOOK' ? el('sim-subject').value.trim() : '';
   const groupName = source==='WATI' ? el('sim-group').value.trim() : '';
   const phone = source==='WATI' ? el('sim-phone').value.trim() : '';
   const attachments = el('sim-attachments').value.split(',').map(a=>a.trim()).filter(Boolean)
     .map(name=>({name, sizeBytes: 40000 + name.length*500}));
+
+  // Replying reuses the existing conversation's own sourceThreadId, which is
+  // what makes it join the same trail — a WhatsApp group also merges purely by
+  // matching group name (see commThreadKey), but reusing the id here keeps
+  // both signals consistent.
+  let sourceThreadId = makeId('THREAD-SIM');
+  if(isReply){
+    const thread = allThreadsGlobal().find(t=>threadKey(t)===el('sim-reply-thread').value);
+    if(thread) sourceThreadId = thread[0].sourceThreadId || sourceThreadId;
+  }
 
   const comm = {
     id: makeId('sim'),
@@ -2451,24 +2617,26 @@ el('save-simulate-comm').addEventListener('click', ()=>{
     content,
     timestamp: new Date(),
     sourceMessageId: makeId('MSG-SIM'),
-    sourceThreadId: makeId('THREAD-SIM'),
+    sourceThreadId,
     attachments,
   };
 
   const result = ingestCommunication(comm);
   COMMUNICATIONS_MOCK.push(comm);
 
+  const replyPrefix = isReply ? '<b>Added as a reply in the existing conversation.</b> ' : '';
   if(!result.triggered){
-    renderSimResult(`<b>Not ingested.</b> Sender/recipients aren't on the watched email/DL or phone number list, so this communication never entered the pipeline — per the customer engagement trigger policy, ZELO/B/L matching was never attempted. Check the browser console for the log.`, true);
+    renderSimResult(`${replyPrefix}<b>Not ingested.</b> Sender/recipients aren't on the watched email/DL or phone number list, so this communication never entered the pipeline — per the customer engagement trigger policy, ZELO/B/L matching was never attempted. Check the browser console for the log.`, true);
     showToast('Not on watch-list — communication not ingested', 'error');
   } else if(result.matches.length){
-    renderSimResult(`<b>Matched to:</b> ${result.matches.join(', ')} — now visible in ${result.matches.length>1?'each shipment\'s':'the shipment\'s'} Communications tab${attachments.length ? ' and Documents tab' : ''}.`, false);
+    const inheritedNote = result.inherited ? ` (no ZELO ID/B-L Number in this message — inherited from its conversation trail)` : '';
+    renderSimResult(`${replyPrefix}<b>Matched to:</b> ${result.matches.join(', ')}${inheritedNote} — now visible in ${result.matches.length>1?'each shipment\'s':'the shipment\'s'} Communications tab${attachments.length ? ' and Documents tab' : ''}.`, false);
     showToast(`Communication matched to ${result.matches.join(', ')}`);
   } else if(result.conflict){
-    renderSimResult(`<b>Conflicting references detected</b> — the ZELO ID and B/L Number in this message point to different shipments (ZELO → ${result.zeloMatches.join(', ')||'—'}, B/L → ${result.blMatches.join(', ')||'—'}). Per the matching rules, no association was made. Check the browser console for the logged conflict.`, true);
+    renderSimResult(`${replyPrefix}<b>Conflicting references detected</b> — the ZELO ID and B/L Number in this message point to different shipments (ZELO → ${result.zeloMatches.join(', ')||'—'}, B/L → ${result.blMatches.join(', ')||'—'}). Per the matching rules, no association was made. Check the browser console for the logged conflict.`, true);
     showToast('Conflict detected — not associated', 'error');
   } else {
-    renderSimResult(`<b>No shipment reference recognized.</b> This communication was not stored against any shipment — there is no unmatched-communications queue in this MVP.`, true);
+    renderSimResult(`${replyPrefix}<b>No shipment reference recognized.</b> This communication was not stored against any shipment — there is no unmatched-communications queue in this MVP.`, true);
     showToast('No shipment reference recognized', 'error');
   }
 
