@@ -65,8 +65,11 @@ input,textarea{font-family:var(--font-body)}
 .brand-mark{ width:30px; height:30px; border-radius:8px; background:var(--green-accent); color:var(--green-dark); display:grid; place-items:center; font-family:var(--font-display); font-weight:700; font-size:12px; flex-shrink:0; }
 .page-head{ display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:10px; }
 .page-head h1{ color:var(--cream); font-size:20px; flex:1; }
+.icon-btn{ background:none; border:none; color:var(--cream); padding:6px; margin:-6px; border-radius:var(--radius-sm); display:flex; flex-shrink:0; }
+.icon-btn:active{ background:rgba(255,255,255,.12); }
 
 .search-bar{ display:flex; align-items:center; gap:8px; background:rgba(253,251,241,.12); border-radius:999px; padding:9px 14px; color:rgba(253,251,241,.65); }
+.search-bar.hidden{ display:none; }
 .search-bar svg{ flex-shrink:0; }
 .search-bar input{ background:none; border:none; outline:none; color:var(--cream); font-size:13.5px; width:100%; }
 .search-bar input::placeholder{ color:rgba(253,251,241,.55); }
@@ -213,8 +216,9 @@ input,textarea{font-family:var(--font-body)}
       </div>
       <div class="page-head">
         <h1>My To-Dos</h1>
+        <button class="icon-btn" id="btn-toggle-search" title="Search"></button>
       </div>
-      <div class="search-bar">
+      <div class="search-bar hidden" id="search-bar">
         <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="M21 21l-4.3-4.3" stroke-linecap="round"></path></svg>
         <input type="search" id="todos-search" placeholder="Search shipment, customer, or task">
       </div>
@@ -303,6 +307,8 @@ const ICON_CLOCK = '<svg width="13" height="13" fill="none" stroke="currentColor
 const ICON_PIN = '<svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M12 21s7-6.6 7-12a7 7 0 10-14 0c0 5.4 7 12 7 12z"></path><circle cx="12" cy="9" r="2.4"></circle></svg>';
 const ICON_WARN = '<svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M12 9v4M12 17h.01M10.3 3.86L1.8 18a2 2 0 001.7 3h17a2 2 0 001.7-3L13.7 3.86a2 2 0 00-3.4 0z" stroke-linecap="round" stroke-linejoin="round"></path></svg>';
 const ICON_RECEIPT = '<svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 2h12v20l-3-2-3 2-3-2-3 2V2z"></path><path d="M9 8h6M9 12h6" stroke-linecap="round"></path></svg>';
+const ICON_SEARCH = '<svg width="19" height="19" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="M21 21l-4.3-4.3" stroke-linecap="round"></path></svg>';
+const ICON_CLOSE = '<svg width="19" height="19" fill="none" stroke="currentColor" stroke-width="2.3" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18" stroke-linecap="round"></path></svg>';
 const SLA_ICON = { healthy: ICON_CLOCK, 'at-risk': ICON_WARN, breached: ICON_WARN };
 
 const state = {
@@ -452,6 +458,23 @@ document.addEventListener('visibilitychange', ()=>{
   if(document.visibilityState==='visible' && state.me && el('screen-todos').classList.contains('active')) loadTodos();
 });
 
+el('btn-toggle-search').innerHTML = ICON_SEARCH;
+el('btn-toggle-search').addEventListener('click', ()=>{
+  const isOpen = !el('search-bar').classList.contains('hidden');
+  setSearchOpen(!isOpen);
+});
+function setSearchOpen(open){
+  el('search-bar').classList.toggle('hidden', !open);
+  el('btn-toggle-search').innerHTML = open ? ICON_CLOSE : ICON_SEARCH;
+  el('btn-toggle-search').title = open ? 'Close search' : 'Search';
+  if(open){
+    el('todos-search').focus();
+  } else if(state.searchQuery){
+    el('todos-search').value = '';
+    state.searchQuery = '';
+    renderTodosList();
+  }
+}
 el('todos-search').addEventListener('input', (e)=>{
   state.searchQuery = e.target.value;
   renderTodosList();
