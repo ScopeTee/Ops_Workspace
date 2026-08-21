@@ -425,8 +425,10 @@ textarea.field-control{resize:vertical;min-height:70px}
 
 .comm-detail-pane{display:flex;flex-direction:column;min-height:0;background:var(--cream)}
 .comm-detail-head{display:flex;align-items:center;gap:12px;padding:14px 20px;border-bottom:1px solid var(--border-tint);background:var(--white);min-height:24px}
+.comm-detail-head .who{flex:1;min-width:0}
 .comm-detail-head .who b{display:block;font-size:14px;color:var(--green-dark)}
 .comm-detail-head .who span{font-size:12px;color:var(--silver-light)}
+.comm-thread-count{flex-shrink:0;font-size:11px;font-weight:700;color:var(--green-dark);background:var(--green-chip-bg);padding:5px 10px;border-radius:999px;white-space:nowrap}
 .comm-detail-scroll{flex:1;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:16px}
 .comm-detail-empty{flex:1;display:flex;align-items:center;justify-content:center;color:var(--silver-light);font-size:13.5px}
 .comm-bubble-row{display:flex;gap:10px;max-width:80%}
@@ -2011,6 +2013,11 @@ function threadPreview(thread){
   const last = thread[thread.length-1];
   return last.subject || last.content;
 }
+function threadCountLabel(thread){
+  const n = thread.length;
+  if(thread[0].source==='OUTLOOK') return `${n} ${n===1?'Mail':'Mails'}`;
+  return `${n} ${n===1?'Message':'Messages'}`;
+}
 
 function updateCommFilterCounts(all, email, wa){
   const btn = (key, label, count) => `<button class="comm-filter-btn ${state.commFilter===key?'active':''}" data-comm-filter="${key}">${label} <span class="cf-count">${count}</span></button>`;
@@ -2079,7 +2086,8 @@ function renderCommDetail(threads){
     <div class="who">
       <b>${escapeHtml(contact.name)}</b>
       <span>${escapeHtml(contact.sub)} · Last message ${timeAgo(last.timestamp)}</span>
-    </div>`;
+    </div>
+    <span class="comm-thread-count">${threadCountLabel(thread)}</span>`;
   el('comm-detail-scroll').innerHTML = thread.map(renderCommBubble).join('');
   el('comm-detail-scroll').scrollTop = el('comm-detail-scroll').scrollHeight;
   el('comm-readonly-note').style.display = 'flex';
@@ -2088,14 +2096,16 @@ function renderCommDetail(threads){
 function renderCommunications(){
   const s = currentShipment();
   const allComms = (s.communications||[]).slice().sort((a,b)=>a.timestamp-b.timestamp);
-  updateCommFilterCounts(allComms.length, allComms.filter(c=>c.source==='OUTLOOK').length, allComms.filter(c=>c.source==='WATI').length);
+  const allThreads = groupIntoThreads(allComms);
+  const emailThreadCount = allThreads.filter(t=>t[0].source==='OUTLOOK').length;
+  const waThreadCount = allThreads.filter(t=>t[0].source==='WATI').length;
+  updateCommFilterCounts(allThreads.length, emailThreadCount, waThreadCount);
 
-  let comms = allComms;
-  if(state.commFilter==='email') comms = comms.filter(c=>c.source==='OUTLOOK');
-  else if(state.commFilter==='whatsapp') comms = comms.filter(c=>c.source==='WATI');
+  let threads = allThreads;
+  if(state.commFilter==='email') threads = threads.filter(t=>t[0].source==='OUTLOOK');
+  else if(state.commFilter==='whatsapp') threads = threads.filter(t=>t[0].source==='WATI');
 
   const q = (state.commSearch||'').trim().toLowerCase();
-  let threads = groupIntoThreads(comms);
   if(q){
     threads = threads.filter(thread=>{
       const contact = threadContact(thread);
