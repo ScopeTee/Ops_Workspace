@@ -90,6 +90,8 @@ input,select,textarea{font-family:var(--font-body)}
 .nav-item.active svg{opacity:1}
 
 .sidebar-footer{margin-top:auto;padding-top:16px;border-top:1px solid rgba(253,251,241,.12)}
+.sync-link-btn{display:flex;align-items:center;gap:8px;width:100%;background:none;border:1px dashed rgba(253,251,241,.25);border-radius:var(--radius-md);color:rgba(253,251,241,.65);font-size:11.5px;font-weight:600;padding:8px 10px;margin-bottom:10px;cursor:pointer;text-align:left}
+.sync-link-btn:hover{border-color:rgba(253,251,241,.45);color:var(--cream)}
 .sidebar-user{display:flex;align-items:center;gap:10px;padding:8px}
 .sidebar-user .avatar{width:34px;height:34px;border-radius:9px;background:rgba(253,251,241,.12);display:grid;place-items:center;font-family:var(--font-display);font-weight:600;font-size:12.5px;color:var(--cream)}
 .sidebar-user .name{font-size:13px;font-weight:700;color:var(--cream)}
@@ -407,6 +409,10 @@ textarea.field-control{resize:vertical;min-height:70px}
     </ul>
 
     <div class="sidebar-footer">
+      <button type="button" id="btn-copy-sync-link" class="sync-link-btn" title="Copy a link that loads this exact milestone data on another device or browser — a testing aid, since demo data is stored locally per device.">
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M10 13a5 5 0 007 0l3-3a5 5 0 00-7-7l-1.5 1.5" stroke-linecap="round"></path><path d="M14 11a5 5 0 00-7 0l-3 3a5 5 0 007 7l1.5-1.5" stroke-linecap="round"></path></svg>
+        Copy Sync Link (testing)
+      </button>
       <div class="sidebar-user">
         <div class="avatar">NM</div>
         <div>
@@ -861,6 +867,7 @@ textarea.field-control{resize:vertical;min-height:70px}
 
 <div id="toast-wrap"></div>
 
+<script src="shared/milestone-store.js"></script>
 <script>
 /* ==========================================================================
    Icon helpers (used sparingly across the interface)
@@ -943,8 +950,33 @@ function computeLiveSlaHealth(dueDate){
   return 'Healthy';
 }
 
-const OCEAN_EXPORT_TEMPLATE = ['Booking Placement','Empty Container','Clean CCI','Draft BL to Customer','Gate-In','Inspection','Vessel Confirmation','Sailing Confirmation','OBL Issuance','Document Release'];
-const OCEAN_IMPORT_TEMPLATE = ['Pre-Alert Receipt','Form M Validation','PAAR Application','Draft Assessment','Final Assessment','THC Payment','Delivery','Empty Return','Post Delivery Docs','Document Release'];
+// Adapts a MilestoneStore record (spec-shaped: NOT_STARTED/COMPLETED,
+// assignedTo, completedAt/completedBy as user id + ISO string) into the
+// shape this prototype's existing render functions expect.
+function toAdminMilestones(storeMilestones){
+  return storeMilestones.map(sm=>{
+    const dueDate = sm.dueDate ? new Date(sm.dueDate) : null;
+    const completedAt = sm.completedAt ? new Date(sm.completedAt) : null;
+    let completedSlaHealth = null;
+    if(sm.status === 'COMPLETED' && dueDate && completedAt){
+      const lateDays = daysBetween(dueDate, completedAt);
+      completedSlaHealth = lateDays <= 0 ? 'Healthy' : lateDays <= 1 ? 'At-Risk' : 'Breached';
+    }
+    return {
+      id: sm.id,
+      name: sm.name,
+      instruction: sm.instruction,
+      location: sm.location,
+      ownerId: sm.assignedTo,
+      status: sm.status === 'COMPLETED' ? 'Completed' : 'Not Started',
+      dueDate,
+      completedBy: sm.completedBy ? (teamMember(sm.completedBy)||{}).name || sm.completedBy : '',
+      completedAt,
+      completedSlaHealth,
+      comment: sm.completionNote || '',
+    };
+  });
+}
 
 const PHYSICAL_TRACKING_TEMPLATE = [
   {label:'Container Gated In · Origin Terminal', loc:'Shanghai Yangshan Port', source:'Terminal'},
@@ -978,40 +1010,11 @@ function buildShipmentDetail(base, seed){
     });
   }
 
-  const template = base.mode.includes('Export') ? OCEAN_EXPORT_TEMPLATE : OCEAN_IMPORT_TEMPLATE;
-  const etdDate = parseDisplayDate(base.etd);
-  const etaDate = parseDisplayDate(base.eta);
-  const span = etaDate.getTime() - etdDate.getTime();
-  const completedCount = base.completedMilestones;
-
-  const milestones = template.map((name,i)=>{
-    const frac = template.length>1 ? i/(template.length-1) : 0;
-    let dueDate = new Date(etdDate.getTime() + span*frac);
-    dueDate.setHours(9 + ((i*3)%8), (i%2)*30, 0, 0);
-    if(i === template.length-1 && seed % 3 === 0) dueDate = null;
-    // Demo overrides so "Today" / "Tomorrow" relative labels are always visible regardless of viewing date
-    if(seed===3 && i===4){ dueDate = new Date(); dueDate.setHours(14,30,0,0); }
-    if(seed===4 && i===6){ dueDate = new Date(); dueDate.setDate(dueDate.getDate()+1); dueDate.setHours(10,0,0,0); }
-    const isDone = i < completedCount;
-    let completedSlaHealth = null, completedBy = '', completedAt = null, comment = '';
-    if(isDone){
-      completedSlaHealth = ((i+seed) % 5 === 0) ? 'Breached' : ((i+seed) % 7 === 0) ? 'At-Risk' : 'Healthy';
-      completedBy = teamMember(shipTeamIds[(i+seed+1)%shipTeamIds.length]).name;
-      completedAt = new Date(Date.now() - (template.length-i)*86400000);
-      comment = (i%3===0) ? 'Cleared without exceptions.' : '';
-    }
-    return {
-      id: makeId('ms'),
-      name,
-      ownerId: shipTeamIds[(i+seed)%shipTeamIds.length],
-      status: isDone ? 'Completed' : 'Not Started',
-      dueDate,
-      completedBy,
-      completedAt,
-      completedSlaHealth,
-      comment,
-    };
-  });
+  // Milestones are NOT generated here. They are read from MilestoneStore —
+  // the same authoritative record the Field Channel reads and writes —
+  // so the Admin Portal and Field Channel can never drift into separate
+  // milestone states (see shared/milestone-store.js).
+  const milestones = toAdminMilestones(MilestoneStore.sync.getMilestonesForShipment(base.jobRef));
 
   const trackedCount = Math.min(PHYSICAL_TRACKING_TEMPLATE.length, 2 + (seed % 5));
   const physicalTracking = PHYSICAL_TRACKING_TEMPLATE.map((t,i)=>({
@@ -1500,17 +1503,43 @@ function openMilestoneModal(msId){
   el('input-milestone-comment').value = '';
   openModal('modal-milestone');
 }
-el('save-milestone').addEventListener('click', ()=>{
+function refreshCurrentShipmentMilestones(){
   const s = currentShipment();
-  const m = s.milestones.find(x=>x.id===state.activeMilestone);
-  m.status = 'Completed';
-  m.completedBy = CURRENT_USER;
-  m.completedAt = new Date();
-  m.completedSlaHealth = computeLiveSlaHealth(m.dueDate);
-  m.comment = el('input-milestone-comment').value.trim();
-  renderServiceDelivery(); renderShipHeader();
-  closeModal('modal-milestone');
-  showToast('Milestone marked complete');
+  if(!s) return;
+  s.milestones = toAdminMilestones(MilestoneStore.sync.getMilestonesForShipment(s.jobRef));
+  // openShipment() doesn't set state.currentView, so check the DOM directly
+  // for whether the shipment-detail view is actually the one on screen.
+  if(el('view-shipment-detail').classList.contains('active')){ renderServiceDelivery(); renderShipHeader(); }
+}
+el('save-milestone').addEventListener('click', ()=>{
+  const note = el('input-milestone-comment').value.trim();
+  const btn = el('save-milestone');
+  btn.disabled = true;
+  MilestoneStore.completeMilestone(state.activeMilestone, MilestoneStore.ADMIN_USER_ID, note).then(res=>{
+    closeModal('modal-milestone');
+    btn.disabled = false;
+    if(!res.ok){ showToast('Unable to update this milestone.', 'error'); return; }
+    refreshCurrentShipmentMilestones();
+    showToast(res.alreadyCompleted ? 'This milestone was already completed' : 'Milestone marked complete');
+  });
+});
+
+// Keep the open shipment in sync when the Field Channel (or another tab)
+// changes a milestone's assignment or status — never trust stale local state.
+MilestoneStore.subscribe(()=>{ refreshCurrentShipmentMilestones(); });
+
+// Testing aid: demo data lives in this browser's localStorage only, so the
+// Admin Portal and Field Channel only auto-sync when opened in the same
+// browser. This copies a link that loads today's exact milestone data on
+// another device/browser — open it there to bring the two back in sync.
+el('btn-copy-sync-link').addEventListener('click', async ()=>{
+  const link = MilestoneStore.getSyncLink();
+  try{
+    await navigator.clipboard.writeText(link);
+    showToast('Sync link copied — open it on the other device to match this data');
+  }catch(e){
+    window.prompt('Copy this sync link and open it on the other device:', link);
+  }
 });
 
 /* ==========================================================================
@@ -1707,11 +1736,13 @@ document.body.addEventListener('click', (e)=>{
 
   const reassignBtn = t.closest('[data-reassign-task]');
   if(reassignBtn){
-    const s = currentShipment();
-    const m = s.milestones.find(x=>x.id===reassignBtn.dataset.reassignTask);
-    m.ownerId = reassignBtn.dataset.newOwner;
-    renderServiceDelivery();
-    showToast('Task reassigned to ' + teamMember(reassignBtn.dataset.newOwner).name);
+    const msId = reassignBtn.dataset.reassignTask;
+    const newOwnerId = reassignBtn.dataset.newOwner;
+    MilestoneStore.reassignMilestone(msId, newOwnerId, MilestoneStore.ADMIN_USER_ID).then(res=>{
+      if(!res.ok){ showToast('Unable to reassign this milestone.', 'error'); return; }
+      refreshCurrentShipmentMilestones();
+      showToast('Task reassigned to ' + teamMember(newOwnerId).name);
+    });
     return;
   }
 
