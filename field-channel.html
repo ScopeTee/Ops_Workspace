@@ -44,52 +44,52 @@ h1,h2,h3{font-family:var(--font-display); color:var(--green-dark); margin:0}
 button{font-family:var(--font-body); cursor:pointer}
 input,textarea{font-family:var(--font-body)}
 
-.app{ max-width:520px; margin:0 auto; min-height:100vh; background:var(--cream); display:flex; flex-direction:column; box-shadow:var(--shadow-e2); position:relative; }
+.app{ max-width:520px; margin:0 auto; height:100vh; background:var(--cream); display:flex; flex-direction:column; box-shadow:var(--shadow-e2); position:relative; overflow:hidden; }
 
 /* ---- Top bar ---- */
 .topbar{
   position:sticky; top:0; z-index:20; background:var(--green-dark); color:var(--cream);
-  padding:16px 18px; display:flex; align-items:center; gap:10px; min-height:30px;
+  padding:12px 16px 14px; flex-shrink:0;
 }
-.topbar .back-btn{ background:none; border:none; color:var(--cream); padding:6px; margin:-6px; display:flex; border-radius:var(--radius-sm); }
-.topbar .back-btn:active{ background:rgba(255,255,255,.12); }
-.topbar h1{ color:var(--cream); font-size:17px; font-weight:600; flex:1; }
-.topbar .user-chip{ display:flex; align-items:center; gap:7px; background:rgba(253,251,241,.1); border:none; color:var(--cream); padding:6px 10px 6px 6px; border-radius:999px; font-size:12.5px; font-weight:600; }
-.topbar .avatar{ width:24px; height:24px; border-radius:50%; background:var(--green-accent); color:var(--green-dark); display:grid; place-items:center; font-family:var(--font-display); font-weight:700; font-size:11px; flex-shrink:0 }
-.topbar .refresh-btn{ background:none; border:none; color:var(--cream); padding:6px; margin:-6px; border-radius:var(--radius-sm); display:flex; }
-.topbar .refresh-btn.spinning svg{ animation: spin .8s linear infinite; }
+.topbar-simple{ display:flex; align-items:center; gap:10px; min-height:26px; padding-top:16px; padding-bottom:16px; }
+.topbar-simple h1{ color:var(--cream); font-size:17px; font-weight:600; flex:1; }
+.back-btn{ background:none; border:none; color:var(--cream); padding:6px; margin:-6px; display:flex; border-radius:var(--radius-sm); }
+.back-btn:active{ background:rgba(255,255,255,.12); }
+
+.identity-row{ display:flex; align-items:center; justify-content:space-between; margin-bottom:12px; }
+.brand-mark{ width:30px; height:30px; border-radius:8px; background:var(--green-accent); color:var(--green-dark); display:grid; place-items:center; font-family:var(--font-display); font-weight:700; font-size:12px; flex-shrink:0; }
+.page-head{ display:flex; align-items:center; justify-content:space-between; gap:10px; }
+.page-head h1{ color:var(--cream); font-size:20px; flex:1; }
+
+.user-chip{ display:flex; align-items:center; gap:7px; background:rgba(253,251,241,.1); border:none; color:var(--cream); padding:6px 10px 6px 6px; border-radius:999px; font-size:12.5px; font-weight:600; }
+.avatar{ width:24px; height:24px; border-radius:50%; background:var(--green-accent); color:var(--green-dark); display:grid; place-items:center; font-family:var(--font-display); font-weight:700; font-size:11px; flex-shrink:0 }
+.refresh-btn{ background:none; border:none; color:var(--cream); padding:6px; margin:-6px; border-radius:var(--radius-sm); display:flex; }
+.refresh-btn.spinning svg{ animation: spin .8s linear infinite; }
 @keyframes spin{ to{ transform:rotate(360deg); } }
 
 /* ---- Screens ---- */
-.screen{ display:none; flex:1; flex-direction:column; }
+.screen{ display:none; flex:1; flex-direction:column; min-height:0; }
 .screen.active{ display:flex; }
 
-/* ---- Filter tabs ---- */
-.filter-bar{ display:flex; gap:8px; padding:12px 16px 4px; }
-.filter-chip{
-  border:1px solid var(--border-tint); background:var(--white); color:var(--silver-dark);
-  padding:7px 14px; border-radius:999px; font-size:13px; font-weight:600; font-family:var(--font-display);
-}
-.filter-chip.active{ background:var(--green-dark); border-color:var(--green-dark); color:var(--green-accent); }
-
 /* ---- To-Do list ---- */
-.list{ padding:8px 16px 100px; display:flex; flex-direction:column; gap:10px; flex:1; }
+.list{ padding:12px 16px 16px; display:flex; flex-direction:column; gap:10px; flex:1; overflow-y:auto; }
 .ms-card{
   background:var(--white); border:1px solid var(--border-tint); border-radius:var(--radius-lg);
-  padding:14px 16px; display:flex; flex-direction:column; gap:6px; text-align:left; width:100%;
+  padding:14px 16px; display:flex; flex-direction:column; gap:7px; text-align:left; width:100%; cursor:pointer;
 }
 .ms-card:active{ background:var(--green-light-surface); }
 .ms-card .row1{ display:flex; justify-content:space-between; align-items:flex-start; gap:10px; }
 .ms-card .ms-name{ font-family:var(--font-display); font-weight:600; font-size:15.5px; color:var(--green-dark); }
 .ms-card .ship-ref{ font-family:var(--font-display); font-weight:600; font-size:12.5px; color:var(--silver-dark); background:var(--green-light-surface); padding:3px 9px; border-radius:var(--radius-sm); white-space:nowrap; }
+.ms-card .customer-line{ font-size:12.5px; color:var(--silver-dark); font-weight:600; }
 .ms-card .meta-row{ display:flex; flex-wrap:wrap; gap:6px 10px; font-size:12.5px; color:var(--silver-light); align-items:center; }
 .ms-card .meta-row svg{ vertical-align:-2px; margin-right:3px; }
-.status-pill{ display:inline-flex; align-items:center; gap:5px; font-family:var(--font-display); font-weight:600; font-size:11.5px; padding:4px 10px; border-radius:999px; }
-.status-pill.not-started{ background:var(--gold-bg); color:var(--gold-text); }
-.status-pill.completed{ background:var(--success-bg); color:var(--success-text); }
-.due-label{ font-weight:600; }
-.due-label.overdue{ color:var(--error); }
-.due-label.today{ color:var(--success-text); }
+.ms-card .btn-card-complete{ margin-top:4px; padding:10px; font-size:13.5px; }
+
+.sla-pill{ display:inline-flex; align-items:center; gap:5px; font-family:var(--font-display); font-weight:600; font-size:11.5px; padding:4px 10px; border-radius:999px; align-self:flex-start; }
+.sla-pill.healthy{ background:var(--success-bg); color:var(--success-text); }
+.sla-pill.at-risk{ background:var(--gold-bg); color:var(--gold-text); }
+.sla-pill.breached{ background:var(--error-bg); color:var(--error-text); }
 
 /* ---- Empty state ---- */
 .empty-state{ flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:40px 30px; gap:10px; color:var(--silver-light); }
@@ -98,34 +98,41 @@ input,textarea{font-family:var(--font-body)}
 .empty-state p{ margin:0; font-size:13.5px; max-width:280px; }
 
 /* ---- Detail screen ---- */
-.detail-body{ padding:18px 18px 130px; flex:1; overflow-y:auto; }
-.detail-status-banner{ display:flex; align-items:center; gap:8px; padding:10px 14px; border-radius:var(--radius-md); font-weight:600; font-size:13.5px; margin-bottom:16px; }
-.detail-status-banner.not-started{ background:var(--gold-bg); color:var(--gold-text); }
-.detail-status-banner.completed{ background:var(--success-bg); color:var(--success-text); }
-.detail-h1{ font-size:21px; margin-bottom:4px; }
-.detail-sub{ color:var(--silver-light); font-size:13.5px; margin-bottom:20px; }
-.info-card{ background:var(--white); border:1px solid var(--border-tint); border-radius:var(--radius-lg); padding:16px; margin-bottom:14px; }
-.info-card h3{ font-size:12.5px; text-transform:uppercase; letter-spacing:.04em; color:var(--silver-light); margin-bottom:10px; font-family:var(--font-body); font-weight:700; }
-.info-row{ display:flex; justify-content:space-between; gap:12px; padding:7px 0; border-bottom:1px solid var(--border-tint); font-size:13.5px; }
+.detail-body{ padding:16px 18px 12px; flex:1; overflow-y:auto; min-height:0; }
+.detail-status-banner{ display:flex; align-items:center; gap:8px; padding:10px 14px; border-radius:var(--radius-md); font-weight:600; font-size:13.5px; margin-bottom:14px; }
+.detail-status-banner.healthy{ background:var(--success-bg); color:var(--success-text); }
+.detail-status-banner.at-risk{ background:var(--gold-bg); color:var(--gold-text); }
+.detail-status-banner.breached{ background:var(--error-bg); color:var(--error-text); }
+.detail-h1{ font-size:20px; margin-bottom:3px; }
+.detail-sub{ color:var(--silver-light); font-size:13.5px; margin-bottom:14px; }
+.info-card{ background:var(--white); border:1px solid var(--border-tint); border-radius:var(--radius-lg); padding:6px 16px; margin-bottom:14px; }
+.info-row{ display:flex; justify-content:space-between; gap:12px; padding:9px 0; border-bottom:1px solid var(--border-tint); font-size:13.5px; }
 .info-row:last-child{ border-bottom:none; }
 .info-row .k{ color:var(--silver-light); flex-shrink:0; }
 .info-row .v{ color:var(--silver-dark); font-weight:600; text-align:right; }
-.instruction-text{ font-size:14px; color:var(--silver-dark); line-height:1.6; }
-.completion-meta{ font-size:13px; color:var(--silver-light); }
-.completion-meta b{ color:var(--green-dark); }
-.note-block{ background:var(--green-light-surface); border-radius:var(--radius-md); padding:10px 12px; font-size:13.5px; margin-top:8px; color:var(--silver-dark); }
 
-/* ---- Bottom action bar ---- */
-.bottom-bar{ position:sticky; bottom:0; background:var(--cream); border-top:1px solid var(--border-tint); padding:14px 18px calc(14px + env(safe-area-inset-bottom)); }
+/* ---- Bottom action bar (per-screen primary action) ---- */
+.bottom-bar{ background:var(--cream); border-top:1px solid var(--border-tint); padding:14px 18px; flex-shrink:0; }
 .btn{ font-family:var(--font-display); font-weight:600; font-size:15px; border-radius:var(--radius-md); border:none; padding:14px 18px; width:100%; display:flex; align-items:center; justify-content:center; gap:8px; }
 .btn-primary{ background:var(--green-dark); color:var(--green-accent); }
 .btn-primary:active{ background:var(--green-dark-hover); }
 .btn-primary:disabled{ opacity:.5; }
 .btn-outline{ background:var(--white); color:var(--green-dark); border:1.5px solid var(--border-tint); }
-.btn-danger-text{ background:none; color:var(--silver-light); font-weight:600; }
+
+/* ---- Bottom tab navigation ---- */
+.bottom-nav{ display:flex; background:var(--white); border-top:1px solid var(--border-tint); flex-shrink:0; padding:4px 6px calc(4px + env(safe-area-inset-bottom)); }
+.bottom-nav.hidden{ display:none; }
+.nav-item{ flex:1; display:flex; flex-direction:column; align-items:center; gap:2px; background:none; border:none; padding:8px 4px 6px; color:var(--silver-light); }
+.nav-item svg{ stroke:var(--silver-light); }
+.nav-item span{ font-family:var(--font-display); font-size:11px; font-weight:600; }
+.nav-item.active{ color:var(--green-dark); }
+.nav-item.active svg{ stroke:var(--green-dark); }
+
+/* ---- Expense screen ---- */
+.expense-body{ flex:1; display:flex; flex-direction:column; justify-content:center; overflow-y:auto; }
 
 /* ---- Login screen ---- */
-.login-screen{ flex:1; display:flex; flex-direction:column; justify-content:center; padding:32px 26px; gap:22px; }
+.login-screen{ flex:1; display:flex; flex-direction:column; justify-content:center; padding:32px 26px; gap:22px; overflow-y:auto; }
 .login-brand{ text-align:center; margin-bottom:8px; }
 .login-brand .mark{ width:52px; height:52px; border-radius:14px; background:var(--green-dark); color:var(--green-accent); display:grid; place-items:center; font-family:var(--font-display); font-weight:700; font-size:20px; margin:0 auto 12px; }
 .login-brand h1{ font-size:19px; }
@@ -182,29 +189,70 @@ input,textarea{font-family:var(--font-body)}
     </div>
   </div>
 
-  <!-- ============== TO-DOS ============== -->
+  <!-- ============== TO-DOS (tab root) ============== -->
   <div class="screen" id="screen-todos">
     <div class="topbar">
-      <h1>My To-Dos</h1>
-      <button class="refresh-btn" id="btn-refresh" title="Refresh">
-        <svg width="19" height="19" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M21 12a9 9 0 11-3-6.7" stroke-linecap="round"></path><path d="M21 3v6h-6" stroke-linecap="round" stroke-linejoin="round"></path></svg>
-      </button>
-      <button class="user-chip" id="btn-account"><span class="avatar" id="me-avatar"></span><span id="me-name"></span></button>
+      <div class="identity-row">
+        <div class="brand-mark">OP</div>
+        <button class="user-chip me-account"><span class="avatar me-avatar"></span><span class="me-name"></span></button>
+      </div>
+      <div class="page-head">
+        <h1>My To-Dos</h1>
+        <button class="refresh-btn" id="btn-refresh" title="Refresh">
+          <svg width="19" height="19" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M21 12a9 9 0 11-3-6.7" stroke-linecap="round"></path><path d="M21 3v6h-6" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+        </button>
+      </div>
     </div>
-    <div class="filter-bar" id="filter-bar"></div>
     <div id="todos-banner"></div>
     <div class="list" id="todos-list"></div>
   </div>
 
-  <!-- ============== MILESTONE DETAIL ============== -->
-  <div class="screen" id="screen-detail">
+  <!-- ============== EXPENSE (tab root) ============== -->
+  <div class="screen" id="screen-expense">
     <div class="topbar">
+      <div class="identity-row">
+        <div class="brand-mark">OP</div>
+        <button class="user-chip me-account"><span class="avatar me-avatar"></span><span class="me-name"></span></button>
+      </div>
+      <div class="page-head"><h1>Expense</h1></div>
+    </div>
+    <div class="expense-body">
+      <div class="empty-state">
+        <div class="icon" id="expense-icon"></div>
+        <h3>No expense requests yet</h3>
+        <p>Submit a request when you incur an eligible field expense.</p>
+      </div>
+    </div>
+    <div class="bottom-bar">
+      <button class="btn btn-primary" id="btn-request-expense">Request Expense</button>
+    </div>
+  </div>
+
+  <!-- ============== MILESTONE DETAIL (drill-down) ============== -->
+  <div class="screen" id="screen-detail">
+    <div class="topbar topbar-simple">
       <button class="back-btn" id="btn-back-detail"><svg width="21" height="21" fill="none" stroke="currentColor" stroke-width="2.3" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6" stroke-linecap="round" stroke-linejoin="round"></path></svg></button>
       <h1>Milestone</h1>
     </div>
     <div id="detail-banner"></div>
     <div class="detail-body" id="detail-body"></div>
     <div class="bottom-bar" id="detail-action-bar"></div>
+  </div>
+
+  <!-- ============== BOTTOM TAB NAV ============== -->
+  <div class="bottom-nav hidden" id="bottom-nav">
+    <button class="nav-item" data-nav="todos">
+      <svg width="21" height="21" fill="none" stroke-width="2.1" viewBox="0 0 24 24"><path d="M9 11l3 3L22 4" stroke-linecap="round" stroke-linejoin="round"></path><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+      <span>Tasks</span>
+    </button>
+    <button class="nav-item" data-nav="expense">
+      <svg width="21" height="21" fill="none" stroke-width="2.1" viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2.5"></rect><path d="M2 10h20" stroke-linecap="round"></path></svg>
+      <span>Expense</span>
+    </button>
+    <button class="nav-item" data-nav="more">
+      <svg width="21" height="21" fill="currentColor" stroke="none" viewBox="0 0 24 24"><circle cx="5" cy="12" r="2"></circle><circle cx="12" cy="12" r="2"></circle><circle cx="19" cy="12" r="2"></circle></svg>
+      <span>More</span>
+    </button>
   </div>
 
 </div>
@@ -233,17 +281,29 @@ const ICON_CHECK = '<svg width="14" height="14" fill="none" stroke="currentColor
 const ICON_CLOCK = '<svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 3" stroke-linecap="round"></path></svg>';
 const ICON_PIN = '<svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M12 21s7-6.6 7-12a7 7 0 10-14 0c0 5.4 7 12 7 12z"></path><circle cx="12" cy="9" r="2.4"></circle></svg>';
 const ICON_WARN = '<svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M12 9v4M12 17h.01M10.3 3.86L1.8 18a2 2 0 001.7 3h17a2 2 0 001.7-3L13.7 3.86a2 2 0 00-3.4 0z" stroke-linecap="round" stroke-linejoin="round"></path></svg>';
+const ICON_RECEIPT = '<svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 2h12v20l-3-2-3 2-3-2-3 2V2z"></path><path d="M9 8h6M9 12h6" stroke-linecap="round"></path></svg>';
+const SLA_ICON = { healthy: ICON_CLOCK, 'at-risk': ICON_WARN, breached: ICON_WARN };
 
 const state = {
   me: null,
-  filter: 'ALL',
   todos: [],
   currentMilestoneId: null,
-  loadingTodos: false,
+  confirmTarget: null, // { id, source: 'todos' | 'detail' }
+  completing: false,
 };
 
 function el(id){ return document.getElementById(id); }
-function showScreen(id){ document.querySelectorAll('.screen').forEach(s=>s.classList.toggle('active', s.id===id)); }
+
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.toggle('active', s.id===id));
+  const isTabRoot = id==='screen-todos' || id==='screen-expense';
+  el('bottom-nav').classList.toggle('hidden', !isTabRoot);
+  if(isTabRoot) setActiveNav(id==='screen-todos' ? 'todos' : 'expense');
+}
+function setActiveNav(key){
+  document.querySelectorAll('.nav-item').forEach(b=>b.classList.toggle('active', b.dataset.nav===key));
+}
+
 function showToast(msg, type){
   const wrap = el('toast-wrap');
   const t = document.createElement('div');
@@ -252,7 +312,28 @@ function showToast(msg, type){
   wrap.appendChild(t);
   setTimeout(()=>{ t.style.opacity='0'; t.style.transition='opacity .25s'; setTimeout(()=>t.remove(),250); }, 2800);
 }
-function initials(name){ return name.split(' ').map(p=>p[0]).slice(0,2).join('').toUpperCase(); }
+function bannerHtml(kind, msg){
+  return `<div class="banner ${kind}">${ICON_WARN}<span>${msg}</span></div>`;
+}
+function transportLabelOf(s){
+  return s.mode.includes('Ocean') ? 'Ocean Freight' : s.mode.includes('Air') ? 'Air Freight' : s.mode;
+}
+// SLA is derived client-side from the due date, the same way the Admin
+// Portal computes it — not a stored field, so both surfaces always agree.
+function slaMeta(dueDateIso){
+  if(!dueDateIso) return { tier:'healthy', label:'No due date' };
+  const due = new Date(dueDateIso);
+  const now = new Date();
+  const startOfDay = d => new Date(d.getFullYear(), d.getMonth(), d.getDate());
+  const diffDays = Math.round((startOfDay(due) - startOfDay(now)) / 86400000);
+  const time = due.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit',hour12:false});
+  const dateStr = due.toLocaleDateString('en-GB',{day:'2-digit',month:'short'});
+  if(diffDays < 0) return { tier:'breached', label:`Overdue · ${dateStr}` };
+  if(diffDays === 0) return { tier:'at-risk', label:`Due Today · ${time}` };
+  if(diffDays === 1) return { tier:'at-risk', label:`Due Tomorrow · ${time}` };
+  if(diffDays <= 2) return { tier:'at-risk', label:`Due ${dateStr}` };
+  return { tier:'healthy', label:`Due ${dateStr}` };
+}
 
 /* ==========================================================================
    Auth (simulated) — stands in for the org's real login. A real build
@@ -272,65 +353,58 @@ el('staff-list').addEventListener('click', (e)=>{
   if(!btn) return;
   signIn(btn.dataset.uid);
 });
+function renderIdentity(){
+  document.querySelectorAll('.me-avatar').forEach(n=>n.textContent = state.me.initials);
+  document.querySelectorAll('.me-name').forEach(n=>n.textContent = state.me.name.split(' ')[0]);
+}
 function signIn(userId){
   state.me = MilestoneStore.getUserById(userId);
   localStorage.setItem(ME_KEY, userId);
-  el('me-avatar').textContent = state.me.initials;
-  el('me-name').textContent = state.me.name.split(' ')[0];
+  renderIdentity();
   goToTodos();
 }
-el('btn-account').addEventListener('click', ()=>{
+document.querySelectorAll('.me-account').forEach(btn=>btn.addEventListener('click', ()=>{
   localStorage.removeItem(ME_KEY);
   state.me = null;
   showScreen('screen-login');
   renderLogin();
+}));
+
+/* ==========================================================================
+   Bottom tab navigation — Tasks / Expense are real destinations; More is
+   an intentional dead end (no screen, no navigation) for this MVP.
+   ========================================================================== */
+el('bottom-nav').addEventListener('click', (e)=>{
+  const btn = e.target.closest('.nav-item');
+  if(!btn) return;
+  const nav = btn.dataset.nav;
+  if(nav==='todos') goToTodos();
+  else if(nav==='expense') showScreen('screen-expense');
+  else if(nav==='more') showToast("More isn't wired up in this prototype yet");
+});
+el('expense-icon').innerHTML = ICON_RECEIPT;
+el('btn-request-expense').addEventListener('click', ()=>{
+  showToast("Expense requests aren't wired up in this prototype yet");
 });
 
 /* ==========================================================================
-   To-Dos
+   To-Dos — a completed milestone is not shown here at all (spec: once
+   complete, it's off the Field Channel), sorted earliest due date first.
    ========================================================================== */
 function goToTodos(){
   showScreen('screen-todos');
-  renderFilterBar();
   loadTodos();
-}
-function renderFilterBar(){
-  const options = [['ALL','All'],['NOT_STARTED','Not Started'],['COMPLETED','Completed']];
-  el('filter-bar').innerHTML = options.map(([key,label])=>
-    `<button class="filter-chip ${state.filter===key?'active':''}" data-filter="${key}">${label}</button>`).join('');
-}
-el('filter-bar').addEventListener('click', (e)=>{
-  const btn = e.target.closest('[data-filter]');
-  if(!btn) return;
-  state.filter = btn.dataset.filter;
-  renderFilterBar();
-  renderTodosList();
-});
-
-function dueMeta(dueDateIso){
-  if(!dueDateIso) return {label:'No due date', cls:''};
-  const due = new Date(dueDateIso);
-  const now = new Date();
-  const startOfDay = d => new Date(d.getFullYear(), d.getMonth(), d.getDate());
-  const diffDays = Math.round((startOfDay(due) - startOfDay(now)) / 86400000);
-  const time = due.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit',hour12:false});
-  if(diffDays < 0) return {label:`Overdue · ${due.toLocaleDateString('en-GB',{day:'2-digit',month:'short'})}`, cls:'overdue'};
-  if(diffDays === 0) return {label:`Due Today · ${time}`, cls:'today'};
-  if(diffDays === 1) return {label:`Due Tomorrow · ${time}`, cls:''};
-  return {label:`Due ${due.toLocaleDateString('en-GB',{day:'2-digit',month:'short'})}`, cls:''};
 }
 
 function loadTodos(){
-  state.loadingTodos = true;
   el('btn-refresh').classList.add('spinning');
   el('todos-banner').innerHTML = '';
   MilestoneStore.getMyMilestones(state.me.id).then(items=>{
-    state.todos = items;
+    state.todos = items.filter(({milestone}) => milestone.status === 'NOT_STARTED');
     renderTodosList();
   }).catch(()=>{
     el('todos-banner').innerHTML = bannerHtml('error', 'Unable to load your To-Dos. Please check your connection and try again.');
   }).finally(()=>{
-    state.loadingTodos = false;
     el('btn-refresh').classList.remove('spinning');
   });
 }
@@ -339,16 +413,7 @@ document.addEventListener('visibilitychange', ()=>{
   if(document.visibilityState==='visible' && state.me && el('screen-todos').classList.contains('active')) loadTodos();
 });
 
-function bannerHtml(kind, msg){
-  return `<div class="banner ${kind}">${ICON_WARN}<span>${msg}</span></div>`;
-}
-
 function renderTodosList(){
-  const filtered = state.todos.filter(({milestone})=>{
-    if(state.filter==='ALL') return true;
-    return milestone.status === state.filter;
-  });
-
   if(!state.todos.length){
     el('todos-list').innerHTML = `
       <div class="empty-state">
@@ -358,45 +423,41 @@ function renderTodosList(){
       </div>`;
     return;
   }
-  if(!filtered.length){
-    el('todos-list').innerHTML = `
-      <div class="empty-state">
-        <div class="icon">${ICON_CLOCK}</div>
-        <h3>Nothing here</h3>
-        <p>No ${state.filter==='COMPLETED' ? 'completed milestones yet' : 'milestones in this view'}.</p>
-      </div>`;
-    return;
-  }
 
-  el('todos-list').innerHTML = filtered.map(({milestone:m, shipment:s})=>{
-    const isDone = m.status==='COMPLETED';
-    const due = dueMeta(m.dueDate);
+  el('todos-list').innerHTML = state.todos.map(({milestone:m, shipment:s})=>{
+    const sla = slaMeta(m.dueDate);
     return `
-    <button class="ms-card" data-open-ms="${m.id}">
+    <div class="ms-card" data-open-ms="${m.id}">
       <div class="row1">
         <span class="ms-name">${m.name}</span>
         <span class="ship-ref">${s.jobRef}</span>
       </div>
+      <div class="customer-line">${s.customer}</div>
       <div class="meta-row">
-        <span>${s.serviceType || s.mode}</span>
+        <span>${transportLabelOf(s)}</span>
         <span>·</span>
         <span>${ICON_PIN}${m.location}</span>
       </div>
-      <div class="meta-row">
-        <span class="status-pill ${isDone?'completed':'not-started'}">${isDone?ICON_CHECK+'Completed':'Not Started'}</span>
-        ${!isDone ? `<span class="due-label ${due.cls}">${ICON_CLOCK} ${due.label}</span>` : ''}
-      </div>
-    </button>`;
+      <span class="sla-pill ${sla.tier}">${SLA_ICON[sla.tier]}${sla.label}</span>
+      <button class="btn btn-outline btn-card-complete" data-complete-ms="${m.id}">${ICON_CHECK} Mark Complete</button>
+    </div>`;
   }).join('');
 }
 el('todos-list').addEventListener('click', (e)=>{
+  const completeBtn = e.target.closest('[data-complete-ms]');
+  if(completeBtn){
+    const item = state.todos.find(t=>t.milestone.id===completeBtn.dataset.completeMs);
+    if(item) openConfirmSheet(item.milestone, item.shipment, 'todos');
+    return;
+  }
   const card = e.target.closest('[data-open-ms]');
-  if(!card) return;
-  openMilestoneDetail(card.dataset.openMs);
+  if(card) openMilestoneDetail(card.dataset.openMs);
 });
 
 /* ==========================================================================
-   Milestone Detail
+   Milestone Detail — compact, single-screen: status/SLA, milestone name,
+   and just enough shipment context to execute it, with the primary action
+   always visible without scrolling.
    ========================================================================== */
 function openMilestoneDetail(id){
   state.currentMilestoneId = id;
@@ -406,17 +467,20 @@ function openMilestoneDetail(id){
   el('detail-action-bar').innerHTML = '';
   loadMilestoneDetail();
 }
-el('btn-back-detail').addEventListener('click', ()=>{
-  goToTodos();
-});
+el('btn-back-detail').addEventListener('click', goToTodos);
 
 function loadMilestoneDetail(){
   MilestoneStore.getMilestone(state.currentMilestoneId).then(result=>{
     if(!result){
-      el('detail-body').innerHTML = '';
-      el('detail-banner').innerHTML = bannerHtml('warn', 'This milestone is no longer available.');
-      el('detail-action-bar').innerHTML = `<button class="btn btn-outline" id="btn-back-empty">Back to To-Dos</button>`;
-      el('btn-back-empty').addEventListener('click', goToTodos);
+      showToast('This milestone is no longer available.', 'error');
+      goToTodos();
+      return;
+    }
+    // A completed milestone is never shown here — it's off the Field
+    // Channel the moment it's done, even if this screen was already open.
+    if(result.milestone.status === 'COMPLETED'){
+      showToast('This milestone has already been completed', 'error');
+      goToTodos();
       return;
     }
     renderMilestoneDetail(result.milestone, result.shipment);
@@ -429,49 +493,29 @@ function loadMilestoneDetail(){
 }
 
 function renderMilestoneDetail(m, s){
-  const isDone = m.status === 'COMPLETED';
   const isMine = m.assignedTo === state.me.id;
-  const due = dueMeta(m.dueDate);
+  const sla = slaMeta(m.dueDate);
 
-  el('detail-banner').innerHTML = (!isDone && !isMine)
+  el('detail-banner').innerHTML = !isMine
     ? bannerHtml('warn', 'This milestone is no longer assigned to you.')
     : '';
 
   el('detail-body').innerHTML = `
-    <div class="detail-status-banner ${isDone?'completed':'not-started'}">
-      ${isDone ? ICON_CHECK+' Completed' : ICON_CLOCK+' Not Started'}
-    </div>
+    <div class="detail-status-banner ${sla.tier}">${SLA_ICON[sla.tier]} ${sla.label}</div>
     <h2 class="detail-h1">${m.name}</h2>
     <p class="detail-sub">${s.jobRef} · ${s.customer}</p>
-
     <div class="info-card">
-      <h3>Shipment</h3>
       <div class="info-row"><span class="k">Reference</span><span class="v">${s.jobRef}</span></div>
-      <div class="info-row"><span class="k">Service</span><span class="v">${s.serviceType || s.mode}</span></div>
+      <div class="info-row"><span class="k">Customer</span><span class="v">${s.customer}</span></div>
+      <div class="info-row"><span class="k">Transport</span><span class="v">${transportLabelOf(s)}</span></div>
       <div class="info-row"><span class="k">Route</span><span class="v">${s.route}</span></div>
       <div class="info-row"><span class="k">Location</span><span class="v">${m.location}</span></div>
-      ${!isDone ? `<div class="info-row"><span class="k">Due</span><span class="v">${due.label}</span></div>` : ''}
     </div>
-
-    <div class="info-card">
-      <h3>Instruction</h3>
-      <p class="instruction-text">${m.instruction || 'No additional instruction provided for this milestone.'}</p>
-    </div>
-
-    ${isDone ? `
-    <div class="info-card">
-      <h3>Completion</h3>
-      <p class="completion-meta">Completed by <b>${(MilestoneStore.getUserById(m.completedBy)||{}).name || 'Unknown'}</b><br>${new Date(m.completedAt).toLocaleString('en-GB',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'})}</p>
-      ${m.completionNote ? `<div class="note-block">${m.completionNote}</div>` : ''}
-    </div>` : ''}
   `;
 
-  if(isDone){
-    el('detail-action-bar').innerHTML = `<button class="btn btn-outline" id="btn-done-back">Back to To-Dos</button>`;
-    el('btn-done-back').addEventListener('click', goToTodos);
-  } else if(isMine){
+  if(isMine){
     el('detail-action-bar').innerHTML = `<button class="btn btn-primary" id="btn-mark-complete">${ICON_CHECK} Mark as Complete</button>`;
-    el('btn-mark-complete').addEventListener('click', ()=>openConfirmSheet(m, s));
+    el('btn-mark-complete').addEventListener('click', ()=>openConfirmSheet(m, s, 'detail'));
   } else {
     el('detail-action-bar').innerHTML = `<button class="btn btn-outline" id="btn-refresh-detail">Refresh</button>`;
     el('btn-refresh-detail').addEventListener('click', loadMilestoneDetail);
@@ -481,7 +525,8 @@ function renderMilestoneDetail(m, s){
 /* ==========================================================================
    Completion confirmation + mutation
    ========================================================================== */
-function openConfirmSheet(m, s){
+function openConfirmSheet(m, s, source){
+  state.confirmTarget = { id: m.id, source };
   el('confirm-sub').textContent = `${m.name} — ${s.jobRef}`;
   el('confirm-note').value = '';
   el('confirm-complete').disabled = false;
@@ -494,44 +539,51 @@ el('confirm-sheet').addEventListener('click', (e)=>{ if(e.target.id==='confirm-s
 
 el('confirm-complete').addEventListener('click', ()=>{
   const note = el('confirm-note').value;
+  const target = state.confirmTarget;
   const btn = el('confirm-complete');
   btn.disabled = true;
   btn.innerHTML = '<span class="spinner"></span> Completing…';
 
+  // Suppressed while our own mutation is in flight: the store notifies
+  // subscribers as soon as it commits, which can otherwise race this same
+  // request's own response and trigger a spurious re-fetch mid-flight.
+  state.completing = true;
+
   // Revalidate immediately before mutating — never trust the state the
   // screen was rendered with (spec section 28: backend is authoritative).
-  MilestoneStore.getMilestone(state.currentMilestoneId).then(fresh=>{
+  MilestoneStore.getMilestone(target.id).then(fresh=>{
     if(!fresh) return Promise.reject({code:'NOT_FOUND'});
-    return MilestoneStore.completeMilestone(state.currentMilestoneId, state.me.id, note);
+    return MilestoneStore.completeMilestone(target.id, state.me.id, note);
   }).then(res=>{
+    state.completing = false;
     closeConfirmSheet();
-    if(!res.ok){
-      handleCompletionError(res.code);
-      return;
-    }
-    loadMilestoneDetail();
+    if(!res.ok){ handleCompletionError(res.code, target.source); return; }
     showToast(res.alreadyCompleted ? 'This milestone has already been completed' : 'Milestone marked complete');
+    // Completed milestones are no longer accessible on the Field Channel,
+    // so always land back on the To-Dos list rather than re-showing detail.
+    goToTodos();
   }).catch(err=>{
-    btn.disabled = false;
-    btn.innerHTML = 'Complete';
+    state.completing = false;
     const code = err && err.code;
     if(code === 'NETWORK_ERROR'){
+      btn.disabled = false;
+      btn.innerHTML = 'Complete';
       showToast('Unable to update this milestone. Please check your connection and try again.', 'error');
     } else {
       closeConfirmSheet();
-      handleCompletionError(code || 'NOT_FOUND');
+      handleCompletionError(code || 'NOT_FOUND', target.source);
     }
   });
 });
 
-function handleCompletionError(code){
+function handleCompletionError(code, source){
   const messages = {
     FORBIDDEN: 'This milestone is no longer assigned to you.',
     NOT_FOUND: 'This milestone is no longer available.',
     UNAUTHENTICATED: 'You no longer have permission to update this milestone.',
   };
   showToast(messages[code] || 'Unable to update this milestone.', 'error');
-  loadMilestoneDetail();
+  if(source === 'detail') loadMilestoneDetail(); else loadTodos();
 }
 
 /* ==========================================================================
@@ -540,7 +592,7 @@ function handleCompletionError(code){
    than trusting whatever it last rendered.
    ========================================================================== */
 MilestoneStore.subscribe(()=>{
-  if(!state.me) return;
+  if(!state.me || state.completing) return;
   if(el('screen-todos').classList.contains('active')) loadTodos();
   if(el('screen-detail').classList.contains('active')) loadMilestoneDetail();
 });
@@ -553,8 +605,7 @@ MilestoneStore.subscribe(()=>{
   const saved = savedId ? MilestoneStore.getUserById(savedId) : null;
   if(saved && !saved.isAdmin){
     state.me = saved;
-    el('me-avatar').textContent = saved.initials;
-    el('me-name').textContent = saved.name.split(' ')[0];
+    renderIdentity();
     goToTodos();
   } else {
     renderLogin();

@@ -88,21 +88,42 @@ sequence (section 43):
   its own identity for a completion (`completeMilestone` takes the acting
   user id, but a real backend would derive it from the session/token, not
   trust a client-supplied value).
-- **To-Dos** — milestones assigned to the signed-in user, with
-  All / Not Started / Completed filters, due-date labels (Today /
-  Tomorrow / Overdue), and the "You're all caught up" / "No completed
-  milestones yet" empty states from spec sections 35–36.
-- **Milestone Detail** — milestone name, status, instruction, and the
-  minimum shipment context from spec section 19 (reference, service type,
-  route, location). Completed milestones show who completed them, when,
-  and the optional note.
+- **Bottom tab navigation** — Tasks / Expense / More. Tasks is the To-Dos
+  flow described below. Expense is a placeholder screen with a "Request
+  Expense" button that isn't wired up yet (shows a toast, same convention
+  the Admin Portal already uses for unbuilt actions). More is an
+  intentional dead end for this MVP — tapping it doesn't navigate
+  anywhere.
+- **To-Dos** — milestones assigned to the signed-in user, sorted by due
+  date (earliest first). A completed milestone is not shown here at all —
+  once done, it's off the Field Channel, so there's no separate
+  "Completed" filter. Each card shows the customer, the shipment's
+  transport type, the execution location, and an SLA indicator
+  (Healthy / At Risk / Breached, derived from the due date) alongside a
+  "Mark Complete" action, so a milestone can be completed straight from
+  the list without opening it. The "You're all caught up" empty state is
+  from spec section 35.
+- **Milestone Detail** — a compact, single-screen view (no scrolling
+  needed to reach the action button): an SLA/status banner, the milestone
+  name, and the shipment context needed to execute it (reference,
+  customer, transport, route, location). Opened only for a milestone that
+  is still `NOT_STARTED` and assigned to the signed-in user; if it's
+  already been completed or reassigned elsewhere by the time the screen
+  loads, the app shows the message and returns to To-Dos rather than
+  rendering a dead page.
 - **Completion confirmation** — a bottom sheet with an optional note,
   requiring a deliberate second action before the mutation fires (spec
-  section 16.2).
+  section 16.2). Reachable from either the To-Dos card or the Detail
+  screen; either path lands back on To-Dos afterward, since a completed
+  milestone is no longer accessible here.
 - **Concurrency & idempotency** — before completing, the app re-fetches
   the milestone from the store; if it's been reassigned, already
   completed, or no longer exists, it shows the corresponding message from
-  spec section 31 instead of pretending the action succeeded.
+  spec section 31 instead of pretending the action succeeded. The app
+  also suppresses its own cross-tab revalidation while a completion it
+  triggered is in flight, so that revalidation can't race the completion
+  and show a spurious "already completed" message for a request that
+  actually just succeeded.
 
 ## Admin Portal — what changed
 
