@@ -103,6 +103,7 @@ input,textarea{font-family:var(--font-body)}
 .sla-pill.healthy{ background:var(--success-bg); color:var(--success-text); }
 .sla-pill.at-risk{ background:var(--gold-bg); color:var(--gold-text); }
 .sla-pill.breached{ background:var(--error-bg); color:var(--error-text); }
+.sla-pill.flagged{ background:var(--gold-bg); color:var(--gold-text); }
 
 /* ---- Empty state ---- */
 .empty-state{ flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:40px 30px; gap:10px; color:var(--silver-light); }
@@ -131,6 +132,10 @@ input,textarea{font-family:var(--font-body)}
 .btn-primary:active{ background:var(--green-dark-hover); }
 .btn-primary:disabled{ opacity:.5; }
 .btn-outline{ background:var(--white); color:var(--green-dark); border:1.5px solid var(--border-tint); }
+.action-row{ display:flex; gap:10px; }
+.action-row .btn-primary{ flex:1; }
+.btn-flag{ width:52px; flex-shrink:0; padding:14px; }
+.btn-flag.flagged{ background:var(--gold-bg); border-color:var(--gold); color:var(--gold-text); }
 
 /* ---- Bottom tab navigation ---- */
 .bottom-nav{ position:sticky; bottom:0; z-index:15; display:flex; background:var(--white); border-top:1px solid var(--border-tint); flex-shrink:0; padding:4px 6px calc(4px + env(safe-area-inset-bottom)); }
@@ -150,12 +155,13 @@ input,textarea{font-family:var(--font-body)}
 .login-brand .mark{ width:52px; height:52px; border-radius:14px; background:var(--green-dark); color:var(--green-accent); display:grid; place-items:center; font-family:var(--font-display); font-weight:700; font-size:20px; margin:0 auto 12px; }
 .login-brand h1{ font-size:19px; }
 .login-brand p{ color:var(--silver-light); font-size:13.5px; margin:4px 0 0; }
-.staff-option{ display:flex; align-items:center; gap:12px; background:var(--white); border:1.5px solid var(--border-tint); border-radius:var(--radius-lg); padding:13px 15px; width:100%; text-align:left; }
-.staff-option:active{ background:var(--green-light-surface); }
-.staff-option .avatar{ width:38px; height:38px; border-radius:10px; background:var(--green-light); color:var(--green-dark); display:grid; place-items:center; font-family:var(--font-display); font-weight:700; font-size:13.5px; flex-shrink:0; }
-.staff-option .who .nm{ font-weight:600; color:var(--green-dark); font-size:14.5px; }
-.staff-option .who .rl{ font-size:12px; color:var(--silver-light); }
-.staff-list{ display:flex; flex-direction:column; gap:9px; }
+.login-form{ display:flex; flex-direction:column; gap:6px; }
+.field-label{ font-family:var(--font-display); font-weight:600; font-size:12.5px; color:var(--green-dark); margin:10px 0 2px; }
+.field-label:first-child{ margin-top:0; }
+.field-input{ width:100%; background:var(--white); border:1.5px solid var(--border-tint); border-radius:var(--radius-md); padding:12px 14px; font-size:14.5px; color:var(--silver-dark); font-family:var(--font-body); appearance:none; -webkit-appearance:none; }
+select.field-input{ background-image:url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" stroke="%23808080" stroke-width="2.4" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg>'); background-repeat:no-repeat; background-position:right 14px center; padding-right:36px; }
+.field-input:focus{ outline:none; border-color:var(--green-dark); }
+.login-form .btn{ margin-top:18px; }
 
 /* ---- Sheet (confirmation) ---- */
 .sheet-overlay{ position:fixed; inset:0; background:rgba(2,56,25,.4); z-index:50; display:none; align-items:flex-end; justify-content:center; }
@@ -197,8 +203,16 @@ input,textarea{font-family:var(--font-body)}
         <h1>OnePort 365 Field Channel</h1>
         <p>Sign in to see the milestones assigned to you.</p>
       </div>
-      <div class="staff-list" id="staff-list"></div>
-      <p class="dev-note">Demo build — standing in for the org's real authentication. Choosing a name below simulates signing in as that Operations Staff member.</p>
+      <form class="login-form" id="login-form">
+        <label class="field-label" for="login-user">Staff Member</label>
+        <select class="field-input" id="login-user" required>
+          <option value="" disabled selected>Select your name</option>
+        </select>
+        <label class="field-label" for="login-password">Password</label>
+        <input class="field-input" id="login-password" type="password" placeholder="Enter your password" autocomplete="current-password">
+        <button type="submit" class="btn btn-primary" id="btn-sign-in">Sign In</button>
+      </form>
+      <p class="dev-note">Demo build — standing in for the org's real authentication. Any password is accepted; the selected name simulates signing in as that Operations Staff member.</p>
     </div>
   </div>
 
@@ -296,6 +310,20 @@ input,textarea{font-family:var(--font-body)}
   </div>
 </div>
 
+<!-- ============== FLAG BLOCKER SHEET ============== -->
+<div class="sheet-overlay" id="flag-sheet">
+  <div class="sheet">
+    <div class="handle"></div>
+    <h2>Flag a blocker?</h2>
+    <p class="sheet-sub" id="flag-sub"></p>
+    <textarea id="flag-note" placeholder="Describe the blocker (optional)" maxlength="280"></textarea>
+    <div class="sheet-actions">
+      <button class="btn btn-outline" id="flag-cancel">Cancel</button>
+      <button class="btn btn-primary" id="flag-submit">Flag</button>
+    </div>
+  </div>
+</div>
+
 <div id="toast-wrap"></div>
 
 <script src="shared/milestone-store.js"></script>
@@ -309,6 +337,7 @@ const ICON_WARN = '<svg width="16" height="16" fill="none" stroke="currentColor"
 const ICON_RECEIPT = '<svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 2h12v20l-3-2-3 2-3-2-3 2V2z"></path><path d="M9 8h6M9 12h6" stroke-linecap="round"></path></svg>';
 const ICON_SEARCH = '<svg width="19" height="19" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="M21 21l-4.3-4.3" stroke-linecap="round"></path></svg>';
 const ICON_CLOSE = '<svg width="19" height="19" fill="none" stroke="currentColor" stroke-width="2.3" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18" stroke-linecap="round"></path></svg>';
+const ICON_FLAG = '<svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M5 21V4a1 1 0 011-1h11.4a1 1 0 01.8 1.6l-3 4 3 4a1 1 0 01-.8 1.6H6" stroke-linecap="round" stroke-linejoin="round"></path></svg>';
 const SLA_ICON = { healthy: ICON_CLOCK, 'at-risk': ICON_WARN, breached: ICON_WARN };
 
 const state = {
@@ -316,7 +345,8 @@ const state = {
   todos: [],
   searchQuery: '',
   currentMilestoneId: null,
-  confirmTarget: null, // { id, source: 'todos' | 'detail' }
+  confirmTarget: null, // { id, source: 'todos' | 'detail' } — completion sheet
+  flagTarget: null, // { id, source: 'detail' } — flag sheet
   completing: false,
 };
 
@@ -332,8 +362,22 @@ function setActiveNav(key){
   document.querySelectorAll('.nav-item').forEach(b=>b.classList.toggle('active', b.dataset.nav===key));
 }
 
+// Clears whatever bottom furniture the active screen actually has — the
+// Expense screen stacks its own action bar on top of the bottom nav, so a
+// single fixed offset can't fit every screen without either floating too
+// high on simpler screens or overlapping the button on busier ones.
+function bottomSafeOffset(){
+  let offset = 18;
+  const nav = el('bottom-nav');
+  if(nav && !nav.classList.contains('hidden')) offset += nav.getBoundingClientRect().height;
+  document.querySelectorAll('.screen.active .bottom-bar').forEach(bar=>{
+    offset += bar.getBoundingClientRect().height;
+  });
+  return offset;
+}
 function showToast(msg, type){
   const wrap = el('toast-wrap');
+  wrap.style.bottom = bottomSafeOffset() + 'px';
   const t = document.createElement('div');
   t.className = 'toast' + (type==='error' ? ' error' : '');
   t.innerHTML = (type==='error' ? ICON_WARN : ICON_CHECK) + `<span>${msg}</span>`;
@@ -376,16 +420,16 @@ function slaMeta(dueDateIso){
    ========================================================================== */
 function renderLogin(){
   const staff = MilestoneStore.getOperationsStaff();
-  el('staff-list').innerHTML = staff.map(u=>`
-    <button class="staff-option" data-uid="${u.id}">
-      <span class="avatar">${u.initials}</span>
-      <span class="who"><div class="nm">${u.name}</div><div class="rl">${u.role}</div></span>
-    </button>`).join('');
+  el('login-user').innerHTML = `<option value="" disabled selected>Select your name</option>` +
+    staff.map(u=>`<option value="${u.id}">${u.name} — ${u.role}</option>`).join('');
+  el('login-password').value = '';
 }
-el('staff-list').addEventListener('click', (e)=>{
-  const btn = e.target.closest('[data-uid]');
-  if(!btn) return;
-  signIn(btn.dataset.uid);
+el('login-form').addEventListener('submit', (e)=>{
+  e.preventDefault();
+  const userId = el('login-user').value;
+  if(!userId) return;
+  // Password is intentionally not validated — see the auth note above.
+  signIn(userId);
 });
 function renderIdentity(){
   document.querySelectorAll('.me-avatar').forEach(n=>n.textContent = state.me.initials);
@@ -521,7 +565,10 @@ function renderTodosList(){
         <span>·</span>
         <span>${ICON_PIN}${s.route}</span>
       </div>
-      <span class="sla-pill ${sla.tier}">${SLA_ICON[sla.tier]}${sla.label}</span>
+      <div class="meta-row">
+        <span class="sla-pill ${sla.tier}">${SLA_ICON[sla.tier]}${sla.label}</span>
+        ${m.flagged ? `<span class="sla-pill flagged" title="Blocker flagged">${ICON_FLAG} Flagged</span>` : ''}
+      </div>
       <button class="btn btn-outline btn-card-complete" data-complete-ms="${m.id}">${ICON_CHECK} Mark Complete</button>
     </div>`;
   }).join('');
@@ -585,6 +632,7 @@ function renderMilestoneDetail(m, s){
 
   el('detail-body').innerHTML = `
     <div class="detail-status-banner ${sla.tier}">${SLA_ICON[sla.tier]} ${sla.label}</div>
+    ${m.flagged ? `<div class="banner warn">${ICON_FLAG}<span><b>Blocker flagged</b>${m.flagNote ? ' — ' + m.flagNote : ''}</span></div>` : ''}
     <h2 class="detail-h1">${m.name}</h2>
     <p class="detail-sub">${s.jobRef} · ${s.customer}</p>
     <div class="info-card">
@@ -599,8 +647,14 @@ function renderMilestoneDetail(m, s){
   `;
 
   if(isMine){
-    el('detail-action-bar').innerHTML = `<button class="btn btn-primary" id="btn-mark-complete">${ICON_CHECK} Mark as Complete</button>`;
+    const flagClasses = 'btn btn-outline btn-flag' + (m.flagged ? ' flagged' : '');
+    el('detail-action-bar').innerHTML = `
+      <div class="action-row">
+        <button class="${flagClasses}" id="btn-flag" title="${m.flagged ? 'Update flagged blocker' : 'Flag a blocker'}">${ICON_FLAG}</button>
+        <button class="btn btn-primary" id="btn-mark-complete">${ICON_CHECK} Mark as Complete</button>
+      </div>`;
     el('btn-mark-complete').addEventListener('click', ()=>openConfirmSheet(m, s, 'detail'));
+    el('btn-flag').addEventListener('click', ()=>openFlagSheet(m, s));
   } else {
     el('detail-action-bar').innerHTML = `<button class="btn btn-outline" id="btn-refresh-detail">Refresh</button>`;
     el('btn-refresh-detail').addEventListener('click', loadMilestoneDetail);
@@ -642,7 +696,7 @@ el('confirm-complete').addEventListener('click', ()=>{
   }).then(res=>{
     state.completing = false;
     closeConfirmSheet();
-    if(!res.ok){ handleCompletionError(res.code, target.source); return; }
+    if(!res.ok){ handleMutationError(res.code, target.source); return; }
     showToast(res.alreadyCompleted ? 'This milestone has already been completed' : 'Milestone marked complete');
     // Completed milestones are no longer accessible on the Field Channel,
     // so always land back on the To-Dos list rather than re-showing detail.
@@ -656,12 +710,12 @@ el('confirm-complete').addEventListener('click', ()=>{
       showToast('Unable to update this milestone. Please check your connection and try again.', 'error');
     } else {
       closeConfirmSheet();
-      handleCompletionError(code || 'NOT_FOUND', target.source);
+      handleMutationError(code || 'NOT_FOUND', target.source);
     }
   });
 });
 
-function handleCompletionError(code, source){
+function handleMutationError(code, source){
   const messages = {
     FORBIDDEN: 'This milestone is no longer assigned to you.',
     NOT_FOUND: 'This milestone is no longer available.',
@@ -670,6 +724,41 @@ function handleCompletionError(code, source){
   showToast(messages[code] || 'Unable to update this milestone.', 'error');
   if(source === 'detail') loadMilestoneDetail(); else loadTodos();
 }
+
+/* ==========================================================================
+   Flag a blocker — a note attached to the milestone, not a status change
+   (MVP has no BLOCKED state). Only reachable from the Detail screen.
+   ========================================================================== */
+function openFlagSheet(m, s){
+  state.flagTarget = { id: m.id, source: 'detail' };
+  el('flag-sub').textContent = `${m.name} — ${s.jobRef}`;
+  el('flag-note').value = m.flagNote || '';
+  el('flag-submit').disabled = false;
+  el('flag-submit').innerHTML = m.flagged ? 'Update Flag' : 'Flag';
+  el('flag-sheet').classList.add('open');
+}
+function closeFlagSheet(){ el('flag-sheet').classList.remove('open'); }
+el('flag-cancel').addEventListener('click', closeFlagSheet);
+el('flag-sheet').addEventListener('click', (e)=>{ if(e.target.id==='flag-sheet') closeFlagSheet(); });
+
+el('flag-submit').addEventListener('click', ()=>{
+  const note = el('flag-note').value;
+  const target = state.flagTarget;
+  const btn = el('flag-submit');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> Flagging…';
+
+  MilestoneStore.flagMilestone(target.id, state.me.id, note).then(res=>{
+    closeFlagSheet();
+    if(!res.ok){ handleMutationError(res.code, 'detail'); return; }
+    showToast('Blocker flagged');
+    loadMilestoneDetail();
+  }).catch(()=>{
+    btn.disabled = false;
+    btn.innerHTML = 'Flag';
+    showToast('Unable to update this milestone. Please check your connection and try again.', 'error');
+  });
+});
 
 /* ==========================================================================
    Cross-channel revalidation — if the Admin Portal (or another tab)

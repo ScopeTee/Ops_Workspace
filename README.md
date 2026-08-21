@@ -81,13 +81,14 @@ Please check your connection and try again." error path (spec section
 Following the spec's recommended screens (section 42) and delivery
 sequence (section 43):
 
-- **Sign-in (simulated)** — stands in for the org's real authentication
-  (spec section 26). Pick an Operations Staff member to "sign in" as.
-  A real build replaces this with SSO/org auth and derives the same
-  stable internal user id server-side — the client never gets to declare
-  its own identity for a completion (`completeMilestone` takes the acting
-  user id, but a real backend would derive it from the session/token, not
-  trust a client-supplied value).
+- **Sign-in (simulated)** — a login form (Staff Member + Password) that
+  stands in for the org's real authentication (spec section 26). The
+  password field accepts anything and isn't checked against anything —
+  only the selected staff member matters. A real build replaces this with
+  SSO/org auth and derives the same stable internal user id server-side —
+  the client never gets to declare its own identity for a completion
+  (`completeMilestone` takes the acting user id, but a real backend would
+  derive it from the session/token, not trust a client-supplied value).
 - **Bottom tab navigation** — Tasks / Expense / More. Tasks is the To-Dos
   flow described below. Expense is a placeholder screen with a "Request
   Expense" button that isn't wired up yet (shows a toast, same convention
@@ -121,6 +122,15 @@ sequence (section 43):
   section 16.2). Reachable from either the To-Dos card or the Detail
   screen; either path lands back on To-Dos afterward, since a completed
   milestone is no longer accessible here.
+- **Flag a blocker** — a "Flag" button beside "Mark as Complete" on the
+  Detail screen opens a sheet for an optional note describing what's
+  blocking the milestone. This is deliberately *not* a status change —
+  MVP has only `NOT_STARTED`/`COMPLETED` (spec sections 7–8), so flagging
+  attaches a note to the milestone without introducing a `BLOCKED` state.
+  A flagged milestone shows a banner on Detail, a "Flagged" pill on its
+  To-Dos card, and a flag icon (with the note as a tooltip) next to its
+  name in the Admin Portal's Service Delivery table — visible everywhere
+  through the same shared record, not a Field-Channel-only note.
 - **Concurrency & idempotency** — before completing, the app re-fetches
   the milestone from the store; if it's been reassigned, already
   completed, or no longer exists, it shows the corresponding message from
