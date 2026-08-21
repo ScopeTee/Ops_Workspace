@@ -7,7 +7,7 @@ spec:
 | File | Role |
 |---|---|
 | `freight-operations-workspace.html` | **Admin Portal** — desktop, office-based shipment/service-delivery management. |
-| `field-channel.html` | **Field Channel (new)** — mobile-first execution surface for Operations Staff. |
+| `index.html` | **Field Channel (new)** — mobile-first execution surface for Operations Staff. |
 | `shared/milestone-store.js` | The shared milestone record both surfaces read and write against. |
 
 > One workflow. One milestone record. Multiple channels of interaction.
@@ -59,7 +59,7 @@ origin), serve the folder rather than opening the files directly:
 ```bash
 python3 -m http.server 8080
 # Admin Portal:  http://localhost:8080/freight-operations-workspace.html
-# Field Channel: http://localhost:8080/field-channel.html
+# Field Channel: http://localhost:8080/index.html
 ```
 
 Open both in the same browser to see completions and reassignments made
@@ -71,7 +71,7 @@ by browsers for `file://` URLs.
 
 ### Simulating a network failure
 
-Append `?simulateOffline=1` to `field-channel.html`'s URL to make every
+Append `?simulateOffline=1` to `index.html`'s URL to make every
 store call reject, so you can see the "Unable to update this milestone.
 Please check your connection and try again." error path (spec section
 30–31) without needing real network conditions.
