@@ -861,6 +861,7 @@ textarea.field-control{resize:vertical;min-height:70px}
 
 <div id="toast-wrap"></div>
 
+<script src="shared/milestone-store.js"></script>
 <script>
 /* ==========================================================================
    Icon helpers (used sparingly across the interface)
@@ -943,8 +944,33 @@ function computeLiveSlaHealth(dueDate){
   return 'Healthy';
 }
 
-const OCEAN_EXPORT_TEMPLATE = ['Booking Placement','Empty Container','Clean CCI','Draft BL to Customer','Gate-In','Inspection','Vessel Confirmation','Sailing Confirmation','OBL Issuance','Document Release'];
-const OCEAN_IMPORT_TEMPLATE = ['Pre-Alert Receipt','Form M Validation','PAAR Application','Draft Assessment','Final Assessment','THC Payment','Delivery','Empty Return','Post Delivery Docs','Document Release'];
+// Adapts a MilestoneStore record (spec-shaped: NOT_STARTED/COMPLETED,
+// assignedTo, completedAt/completedBy as user id + ISO string) into the
+// shape this prototype's existing render functions expect.
+function toAdminMilestones(storeMilestones){
+  return storeMilestones.map(sm=>{
+    const dueDate = sm.dueDate ? new Date(sm.dueDate) : null;
+    const completedAt = sm.completedAt ? new Date(sm.completedAt) : null;
+    let completedSlaHealth = null;
+    if(sm.status === 'COMPLETED' && dueDate && completedAt){
+      const lateDays = daysBetween(dueDate, completedAt);
+      completedSlaHealth = lateDays <= 0 ? 'Healthy' : lateDays <= 1 ? 'At-Risk' : 'Breached';
+    }
+    return {
+      id: sm.id,
+      name: sm.name,
+      instruction: sm.instruction,
+      location: sm.location,
+      ownerId: sm.assignedTo,
+      status: sm.status === 'COMPLETED' ? 'Completed' : 'Not Started',
+      dueDate,
+      completedBy: sm.completedBy ? (teamMember(sm.completedBy)||{}).name || sm.completedBy : '',
+      completedAt,
+      completedSlaHealth,
+      comment: sm.completionNote || '',
+    };
+  });
+}
 
 const PHYSICAL_TRACKING_TEMPLATE = [
   {label:'Container Gated In · Origin Terminal', loc:'Shanghai Yangshan Port', source:'Terminal'},
@@ -978,40 +1004,11 @@ function buildShipmentDetail(base, seed){
     });
   }
 
-  const template = base.mode.includes('Export') ? OCEAN_EXPORT_TEMPLATE : OCEAN_IMPORT_TEMPLATE;
-  const etdDate = parseDisplayDate(base.etd);
-  const etaDate = parseDisplayDate(base.eta);
-  const span = etaDate.getTime() - etdDate.getTime();
-  const completedCount = base.completedMilestones;
-
-  const milestones = template.map((name,i)=>{
-    const frac = template.length>1 ? i/(template.length-1) : 0;
-    let dueDate = new Date(etdDate.getTime() + span*frac);
-    dueDate.setHours(9 + ((i*3)%8), (i%2)*30, 0, 0);
-    if(i === template.length-1 && seed % 3 === 0) dueDate = null;
-    // Demo overrides so "Today" / "Tomorrow" relative labels are always visible regardless of viewing date
-    if(seed===3 && i===4){ dueDate = new Date(); dueDate.setHours(14,30,0,0); }
-    if(seed===4 && i===6){ dueDate = new Date(); dueDate.setDate(dueDate.getDate()+1); dueDate.setHours(10,0,0,0); }
-    const isDone = i < completedCount;
-    let completedSlaHealth = null, completedBy = '', completedAt = null, comment = '';
-    if(isDone){
-      completedSlaHealth = ((i+seed) % 5 === 0) ? 'Breached' : ((i+seed) % 7 === 0) ? 'At-Risk' : 'Healthy';
-      completedBy = teamMember(shipTeamIds[(i+seed+1)%shipTeamIds.length]).name;
-      completedAt = new Date(Date.now() - (template.length-i)*86400000);
-      comment = (i%3===0) ? 'Cleared without exceptions.' : '';
-    }
-    return {
-      id: makeId('ms'),
-      name,
-      ownerId: shipTeamIds[(i+seed)%shipTeamIds.length],
-      status: isDone ? 'Completed' : 'Not Started',
-      dueDate,
-      completedBy,
-      completedAt,
-      completedSlaHealth,
-      comment,
-    };
-  });
+  // Milestones are NOT generated here. They are read from MilestoneStore —
+  // the same authoritative record the Field Channel reads and writes —
+  // so the Admin Portal and Field Channel can never drift into separate
+  // milestone states (see shared/milestone-store.js).
+  const milestones = toAdminMilestones(MilestoneStore.sync.getMilestonesForShipment(base.jobRef));
 
   const trackedCount = Math.min(PHYSICAL_TRACKING_TEMPLATE.length, 2 + (seed % 5));
   const physicalTracking = PHYSICAL_TRACKING_TEMPLATE.map((t,i)=>({
@@ -1500,18 +1497,30 @@ function openMilestoneModal(msId){
   el('input-milestone-comment').value = '';
   openModal('modal-milestone');
 }
-el('save-milestone').addEventListener('click', ()=>{
+function refreshCurrentShipmentMilestones(){
   const s = currentShipment();
-  const m = s.milestones.find(x=>x.id===state.activeMilestone);
-  m.status = 'Completed';
-  m.completedBy = CURRENT_USER;
-  m.completedAt = new Date();
-  m.completedSlaHealth = computeLiveSlaHealth(m.dueDate);
-  m.comment = el('input-milestone-comment').value.trim();
-  renderServiceDelivery(); renderShipHeader();
-  closeModal('modal-milestone');
-  showToast('Milestone marked complete');
+  if(!s) return;
+  s.milestones = toAdminMilestones(MilestoneStore.sync.getMilestonesForShipment(s.jobRef));
+  // openShipment() doesn't set state.currentView, so check the DOM directly
+  // for whether the shipment-detail view is actually the one on screen.
+  if(el('view-shipment-detail').classList.contains('active')){ renderServiceDelivery(); renderShipHeader(); }
+}
+el('save-milestone').addEventListener('click', ()=>{
+  const note = el('input-milestone-comment').value.trim();
+  const btn = el('save-milestone');
+  btn.disabled = true;
+  MilestoneStore.completeMilestone(state.activeMilestone, MilestoneStore.ADMIN_USER_ID, note).then(res=>{
+    closeModal('modal-milestone');
+    btn.disabled = false;
+    if(!res.ok){ showToast('Unable to update this milestone.', 'error'); return; }
+    refreshCurrentShipmentMilestones();
+    showToast(res.alreadyCompleted ? 'This milestone was already completed' : 'Milestone marked complete');
+  });
 });
+
+// Keep the open shipment in sync when the Field Channel (or another tab)
+// changes a milestone's assignment or status — never trust stale local state.
+MilestoneStore.subscribe(()=>{ refreshCurrentShipmentMilestones(); });
 
 /* ==========================================================================
    Documents — upload / view / download / update / delete
@@ -1707,11 +1716,13 @@ document.body.addEventListener('click', (e)=>{
 
   const reassignBtn = t.closest('[data-reassign-task]');
   if(reassignBtn){
-    const s = currentShipment();
-    const m = s.milestones.find(x=>x.id===reassignBtn.dataset.reassignTask);
-    m.ownerId = reassignBtn.dataset.newOwner;
-    renderServiceDelivery();
-    showToast('Task reassigned to ' + teamMember(reassignBtn.dataset.newOwner).name);
+    const msId = reassignBtn.dataset.reassignTask;
+    const newOwnerId = reassignBtn.dataset.newOwner;
+    MilestoneStore.reassignMilestone(msId, newOwnerId, MilestoneStore.ADMIN_USER_ID).then(res=>{
+      if(!res.ok){ showToast('Unable to reassign this milestone.', 'error'); return; }
+      refreshCurrentShipmentMilestones();
+      showToast('Task reassigned to ' + teamMember(newOwnerId).name);
+    });
     return;
   }
 
