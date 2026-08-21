@@ -64,6 +64,8 @@ input,textarea{font-family:var(--font-body)}
 .user-chip{ display:flex; align-items:center; gap:7px; background:rgba(253,251,241,.1); border:none; color:var(--cream); padding:6px 10px 6px 6px; border-radius:999px; font-size:12.5px; font-weight:600; }
 .avatar{ width:24px; height:24px; border-radius:50%; background:var(--green-accent); color:var(--green-dark); display:grid; place-items:center; font-family:var(--font-display); font-weight:700; font-size:11px; flex-shrink:0 }
 .refresh-btn{ background:none; border:none; color:var(--cream); padding:6px; margin:-6px; border-radius:var(--radius-sm); display:flex; }
+.sync-link-btn{ background:none; border:none; color:rgba(253,251,241,.6); padding:6px; display:flex; border-radius:var(--radius-sm); }
+.sync-link-btn:active{ background:rgba(255,255,255,.12); color:var(--cream); }
 .refresh-btn.spinning svg{ animation: spin .8s linear infinite; }
 @keyframes spin{ to{ transform:rotate(360deg); } }
 
@@ -194,7 +196,12 @@ input,textarea{font-family:var(--font-body)}
     <div class="topbar">
       <div class="identity-row">
         <div class="brand-mark">OP</div>
-        <button class="user-chip me-account"><span class="avatar me-avatar"></span><span class="me-name"></span></button>
+        <div style="display:flex; align-items:center; gap:8px;">
+          <button class="sync-link-btn" title="Copy a link that loads this exact milestone data on another device — a testing aid, since demo data is stored locally per device.">
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M10 13a5 5 0 007 0l3-3a5 5 0 00-7-7l-1.5 1.5" stroke-linecap="round"></path><path d="M14 11a5 5 0 00-7 0l-3 3a5 5 0 007 7l1.5-1.5" stroke-linecap="round"></path></svg>
+          </button>
+          <button class="user-chip me-account"><span class="avatar me-avatar"></span><span class="me-name"></span></button>
+        </div>
       </div>
       <div class="page-head">
         <h1>My To-Dos</h1>
@@ -212,7 +219,12 @@ input,textarea{font-family:var(--font-body)}
     <div class="topbar">
       <div class="identity-row">
         <div class="brand-mark">OP</div>
-        <button class="user-chip me-account"><span class="avatar me-avatar"></span><span class="me-name"></span></button>
+        <div style="display:flex; align-items:center; gap:8px;">
+          <button class="sync-link-btn" title="Copy a link that loads this exact milestone data on another device — a testing aid, since demo data is stored locally per device.">
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M10 13a5 5 0 007 0l3-3a5 5 0 00-7-7l-1.5 1.5" stroke-linecap="round"></path><path d="M14 11a5 5 0 00-7 0l-3 3a5 5 0 007 7l1.5-1.5" stroke-linecap="round"></path></svg>
+          </button>
+          <button class="user-chip me-account"><span class="avatar me-avatar"></span><span class="me-name"></span></button>
+        </div>
       </div>
       <div class="page-head"><h1>Expense</h1></div>
     </div>
@@ -368,6 +380,21 @@ document.querySelectorAll('.me-account').forEach(btn=>btn.addEventListener('clic
   state.me = null;
   showScreen('screen-login');
   renderLogin();
+}));
+
+// Testing aid: demo data lives in this browser's localStorage only, so the
+// Admin Portal and Field Channel only auto-sync when opened in the same
+// browser. This copies a link that loads today's exact milestone data on
+// another device/browser — open it there to bring the two back in sync.
+document.querySelectorAll('.sync-link-btn').forEach(btn=>btn.addEventListener('click', async (e)=>{
+  e.stopPropagation();
+  const link = MilestoneStore.getSyncLink();
+  try{
+    await navigator.clipboard.writeText(link);
+    showToast('Sync link copied — open it on the other device to match this data');
+  }catch(err){
+    window.prompt('Copy this sync link and open it on the other device:', link);
+  }
 }));
 
 /* ==========================================================================

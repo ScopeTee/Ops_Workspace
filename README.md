@@ -168,9 +168,32 @@ migration on this shape.
   store, standing in for the organization's real RBAC model (spec section
   38's authorization *sequence* — authenticated → authorized → assigned →
   correct state — is implemented; the specific role model is not).
-- **Persistence** is `localStorage`, not a real database — it's scoped to
-  one browser, which is why the two apps must be opened in the same
-  browser to observe shared state.
+- **Persistence is `localStorage`, not a real database — read this before
+  testing on two devices.** `localStorage` is scoped to one browser on one
+  device. The Admin Portal and Field Channel only auto-sync when opened in
+  the **same browser** (e.g. two tabs on the same laptop). Testing them on
+  two different devices — Admin on a desktop, Field Channel on a phone,
+  which is the natural way to try this — will look like the two apps are
+  showing completely different, "misaligned" tasks. They're not out of
+  sync in the sense the spec cares about; they're just two independent,
+  disconnected copies of the demo data, because there is no server in
+  between. A real deployment replaces this file's internals with actual
+  API calls, at which point every device is naturally in sync and this
+  whole caveat disappears.
+  - **To test on one device:** open both apps in the same browser
+    (two tabs, or one desktop + one mobile-viewport devtools tab). They'll
+    share state immediately.
+  - **To test on two separate devices:** each app has a small "Copy Sync
+    Link" control (Admin Portal: bottom of the sidebar; Field Channel: the
+    icon next to the account chip). It copies a URL encoding the current
+    milestone data; opening that URL on the other device prompts to load
+    it there, bringing both devices back onto the same data. This is a
+    manual, one-shot copy for testing convenience — not live sync, so
+    re-copy the link any time you want the two devices to match again.
 - `MilestoneStore` seeds fresh demo data on first load per browser and
-  keeps mutations after that. Call `MilestoneStore.resetDemoData()` from
-  either app's console to start over.
+  keeps mutations after that. The seed itself is fully deterministic (no
+  `Date.now()`/`Math.random()` in it), so two devices that have never
+  synced still start from byte-identical data — divergence only comes
+  from mutations made independently on each device. Call
+  `MilestoneStore.resetDemoData()` from either app's console to start
+  over.

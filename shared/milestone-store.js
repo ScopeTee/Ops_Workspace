@@ -141,7 +141,10 @@
         completedBy: isDone ? teamIds[(i + 1) % teamIds.length] : null,
         completedAt: isDone ? new Date(dueDate.getTime() - 3600000).toISOString() : null,
         completionNote: isDone && i % 3 === 0 ? 'Cleared without exceptions.' : '',
-        updatedAt: new Date().toISOString(),
+        // Deliberately derived from dueDate, not `new Date()` — the seed
+        // must be byte-identical across devices/browsers with no shared
+        // storage, so nothing here may depend on wall-clock "now".
+        updatedAt: dueDate.toISOString(),
       };
       return milestone;
     });
@@ -174,7 +177,49 @@
     global.localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
   }
 
-  let state = loadState();
+  // ------------------------------------------------------------------
+  // Manual cross-device sync (testing aid only)
+  // ------------------------------------------------------------------
+  // localStorage is scoped per browser/device, so the Admin Portal and
+  // Field Channel only share state automatically when opened in the SAME
+  // browser. Testing them on two different devices (e.g. Admin on a
+  // laptop, Field Channel on a phone) otherwise looks like the two apps
+  // showing "the wrong tasks" — really just two disconnected copies of
+  // the demo data. A real deployment replaces this whole file with calls
+  // to a real backend, at which point every device is naturally in sync
+  // and this workaround goes away. Until then, getSyncLink() encodes the
+  // current store into a URL; opening that URL on another device loads
+  // the exact same milestone data there.
+  function toBase64Unicode(str) { return global.btoa(unescape(encodeURIComponent(str))); }
+  function fromBase64Unicode(b64) { return decodeURIComponent(escape(global.atob(b64))); }
+
+  function tryImportFromHash() {
+    const hash = global.location.hash;
+    if (!hash || !hash.startsWith('#state=')) return null;
+    const stripHash = () => global.history.replaceState(null, '', global.location.pathname + global.location.search);
+    try {
+      const encoded = decodeURIComponent(hash.slice('#state='.length));
+      const parsed = JSON.parse(fromBase64Unicode(encoded));
+      if (!parsed || !parsed.shipments || !parsed.milestones) throw new Error('malformed sync link');
+      const proceed = global.confirm(
+        'Load synced test data from this link?\n\nThis replaces the milestone data currently stored on this device.'
+      );
+      stripHash();
+      if (!proceed) return null;
+      saveState(parsed);
+      return parsed;
+    } catch (e) {
+      stripHash();
+      return null;
+    }
+  }
+
+  let state = tryImportFromHash() || loadState();
+
+  function getSyncLink() {
+    const encoded = encodeURIComponent(toBase64Unicode(JSON.stringify(state)));
+    return global.location.origin + global.location.pathname + '#state=' + encoded;
+  }
 
   // ------------------------------------------------------------------
   // Cross-tab notification (simulated "revalidate" signal — see spec 36)
@@ -315,7 +360,7 @@
     getShipments, getShipment, getMilestonesForShipment,
     getMyMilestones, getMilestone,
     reassignMilestone, completeMilestone,
-    subscribe, resetDemoData,
+    subscribe, resetDemoData, getSyncLink,
     ADMIN_USER_ID: ADMIN_USER.id,
     sync: {
       getShipments: _getShipments,

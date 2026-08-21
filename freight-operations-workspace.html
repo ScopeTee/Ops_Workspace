@@ -90,6 +90,8 @@ input,select,textarea{font-family:var(--font-body)}
 .nav-item.active svg{opacity:1}
 
 .sidebar-footer{margin-top:auto;padding-top:16px;border-top:1px solid rgba(253,251,241,.12)}
+.sync-link-btn{display:flex;align-items:center;gap:8px;width:100%;background:none;border:1px dashed rgba(253,251,241,.25);border-radius:var(--radius-md);color:rgba(253,251,241,.65);font-size:11.5px;font-weight:600;padding:8px 10px;margin-bottom:10px;cursor:pointer;text-align:left}
+.sync-link-btn:hover{border-color:rgba(253,251,241,.45);color:var(--cream)}
 .sidebar-user{display:flex;align-items:center;gap:10px;padding:8px}
 .sidebar-user .avatar{width:34px;height:34px;border-radius:9px;background:rgba(253,251,241,.12);display:grid;place-items:center;font-family:var(--font-display);font-weight:600;font-size:12.5px;color:var(--cream)}
 .sidebar-user .name{font-size:13px;font-weight:700;color:var(--cream)}
@@ -407,6 +409,10 @@ textarea.field-control{resize:vertical;min-height:70px}
     </ul>
 
     <div class="sidebar-footer">
+      <button type="button" id="btn-copy-sync-link" class="sync-link-btn" title="Copy a link that loads this exact milestone data on another device or browser — a testing aid, since demo data is stored locally per device.">
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M10 13a5 5 0 007 0l3-3a5 5 0 00-7-7l-1.5 1.5" stroke-linecap="round"></path><path d="M14 11a5 5 0 00-7 0l-3 3a5 5 0 007 7l1.5-1.5" stroke-linecap="round"></path></svg>
+        Copy Sync Link (testing)
+      </button>
       <div class="sidebar-user">
         <div class="avatar">NM</div>
         <div>
@@ -1521,6 +1527,20 @@ el('save-milestone').addEventListener('click', ()=>{
 // Keep the open shipment in sync when the Field Channel (or another tab)
 // changes a milestone's assignment or status — never trust stale local state.
 MilestoneStore.subscribe(()=>{ refreshCurrentShipmentMilestones(); });
+
+// Testing aid: demo data lives in this browser's localStorage only, so the
+// Admin Portal and Field Channel only auto-sync when opened in the same
+// browser. This copies a link that loads today's exact milestone data on
+// another device/browser — open it there to bring the two back in sync.
+el('btn-copy-sync-link').addEventListener('click', async ()=>{
+  const link = MilestoneStore.getSyncLink();
+  try{
+    await navigator.clipboard.writeText(link);
+    showToast('Sync link copied — open it on the other device to match this data');
+  }catch(e){
+    window.prompt('Copy this sync link and open it on the other device:', link);
+  }
+});
 
 /* ==========================================================================
    Documents — upload / view / download / update / delete
