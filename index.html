@@ -393,6 +393,63 @@ textarea.field-control{resize:vertical;min-height:70px}
 .list-search svg{color:var(--silver-light);flex-shrink:0}
 .list-search input{border:none;outline:none;background:transparent;font-size:13.5px;width:100%;color:var(--silver-dark)}
 
+/* Communications — inbox layout */
+.comm-source-tag{display:inline-flex;align-items:center;gap:5px;font-size:10px;font-weight:700;padding:3px 8px;border-radius:5px;text-transform:uppercase;letter-spacing:.04em;flex-shrink:0}
+.comm-source-tag.email{background:var(--green-chip-bg);color:#4a5a3f}
+.comm-source-tag.whatsapp{background:var(--success-bg);color:var(--success-text)}
+
+.comm-filter-group{display:flex;gap:4px;background:var(--green-chip-bg);padding:4px;border-radius:999px}
+.comm-filter-btn{background:transparent;border:none;padding:7px 13px;border-radius:999px;font-family:var(--font-display);font-weight:600;font-size:12.5px;color:var(--silver-dark);cursor:pointer;transition:.12s}
+.comm-filter-btn.active{background:var(--white);color:var(--green-dark);box-shadow:var(--shadow-e1)}
+.cf-count{display:inline-flex;align-items:center;justify-content:center;min-width:16px;height:16px;padding:0 4px;border-radius:999px;background:rgba(2,56,25,.13);color:var(--green-dark);font-size:10px;font-weight:700;margin-left:4px}
+.comm-filter-btn.active .cf-count{background:var(--green-dark);color:var(--green-accent)}
+
+.comm-inbox{display:grid;grid-template-columns:290px 1fr;border:1px solid var(--border-tint);border-radius:var(--radius-lg);overflow:hidden;height:620px}
+.comm-list-pane{border-right:1px solid var(--border-tint);display:flex;flex-direction:column;min-height:0;background:var(--white)}
+.comm-list-head{padding:14px 14px 12px;border-bottom:1px solid var(--border-tint-soft);display:flex;flex-direction:column;gap:10px}
+.comm-search{display:flex;align-items:center;gap:8px;background:var(--green-light-surface);border-radius:var(--radius-md);padding:9px 11px}
+.comm-search svg{color:var(--silver-light);flex-shrink:0}
+.comm-search input{border:none;background:transparent;outline:none;font-size:12.5px;width:100%;color:var(--silver-dark)}
+.comm-list-scroll{flex:1;overflow-y:auto}
+.comm-list-item{display:flex;gap:10px;align-items:flex-start;padding:12px 14px;cursor:pointer;border-bottom:1px solid var(--border-tint-soft);transition:.12s}
+.comm-list-item:hover{background:var(--green-light-surface)}
+.comm-list-item.active{background:var(--green-light-surface);box-shadow:inset 3px 0 0 var(--green-accent)}
+.comm-list-item .clist-main{flex:1;min-width:0}
+.comm-list-item .clist-top{display:flex;align-items:baseline;justify-content:space-between;gap:6px}
+.comm-list-item .clist-name{font-weight:700;font-size:12.5px;color:var(--green-dark);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.comm-list-item .clist-time{font-size:10.5px;color:var(--silver-light);flex-shrink:0}
+.comm-list-item .clist-preview{display:flex;align-items:center;gap:4px;font-size:11.5px;color:var(--silver-light);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px}
+.comm-list-item .clist-preview svg{flex-shrink:0}
+.comm-unread-dot{width:8px;height:8px;border-radius:50%;background:var(--green-accent-hover);flex-shrink:0;margin-top:4px}
+.comm-list-empty{padding:44px 20px;text-align:center;color:var(--silver-light);font-size:13px}
+
+.comm-detail-pane{display:flex;flex-direction:column;min-height:0;background:var(--cream)}
+.comm-detail-head{display:flex;align-items:center;gap:12px;padding:14px 20px;border-bottom:1px solid var(--border-tint);background:var(--white);min-height:24px}
+.comm-detail-head .who b{display:block;font-size:14px;color:var(--green-dark)}
+.comm-detail-head .who span{font-size:12px;color:var(--silver-light)}
+.comm-detail-scroll{flex:1;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:16px}
+.comm-detail-empty{flex:1;display:flex;align-items:center;justify-content:center;color:var(--silver-light);font-size:13.5px}
+.comm-bubble-row{display:flex;gap:10px;max-width:80%}
+.comm-bubble-row.out{align-self:flex-end;flex-direction:row-reverse}
+.comm-bubble{background:var(--white);border:1px solid var(--border-tint);border-radius:var(--radius-lg);padding:12px 14px}
+.comm-bubble-row.out .comm-bubble{background:var(--green-light-surface);border-color:var(--green-light)}
+.comm-bubble .csubject{font-weight:700;color:var(--green-dark);font-size:13px;margin-bottom:6px}
+.comm-bubble .cbody{font-size:13px;color:var(--silver-dark);white-space:pre-wrap;line-height:1.6}
+.comm-bubble-meta{display:flex;align-items:center;gap:6px;font-size:10.5px;color:var(--silver-light);margin-top:6px}
+.comm-bubble-row.out .comm-bubble-meta{justify-content:flex-end}
+.comm-attach-card{display:flex;align-items:center;gap:8px;background:var(--green-light-surface);border-radius:var(--radius-sm);padding:7px 10px;margin-top:8px;font-size:12px;font-weight:600;color:var(--green-dark)}
+.comm-bubble-row.out .comm-attach-card{background:var(--white)}
+.comm-attach-card .asize{color:var(--silver-light);font-weight:500;margin-left:auto}
+.comm-readonly-note{display:flex;align-items:center;gap:8px;justify-content:center;padding:12px 20px;border-top:1px solid var(--border-tint);background:var(--white);font-size:11.5px;color:var(--silver-light);text-align:center}
+
+@media (max-width:900px){
+  .comm-inbox{grid-template-columns:1fr;height:auto}
+  .comm-list-pane{max-height:320px;border-right:none;border-bottom:1px solid var(--border-tint)}
+}
+.sim-result-box{border-radius:var(--radius-md);padding:14px 16px;font-size:13px;margin-top:4px;line-height:1.6}
+.sim-result-box.success{background:var(--success-bg);color:var(--success-text)}
+.sim-result-box.error{background:var(--error-bg);color:var(--error-text)}
+
 @media (max-width:900px){
   .form-grid{grid-template-columns:1fr}
 }
@@ -443,6 +500,10 @@ textarea.field-control{resize:vertical;min-height:70px}
   <div class="main">
     <header class="topbar">
       <div class="breadcrumbs" id="breadcrumbs"></div>
+      <button class="btn btn-outline btn-sm" id="btn-simulate-comm" style="margin-left:auto">
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 3h6M10 3v5.5L4.5 18a2 2 0 001.7 3h11.6a2 2 0 001.7-3L14 8.5V3" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+        Simulate Communication
+      </button>
     </header>
 
     <main class="content">
@@ -552,6 +613,10 @@ textarea.field-control{resize:vertical;min-height:70px}
             <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 7a2 2 0 012-2h4l2 2h8a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V7z"></path></svg>
             Documents
           </button>
+          <button class="tab-btn" data-tab="communications">
+            <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"></rect><path d="M3 6l9 7 9-7" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+            Communications
+          </button>
         </div>
 
         <!-- Tab: Overview -->
@@ -639,6 +704,7 @@ textarea.field-control{resize:vertical;min-height:70px}
                   <tr>
                     <th>File Name</th>
                     <th>Category</th>
+                    <th>Source</th>
                     <th>Uploaded By</th>
                     <th>Date &amp; Time</th>
                     <th style="text-align:right">Actions</th>
@@ -646,6 +712,34 @@ textarea.field-control{resize:vertical;min-height:70px}
                 </thead>
                 <tbody id="documents-tbody"></tbody>
               </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab: Communications -->
+        <div class="tab-pane" id="tab-communications" style="display:none">
+          <div class="card card-pad">
+            <h3 class="section-title" style="margin-bottom:2px">Communications</h3>
+            <p class="section-sub" style="margin:0 0 16px">Emails and WhatsApp messages matched to this shipment via ZELO ID or B/L Number.</p>
+            <div class="comm-inbox">
+              <div class="comm-list-pane">
+                <div class="comm-list-head">
+                  <div class="comm-filter-group" id="comm-filter-group"></div>
+                  <div class="comm-search">
+                    <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="M21 21l-4-4" stroke-linecap="round"></path></svg>
+                    <input type="text" id="comm-search-input" placeholder="Search messages...">
+                  </div>
+                </div>
+                <div class="comm-list-scroll" id="comm-list-scroll"></div>
+              </div>
+              <div class="comm-detail-pane">
+                <div class="comm-detail-head" id="comm-detail-head"></div>
+                <div class="comm-detail-scroll" id="comm-detail-scroll"></div>
+                <div class="comm-readonly-note" id="comm-readonly-note" style="display:none">
+                  <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="4" y="10" width="16" height="10" rx="2"></rect><path d="M8 10V7a4 4 0 018 0v3"></path></svg>
+                  Read-only — this platform doesn't support replying. Continue this conversation in Outlook or WhatsApp.
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -892,6 +986,75 @@ textarea.field-control{resize:vertical;min-height:70px}
   </div>
 </div>
 
+<!-- Simulate Incoming Communication (test harness for the deterministic matcher) -->
+<div class="modal-overlay" id="modal-simulate-comm">
+  <div class="modal modal-wide">
+    <div class="modal-head">
+      <div>
+        <h3>Simulate Incoming Communication</h3>
+        <p>Draft a test email or WhatsApp message and run it through the same trigger policy and deterministic ZELO ID / B/L Number matcher used for real Outlook and WATI ingestion.</p>
+      </div>
+      <button class="modal-close" data-close-modal><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18" stroke-linecap="round"></path></svg></button>
+    </div>
+    <div class="modal-body">
+      <div class="field-hint" id="sim-watchlist-hint" style="margin-bottom:16px"></div>
+      <div class="form-grid">
+        <div class="form-field filled">
+          <label class="field-label">Message Type</label>
+          <select class="field-control" id="sim-mode">
+            <option value="new">New Conversation</option>
+            <option value="reply">Reply to Existing Conversation</option>
+          </select>
+        </div>
+        <div class="form-field filled" id="sim-reply-thread-field" style="display:none">
+          <label class="field-label">Existing Conversation</label>
+          <select class="field-control" id="sim-reply-thread"></select>
+        </div>
+        <div class="form-field filled">
+          <label class="field-label">Source</label>
+          <select class="field-control" id="sim-source">
+            <option value="OUTLOOK">Outlook (Email)</option>
+            <option value="WATI">WATI (WhatsApp)</option>
+          </select>
+        </div>
+        <div class="form-field">
+          <label class="field-label">Sender</label>
+          <input class="field-control" id="sim-sender" placeholder="e.g. ops@carrier.com or +234 803 000 0000">
+        </div>
+        <div class="form-field full" id="sim-subject-field">
+          <label class="field-label">Subject</label>
+          <input class="field-control" id="sim-subject" placeholder="e.g. RE: ZELO000002 Vessel Update">
+        </div>
+        <div class="form-field full" id="sim-group-field" style="display:none">
+          <label class="field-label">WhatsApp Group Name (optional)</label>
+          <input class="field-control" id="sim-group" placeholder="e.g. Ops Team — Customer X">
+        </div>
+        <div class="form-field full" id="sim-phone-field" style="display:none">
+          <label class="field-label">Phone Number (used for trigger matching)</label>
+          <input class="field-control" id="sim-phone" placeholder="e.g. +2348020001122">
+        </div>
+        <div class="form-field full">
+          <label class="field-label">Recipients (comma-separated, optional)</label>
+          <input class="field-control" id="sim-recipients" placeholder="e.g. ops@oneport365.com, finance@oneport365.com">
+        </div>
+        <div class="form-field full">
+          <label class="field-label">Message Content</label>
+          <textarea class="field-control" id="sim-content" rows="5" placeholder="Type the message body — include a ZELOxxxxxx ID or a shipment's Bill of Lading number to test matching..."></textarea>
+        </div>
+        <div class="form-field full">
+          <label class="field-label">Attachment file name(s) (comma-separated, optional)</label>
+          <input class="field-control" id="sim-attachments" placeholder="e.g. Booking_Confirmation.pdf">
+        </div>
+      </div>
+      <div class="sim-result-box" id="sim-result" style="display:none"></div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-outline" data-close-modal>Close</button>
+      <button class="btn btn-accent" id="save-simulate-comm">Ingest &amp; Match</button>
+    </div>
+  </div>
+</div>
+
 <div id="toast-wrap"></div>
 
 <script>
@@ -910,6 +1073,9 @@ const SOURCE_ICON = {
   Vessel: `<svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 17l1.2-5h13.6L20 17M6 12V7h3V5h6v2h3v5M3 21c1.3 0 1.3-1.3 2.6-1.3S7.9 21 9.2 21s1.3-1.3 2.6-1.3S14.1 21 15.4 21s1.3-1.3 2.6-1.3S20.3 21 21.6 21" stroke-linecap="round" stroke-linejoin="round"></path></svg>`,
   Haulage: `<svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 16V6a1 1 0 011-1h9v11M3 16h10m0-11h3l4 4v7h-2M3 16a2 2 0 104 0 2 2 0 00-4 0zm10 0a2 2 0 104 0 2 2 0 00-4 0z" stroke-linecap="round" stroke-linejoin="round"></path></svg>`,
 };
+const ICON_MAIL = `<svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2"></rect><path d="M2 6l10 7 10-7" stroke-linecap="round" stroke-linejoin="round"></path></svg>`;
+const ICON_CHAT = `<svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z" stroke-linecap="round" stroke-linejoin="round"></path></svg>`;
+const ICON_PAPERCLIP = `<svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21.44 11.05l-9.19 9.19a5 5 0 01-7.07-7.07l9.19-9.19a3.5 3.5 0 014.95 4.95l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48" stroke-linecap="round" stroke-linejoin="round"></path></svg>`;
 
 /* ==========================================================================
    Mock data
@@ -1173,6 +1339,7 @@ function buildShipmentDetail(base, seed){
     milestones,
     physicalTracking,
     documents,
+    communications: [],
   };
 }
 
@@ -1192,6 +1359,276 @@ SHIPMENT_LIST_BASE.forEach((base, i)=>{
 });
 
 /* ==========================================================================
+   Shipment Communications (Outlook / WATI) — deterministic ingestion
+   ZELO ID / B/L Number matching only. No AI, no inference. See spec.
+   ========================================================================== */
+const COMMUNICATIONS_MOCK = [
+  {id:'c1', source:'OUTLOOK', sender:'ops@maersklogistics.com', recipients:['sarah.adeyemi@oneport365.com','ops@oneport365.com'],
+    subject:'RE: ZELO000001 — Vessel Departure Confirmation',
+    content:'Dear Team,\n\nPlease find attached the vessel departure confirmation for shipment ZELO000001. The vessel sailed on schedule from Shanghai Yangshan Port.\n\nRegards,\nMaersk Logistics Ops',
+    timestamp:new Date(2026,6,13,9,20), sourceMessageId:'MSG-OUT-10021', sourceThreadId:'THREAD-OUT-771',
+    attachments:[{name:'Vessel_Departure_Confirmation.pdf', sizeBytes:184320}]},
+
+  // Reply chain on the same thread (THREAD-OUT-771) — neither reply repeats the
+  // ZELO ID, demonstrating that a conversation's shipment match is inherited by
+  // its later replies rather than requiring every message to restate it.
+  {id:'c1b', source:'OUTLOOK', sender:'sarah.adeyemi@oneport365.com', recipients:['ops@maersklogistics.com'],
+    subject:'RE: ZELO000001 — Vessel Departure Confirmation',
+    content:'Thanks for confirming the departure. Could you also share the estimated transit time to Lagos?',
+    timestamp:new Date(2026,6,13,15,10), sourceMessageId:'MSG-OUT-10023', sourceThreadId:'THREAD-OUT-771',
+    attachments:[]},
+  {id:'c1c', source:'OUTLOOK', sender:'ops@maersklogistics.com', recipients:['sarah.adeyemi@oneport365.com','ops@oneport365.com'],
+    subject:'RE: ZELO000001 — Vessel Departure Confirmation',
+    content:'Estimated transit time is 21 days, so an arrival around early August is expected, weather permitting.',
+    timestamp:new Date(2026,6,14,8,30), sourceMessageId:'MSG-OUT-10027', sourceThreadId:'THREAD-OUT-771',
+    attachments:[]},
+
+  {id:'c2', source:'WATI', sender:'Chinedu Okafor', groupName:'OnePort Ops — Dangote Team', recipients:['Ops Desk'], phone:'+2348020001122',
+    content:'Good morning, kindly confirm ETA for ZELO000001. Customer is asking for an update.',
+    timestamp:new Date(2026,6,15,11,5), sourceMessageId:'WATI-55210', sourceThreadId:'WATI-CONV-4471',
+    attachments:[]},
+
+  {id:'c3', source:'OUTLOOK', sender:'documentation@hapag-lloyd.com', recipients:['michael.ibe@oneport365.com'],
+    subject:'Original Bill of Lading — HLCUHAM774410',
+    content:'Hello,\n\nAttached is the original Bill of Lading (HLCUHAM774410) for your records ahead of vessel arrival.\n\nBest,\nHapag-Lloyd Documentation',
+    timestamp:new Date(2026,6,18,14,40), sourceMessageId:'MSG-OUT-10088', sourceThreadId:'THREAD-OUT-812',
+    attachments:[{name:'Original_BL_HLCUHAM774410.pdf', sizeBytes:97280}]},
+
+  {id:'c4', source:'WATI', sender:'+234 803 221 9087', recipients:['Chidi Eze'],
+    content:'Hello, following up on ZELO000005 — has the container gated in yet?',
+    timestamp:new Date(2026,6,16,9,50), sourceMessageId:'WATI-55298', sourceThreadId:'WATI-CONV-4488',
+    attachments:[]},
+
+  // Reply chain on the same WhatsApp DM thread (WATI-CONV-4488) — again, neither
+  // reply repeats the ZELO ID, exercising the same inheritance behaviour on the
+  // WhatsApp channel.
+  {id:'c4b', source:'WATI', sender:'Chidi Eze', recipients:['+234 803 221 9087'],
+    content:'Good morning — yes, gate-in was completed this morning. I\'ll share the seal number shortly.',
+    timestamp:new Date(2026,6,16,10,15), sourceMessageId:'WATI-55301', sourceThreadId:'WATI-CONV-4488',
+    attachments:[]},
+  {id:'c4c', source:'WATI', sender:'+234 803 221 9087', recipients:['Chidi Eze'],
+    content:'Perfect, thank you for the quick update!',
+    timestamp:new Date(2026,6,16,10,20), sourceMessageId:'WATI-55303', sourceThreadId:'WATI-CONV-4488',
+    attachments:[]},
+
+  {id:'c5', source:'OUTLOOK', sender:'consolidation@oneport365.com', recipients:['ops@oneport365.com','finance@oneport365.com'],
+    subject:'Consolidated Customs Update — ZELO000001 & ZELO000005',
+    content:'Hi team,\n\nSharing a consolidated customs status update covering ZELO000001 and ZELO000005. Both shipments have cleared the first inspection stage.\n\nThanks,\nCustoms Desk',
+    timestamp:new Date(2026,6,21,16,5), sourceMessageId:'MSG-OUT-10122', sourceThreadId:'THREAD-OUT-845',
+    attachments:[{name:'Customs_Status_Update.pdf', sizeBytes:152064}]},
+
+  {id:'c6', source:'WATI', sender:'Amaka (MTN Nigeria)', groupName:'MTN Nigeria — Air Freight Updates', recipients:['Titi Aluko','James Adewale'], phone:'+2348020001122',
+    content:'Hi team, noting that ZELO000004 has been cancelled on our end per our last call. Please confirm no further action is needed.',
+    timestamp:new Date(2026,6,22,13,30), sourceMessageId:'WATI-55402', sourceThreadId:'WATI-CONV-4520',
+    attachments:[]},
+
+  // Same WhatsApp GROUP (matched by group name, not sourceThreadId — see
+  // commThreadKey) continuing across three distinct participants: the original
+  // MTN contact, an internal reply, and a second, different MTN contact —
+  // demonstrating a group trail with all involved parties, not just a DM.
+  {id:'c6b', source:'WATI', sender:'Titi Aluko', groupName:'MTN Nigeria — Air Freight Updates', recipients:['Amaka (MTN Nigeria)'], phone:'+2348020001122',
+    content:'Confirmed — we\'ve closed this out on our end as well, no further action needed.',
+    timestamp:new Date(2026,6,22,14,0), sourceMessageId:'WATI-55405', sourceThreadId:'WATI-CONV-4523',
+    attachments:[]},
+  {id:'c6c', source:'WATI', sender:'Emeka (MTN Nigeria)', groupName:'MTN Nigeria — Air Freight Updates', recipients:['Titi Aluko','James Adewale'], phone:'+2348020001122',
+    content:'Thank you for confirming, appreciate the quick turnaround.',
+    timestamp:new Date(2026,6,22,14,20), sourceMessageId:'WATI-55409', sourceThreadId:'WATI-CONV-4524',
+    attachments:[]},
+
+  {id:'c7', source:'OUTLOOK', sender:'random-vendor@example.com', recipients:['ops@oneport365.com'],
+    subject:'Regarding ZELO000099',
+    content:'Hello, following up on ZELO000099 shipment status please.',
+    timestamp:new Date(2026,6,23,10,0), sourceMessageId:'MSG-OUT-10145', sourceThreadId:'THREAD-OUT-861',
+    attachments:[]},
+
+  {id:'c8', source:'OUTLOOK', sender:'agent@freightpartner.com', recipients:['ops@oneport365.com'],
+    subject:'ZELO000002 documents — BL HLCUHAM774410 attached',
+    content:'Hi, please find attached documents referencing ZELO000002. Note the B/L number is HLCUHAM774410.',
+    timestamp:new Date(2026,6,24,12,15), sourceMessageId:'MSG-OUT-10167', sourceThreadId:'THREAD-OUT-878',
+    attachments:[{name:'Conflicting_Reference_Docs.pdf', sizeBytes:63488}]},
+
+  {id:'c9', source:'WATI', sender:'Sarah Adeyemi', recipients:['Ops Group'], phone:'+2348020001122',
+    content:'Good morning everyone, hope you all have a great week ahead!',
+    timestamp:new Date(2026,6,25,9,0), sourceMessageId:'WATI-55430', sourceThreadId:'WATI-CONV-4531',
+    attachments:[]},
+
+  {id:'c10', source:'OUTLOOK', sender:'export.docs@oneport365.com', recipients:['sarah.adeyemi@oneport365.com','ada.nwosu@oneport365.com'],
+    subject:'Export Docs Pack — ZELO000005',
+    content:'Hi team,\n\nAttached is the full export documentation pack for ZELO000005 ahead of vessel sailing.\n\nRegards,\nExport Docs',
+    timestamp:new Date(2026,6,26,15,45), sourceMessageId:'MSG-OUT-10190', sourceThreadId:'THREAD-OUT-902',
+    attachments:[{name:'Packing_List_Export.xlsx', sizeBytes:45056},{name:'Certificate_of_Origin_Export.pdf', sizeBytes:71680}]},
+
+  {id:'c11', source:'WATI', sender:'Ada Nwosu', recipients:['Finance Desk'], phone:'+2348020001122',
+    content:'Hi, can we get confirmation that the final invoice for ZELO000006 has been settled?',
+    timestamp:new Date(2026,5,25,10,0), sourceMessageId:'WATI-55011', sourceThreadId:'WATI-CONV-4200',
+    attachments:[]},
+
+  {id:'c12', source:'WATI', sender:'Nigerian Breweries Finance', recipients:['Ada Nwosu'], phone:'+2348020001122',
+    content:'Confirmed — payment for ZELO000006 was settled this morning. Thank you.',
+    timestamp:new Date(2026,5,25,14,30), sourceMessageId:'WATI-55015', sourceThreadId:'WATI-CONV-4200',
+    attachments:[]},
+  {id:'c12b', source:'WATI', sender:'Ada Nwosu', recipients:['Nigerian Breweries Finance'], phone:'+2348020001122',
+    content:'Perfect, thank you for confirming so quickly!',
+    timestamp:new Date(2026,5,25,14,45), sourceMessageId:'WATI-55017', sourceThreadId:'WATI-CONV-4200',
+    attachments:[]},
+
+  // Deliberately NOT on the watch-list (external sender + external distribution list) —
+  // demonstrates the trigger policy blocking ingestion even though a valid ZELO ID is present.
+  {id:'c13', source:'OUTLOOK', sender:'newsletter@shippingweekly.com', recipients:['distribution@shippingweekly-subscribers.com'],
+    subject:'Industry News feat. ZELO000001',
+    content:'This week in shipping news, we highlight ZELO000001 as an example of efficient customs clearance...',
+    timestamp:new Date(2026,6,27,8,0), sourceMessageId:'MSG-OUT-10210', sourceThreadId:'THREAD-OUT-915',
+    attachments:[]},
+];
+
+/* ==========================================================================
+   Customer Engagement Trigger Policy — internal ingestion watch-list.
+   A communication is only pulled into the pipeline at all if it was sent or
+   received by a watched email (or a member of its distribution list) or a
+   watched phone number. This runs BEFORE shipment matching and is entirely
+   separate from it — sender/recipient identity still never decides WHICH
+   shipment a communication belongs to (that stays ZELO ID / B/L Number only).
+   ========================================================================== */
+const EMAIL_WATCHLIST = [
+  {address:'ops@oneport365.com', label:'Ops Distribution List', members:['sarah.adeyemi@oneport365.com','michael.ibe@oneport365.com','ada.nwosu@oneport365.com','chidi.eze@oneport365.com','titi.aluko@oneport365.com','james.adewale@oneport365.com']},
+  {address:'finance@oneport365.com', label:'Finance Distribution List', members:['ada.nwosu@oneport365.com']},
+];
+const PHONE_WATCHLIST = [
+  {number:'+2348020001122', label:'OnePort Ops WhatsApp Business Line'},
+  {number:'+2348032219087', label:'Dufil Prima Foods — Primary Contact'},
+];
+
+function normalizeEmail(e){ return (e||'').trim().toLowerCase(); }
+function normalizePhone(p){ return (p||'').replace(/[^\d+]/g,''); }
+
+function isWatchedEmail(address){
+  const norm = normalizeEmail(address);
+  if(!norm) return false;
+  return EMAIL_WATCHLIST.some(rule => normalizeEmail(rule.address)===norm || rule.members.some(m=>normalizeEmail(m)===norm));
+}
+function isWatchedPhone(number){
+  const norm = normalizePhone(number);
+  if(!norm) return false;
+  return PHONE_WATCHLIST.some(rule => normalizePhone(rule.number)===norm);
+}
+
+// "Sent or received" — checked against sender AND recipients, either direction.
+function matchesTriggerPolicy(comm){
+  if(comm.source==='OUTLOOK'){
+    return [comm.sender, ...(comm.recipients||[])].some(isWatchedEmail);
+  }
+  if(comm.source==='WATI'){
+    return [comm.phone, comm.sender, ...(comm.recipients||[])].filter(Boolean).some(isWatchedPhone);
+  }
+  return false;
+}
+
+// Deterministic, rules-based extraction — no LLM/AI inference. ZELO regex + exact B/L
+// lookup against the shipment DB (the only available validation layer, per spec §20).
+function extractZeloIds(text){
+  const found = text.match(/ZELO\d{4,}/gi) || [];
+  return [...new Set(found.map(m=>m.toUpperCase()))];
+}
+function extractBlMatches(text){
+  return Object.values(SHIPMENTS).filter(s=>s.bl && text.includes(s.bl)).map(s=>s.jobRef);
+}
+
+// Returns { matches, conflict, zeloMatches, blMatches, invalidZelo } — never guesses,
+// never uses AI. See spec §6 (deterministic matching) and §19 (error handling).
+function resolveShipmentMatches(comm){
+  const text = [comm.subject||'', comm.content||''].join(' ');
+  const zeloIds = extractZeloIds(text);
+  const validZelo = zeloIds.filter(id=>SHIPMENTS[id]);
+  const invalidZelo = zeloIds.filter(id=>!SHIPMENTS[id]);
+  if(invalidZelo.length){
+    console.warn(`[Communications] Unresolved ZELO reference(s) in ${comm.id}:`, invalidZelo);
+  }
+  const zeloMatches = [...new Set(validZelo)];
+  const blMatches = [...new Set(extractBlMatches(text))];
+
+  if(zeloMatches.length && blMatches.length){
+    const combined = new Set([...zeloMatches, ...blMatches]);
+    if(combined.size > 1){
+      console.warn(`[Communications] Conflicting shipment references in ${comm.id}: ZELO→[${zeloMatches}] vs B/L→[${blMatches}]. Not associating — logged for review.`);
+      return { matches: [], conflict: true, zeloMatches, blMatches, invalidZelo };
+    }
+  }
+  return { matches: [...new Set([...zeloMatches, ...blMatches])], conflict: false, zeloMatches, blMatches, invalidZelo };
+}
+
+function normalizeLabel(s){ return String(s||'').trim().toLowerCase(); }
+
+// The key used to group communications into one conversation "trail" — for both
+// UI threading (groupIntoThreads) and match inheritance (below). A WhatsApp
+// group is identified by its name (any participant posting under the same
+// group name is the same conversation, mirroring how a real WhatsApp group
+// works); everything else (email, WhatsApp DMs) is identified by the
+// channel's own conversation id, exactly as a real Outlook Conversation ID
+// or WATI conversation id would group replies.
+function commThreadKey(comm){
+  if(comm.source==='WATI' && comm.groupName){
+    return 'WAGROUP::' + normalizeLabel(comm.groupName);
+  }
+  return comm.sourceThreadId || comm.id;
+}
+
+// Cumulative record of which shipment(s) each conversation trail has already
+// been matched to — populated as messages are ingested, so a later reply that
+// carries no ZELO ID/B-L number of its own can still be recognized as part of
+// an already-matched conversation instead of being silently dropped.
+const THREAD_SHIPMENT_INDEX = {};
+
+function ingestCommunication(comm){
+  if(!matchesTriggerPolicy(comm)){
+    console.info(`[Communications] Not ingested — ${comm.id} sender/recipients are not on the watched email/number list (customer engagement trigger policy).`);
+    comm.matchedShipments = [];
+    return { triggered:false, matches:[], conflict:false, zeloMatches:[], blMatches:[], invalidZelo:[], inherited:false };
+  }
+  const key = commThreadKey(comm);
+  const result = resolveShipmentMatches(comm);
+  result.inherited = false;
+  // No explicit reference in THIS message, and no contradiction either — if its
+  // conversation trail already has an established shipment match, inherit it.
+  // An explicit conflict (§ resolveShipmentMatches) is never overridden by
+  // inheritance: a message that contradicts itself stays flagged, not guessed.
+  if(!result.matches.length && !result.conflict){
+    const prior = THREAD_SHIPMENT_INDEX[key];
+    if(prior && prior.size){
+      result.matches = [...prior];
+      result.inherited = true;
+      console.info(`[Communications] ${comm.id} has no ZELO ID/B-L Number of its own — inherited shipment match from its conversation trail (${key}): ${result.matches.join(', ')}`);
+    }
+  }
+  result.triggered = true;
+  comm.matchedShipments = result.matches;
+  if(result.matches.length){
+    if(!THREAD_SHIPMENT_INDEX[key]) THREAD_SHIPMENT_INDEX[key] = new Set();
+    result.matches.forEach(jobRef=>THREAD_SHIPMENT_INDEX[key].add(jobRef));
+  }
+  result.matches.forEach(jobRef=>{
+    const s = SHIPMENTS[jobRef];
+    s.communications.push(comm);
+    (comm.attachments||[]).forEach(att=>{
+      s.documents.push({
+        id: makeId('doc'),
+        name: att.name,
+        category: '',
+        uploadedBy: comm.source==='OUTLOOK' ? comm.sender : (comm.groupName || comm.sender),
+        uploadedOn: comm.timestamp,
+        isMock: true,
+        fileUrl: null,
+        size: att.sizeBytes,
+        source: comm.source,
+        commId: comm.id,
+      });
+    });
+  });
+  return result;
+}
+
+COMMUNICATIONS_MOCK.forEach(ingestCommunication);
+
+/* ==========================================================================
    App state & routing
    ========================================================================== */
 const state = {
@@ -1203,6 +1640,10 @@ const state = {
   activeMilestone: null,
   activeDocUpdate: null,
   activeDocDelete: null,
+  commFilter: 'all',
+  commSearch: '',
+  selectedCommThread: null,
+  readThreads: new Set(),
 };
 const ownerModalState = { checked: new Set(), primary: null, responsibilities: {}, openRespUid: null };
 
@@ -1229,6 +1670,10 @@ function navTo(view){
 
 function openShipment(jobRef){
   state.currentShipmentRef = jobRef;
+  state.commFilter = 'all';
+  state.commSearch = '';
+  state.selectedCommThread = null;
+  state.currentView = 'shipment-detail';
   document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
   el('view-shipment-detail').classList.add('active');
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.toggle('active', n.dataset.nav==='shipments'));
@@ -1301,6 +1746,7 @@ function renderShipmentDetail(){
   renderServiceDelivery();
   renderShipmentTracking();
   renderDocuments();
+  renderCommunications();
 }
 
 function renderShipHeader(){
@@ -1463,6 +1909,12 @@ function renderShipmentTracking(){
   `).join('');
 }
 
+function sourceChipHtml(d){
+  if(d.source==='OUTLOOK') return `<span class="comm-source-tag email">${ICON_MAIL}Outlook</span>`;
+  if(d.source==='WATI') return `<span class="comm-source-tag whatsapp">${ICON_CHAT}WhatsApp</span>`;
+  return `<span class="chip chip-neutral">Manual</span>`;
+}
+
 function renderDocuments(){
   const s = currentShipment();
   el('doc-total-count').textContent = s.documents.length;
@@ -1475,6 +1927,7 @@ function renderDocuments(){
         </div>
       </td>
       <td>${d.category ? `<span class="chip chip-neutral">${d.category}</span>` : '<span style="color:var(--silver-light)">—</span>'}</td>
+      <td>${sourceChipHtml(d)}</td>
       <td>${d.uploadedBy}</td>
       <td>${formatDateTime(d.uploadedOn)}</td>
       <td style="text-align:right">
@@ -1489,7 +1942,174 @@ function renderDocuments(){
         </div>
       </td>
     </tr>
-  `).join('') || `<tr><td colspan="5" style="text-align:center;color:var(--silver-light);padding:30px">No documents uploaded yet.</td></tr>`;
+  `).join('') || `<tr><td colspan="6" style="text-align:center;color:var(--silver-light);padding:30px">No documents uploaded yet.</td></tr>`;
+}
+
+/* ==========================================================================
+   Communications tab render
+   ========================================================================== */
+function escapeHtml(str){
+  return String(str).replace(/[&<>"']/g, ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+}
+function commTypeLabel(source){ return source==='OUTLOOK' ? 'Email' : 'WhatsApp'; }
+function commTypeClass(source){ return source==='OUTLOOK' ? 'email' : 'whatsapp'; }
+function commTypeIcon(source){ return source==='OUTLOOK' ? ICON_MAIL : ICON_CHAT; }
+
+function groupIntoThreads(comms){
+  const order = [], byThread = {};
+  comms.forEach(c=>{
+    const key = commThreadKey(c);
+    if(!byThread[key]){ byThread[key] = []; order.push(key); }
+    byThread[key].push(c);
+  });
+  return order.map(key=>byThread[key].slice().sort((a,b)=>a.timestamp-b.timestamp));
+}
+
+function hashStr(str){
+  let h = 0;
+  for(let i=0;i<str.length;i++) h = (h*31 + str.charCodeAt(i)) | 0;
+  return Math.abs(h);
+}
+function contactInitials(name){
+  const parts = String(name).replace(/[()]/g,'').trim().split(/\s+/).filter(Boolean);
+  if(!parts.length) return '?';
+  if(parts.length===1) return parts[0].slice(0,2).toUpperCase();
+  return (parts[0][0]+parts[1][0]).toUpperCase();
+}
+function contactFill(name){
+  const fills = ['dark','light','gold'];
+  return fills[hashStr(String(name)) % fills.length];
+}
+function isOutgoingComm(c){
+  if(c.source==='OUTLOOK') return normalizeEmail(c.sender).endsWith('@oneport365.com');
+  return TEAM.some(t=>t.name===c.sender);
+}
+function timeAgo(date){
+  const diffMs = Date.now() - date.getTime();
+  const mins = Math.floor(diffMs/60000);
+  if(mins < 1) return 'Just now';
+  if(mins < 60) return `${mins}m ago`;
+  const hours = Math.floor(mins/60);
+  if(hours < 24) return `${hours}h ago`;
+  const days = Math.floor(hours/24);
+  if(days < 7) return `${days}d ago`;
+  return formatDate(date);
+}
+function threadKey(thread){ return commThreadKey(thread[0]); }
+function threadContact(thread){
+  const first = thread[0];
+  const name = first.groupName || first.sender;
+  let sub;
+  if(first.source==='OUTLOOK'){
+    sub = (first.recipients && first.recipients.length) ? `To: ${first.recipients.join(', ')}` : 'Email';
+  } else {
+    sub = first.groupName ? 'WhatsApp Group' : (first.phone || 'WhatsApp');
+  }
+  return { name, sub };
+}
+function threadPreview(thread){
+  const last = thread[thread.length-1];
+  return last.subject || last.content;
+}
+
+function updateCommFilterCounts(all, email, wa){
+  const btn = (key, label, count) => `<button class="comm-filter-btn ${state.commFilter===key?'active':''}" data-comm-filter="${key}">${label} <span class="cf-count">${count}</span></button>`;
+  el('comm-filter-group').innerHTML = btn('all','All',all) + btn('email','Email',email) + btn('whatsapp','WhatsApp',wa);
+}
+
+function renderCommList(threads){
+  if(!threads.length){
+    el('comm-list-scroll').innerHTML = `<div class="comm-list-empty">No communications matched to this shipment yet.</div>`;
+    return;
+  }
+  el('comm-list-scroll').innerHTML = threads.map(thread=>{
+    const key = threadKey(thread);
+    const contact = threadContact(thread);
+    const last = thread[thread.length-1];
+    const unread = !state.readThreads.has(key);
+    const active = state.selectedCommThread === key;
+    return `
+    <div class="comm-list-item ${active?'active':''}" data-comm-thread="${key}">
+      <div class="avatar avatar-sm" style="${avatarFillStyle(contactFill(contact.name))}">${contactInitials(contact.name)}</div>
+      <div class="clist-main">
+        <div class="clist-top">
+          <span class="clist-name">${escapeHtml(contact.name)}</span>
+          <span class="clist-time">${timeAgo(last.timestamp)}</span>
+        </div>
+        <div class="clist-preview">${commTypeIcon(last.source)}<span style="overflow:hidden;text-overflow:ellipsis">${escapeHtml(threadPreview(thread))}</span></div>
+      </div>
+      ${unread ? '<span class="comm-unread-dot"></span>' : ''}
+    </div>`;
+  }).join('');
+}
+
+function renderCommBubble(c){
+  const outgoing = isOutgoingComm(c);
+  const attachHtml = (c.attachments&&c.attachments.length) ? c.attachments.map(a=>`
+    <div class="comm-attach-card">${ICON_PAPERCLIP}<span>${escapeHtml(a.name)}</span><span class="asize">${formatBytes(a.sizeBytes)}</span></div>
+  `).join('') : '';
+  const subjectHtml = c.source==='OUTLOOK' && c.subject ? `<div class="csubject">${escapeHtml(c.subject)}</div>` : '';
+  return `
+  <div class="comm-bubble-row ${outgoing?'out':''}">
+    <div class="avatar avatar-sm" style="${avatarFillStyle(contactFill(c.sender))}">${contactInitials(c.sender)}</div>
+    <div>
+      <div class="comm-bubble">
+        ${subjectHtml}
+        <div class="cbody">${escapeHtml(c.content)}</div>
+        ${attachHtml}
+      </div>
+      <div class="comm-bubble-meta">${commTypeIcon(c.source)}${commTypeLabel(c.source)} · ${escapeHtml(c.sender)} · ${formatDateTime(c.timestamp)}</div>
+    </div>
+  </div>`;
+}
+
+function renderCommDetail(threads){
+  const key = state.selectedCommThread;
+  const thread = threads.find(t=>threadKey(t)===key);
+  if(!thread){
+    el('comm-detail-head').innerHTML = '';
+    el('comm-detail-scroll').innerHTML = `<div class="comm-detail-empty">Select a conversation to view messages.</div>`;
+    el('comm-readonly-note').style.display = 'none';
+    return;
+  }
+  const contact = threadContact(thread);
+  const last = thread[thread.length-1];
+  el('comm-detail-head').innerHTML = `
+    <div class="avatar avatar-md" style="${avatarFillStyle(contactFill(contact.name))}">${contactInitials(contact.name)}</div>
+    <div class="who">
+      <b>${escapeHtml(contact.name)}</b>
+      <span>${escapeHtml(contact.sub)} · Last message ${timeAgo(last.timestamp)}</span>
+    </div>`;
+  el('comm-detail-scroll').innerHTML = thread.map(renderCommBubble).join('');
+  el('comm-detail-scroll').scrollTop = el('comm-detail-scroll').scrollHeight;
+  el('comm-readonly-note').style.display = 'flex';
+}
+
+function renderCommunications(){
+  const s = currentShipment();
+  const allComms = (s.communications||[]).slice().sort((a,b)=>a.timestamp-b.timestamp);
+  updateCommFilterCounts(allComms.length, allComms.filter(c=>c.source==='OUTLOOK').length, allComms.filter(c=>c.source==='WATI').length);
+
+  let comms = allComms;
+  if(state.commFilter==='email') comms = comms.filter(c=>c.source==='OUTLOOK');
+  else if(state.commFilter==='whatsapp') comms = comms.filter(c=>c.source==='WATI');
+
+  const q = (state.commSearch||'').trim().toLowerCase();
+  let threads = groupIntoThreads(comms);
+  if(q){
+    threads = threads.filter(thread=>{
+      const contact = threadContact(thread);
+      const hay = [contact.name, contact.sub, ...thread.map(m=>m.content), ...thread.map(m=>m.subject||'')].join(' ').toLowerCase();
+      return hay.includes(q);
+    });
+  }
+  threads.sort((a,b)=> b[b.length-1].timestamp - a[a.length-1].timestamp);
+
+  const keys = threads.map(threadKey);
+  if(!keys.includes(state.selectedCommThread)) state.selectedCommThread = keys[0] || null;
+
+  renderCommList(threads);
+  renderCommDetail(threads);
 }
 
 /* ==========================================================================
@@ -1869,6 +2489,164 @@ el('confirm-delete-doc').addEventListener('click', ()=>{
 });
 
 /* ==========================================================================
+   Simulate Incoming Communication — manual test harness for the matcher
+   ========================================================================== */
+function renderWatchlistHint(){
+  const emailBits = EMAIL_WATCHLIST.map(r=>`${r.address}${r.members.length ? ' (+ '+r.members.length+' DL members)' : ''}`).join(', ');
+  const phoneBits = PHONE_WATCHLIST.map(r=>`${r.number} — ${r.label}`).join(', ');
+  el('sim-watchlist-hint').innerHTML = `<b>Active watch-list</b> (customer engagement trigger policy) — only messages sent or received by these are ingested at all.<br>Emails: ${emailBits}<br>Numbers: ${phoneBits}`;
+}
+
+// All conversations across every shipment, deduplicated (the same message can
+// be pushed into two shipments' communications lists when it matched both —
+// e.g. a consolidated update — and should still only appear once here).
+function allThreadsGlobal(){
+  const seen = new Map();
+  Object.values(SHIPMENTS).forEach(s=>{
+    (s.communications||[]).forEach(c=>{ if(!seen.has(c.id)) seen.set(c.id, c); });
+  });
+  return groupIntoThreads([...seen.values()]);
+}
+function threadShipmentRefs(thread){
+  const set = new Set();
+  thread.forEach(c=>(c.matchedShipments||[]).forEach(r=>set.add(r)));
+  return [...set];
+}
+function stripReplyPrefix(subject){ return String(subject||'').replace(/^\s*(re|fwd?)\s*:\s*/i, '').trim(); }
+
+function updateSourceFieldVisibility(){
+  const isEmail = el('sim-source').value === 'OUTLOOK';
+  el('sim-subject-field').style.display = isEmail ? '' : 'none';
+  el('sim-group-field').style.display = isEmail ? 'none' : '';
+  el('sim-phone-field').style.display = isEmail ? 'none' : '';
+}
+
+function populateReplyThreadOptions(){
+  const threads = allThreadsGlobal().sort((a,b)=> b[b.length-1].timestamp - a[a.length-1].timestamp);
+  el('sim-reply-thread').innerHTML = threads.map(t=>{
+    const key = threadKey(t);
+    const refs = threadShipmentRefs(t).join('/') || 'Unmatched';
+    const contact = threadContact(t);
+    const channel = t[0].source==='OUTLOOK' ? 'Email' : (t[0].groupName ? 'WhatsApp Group' : 'WhatsApp');
+    return `<option value="${escapeHtml(key)}">[${escapeHtml(refs)}] ${escapeHtml(contact.name)} — ${channel}</option>`;
+  }).join('');
+}
+// Reusing an existing conversation's channel/subject/group/phone is what makes
+// the new message join the SAME trail (see commThreadKey) instead of starting
+// a disconnected one — the whole point of "reply" mode.
+function applyReplyThreadPrefill(){
+  const threads = allThreadsGlobal();
+  const thread = threads.find(t=>threadKey(t)===el('sim-reply-thread').value);
+  if(!thread) return;
+  const first = thread[0];
+  el('sim-source').value = first.source;
+  el('sim-source').disabled = true;
+  updateSourceFieldVisibility();
+  el('sim-subject').value = first.source==='OUTLOOK' ? `RE: ${stripReplyPrefix(first.subject)}` : '';
+  el('sim-group').value = first.groupName || '';
+  el('sim-phone').value = first.phone || '';
+}
+function openSimulateModal(){
+  el('sim-mode').value = 'new';
+  el('sim-reply-thread-field').style.display = 'none';
+  el('sim-source').disabled = false;
+  el('sim-source').value = 'OUTLOOK';
+  el('sim-sender').value = '';
+  el('sim-subject').value = '';
+  el('sim-group').value = '';
+  el('sim-phone').value = '';
+  el('sim-recipients').value = '';
+  el('sim-content').value = '';
+  el('sim-attachments').value = '';
+  updateSourceFieldVisibility();
+  el('sim-result').style.display = 'none';
+  renderWatchlistHint();
+  openModal('modal-simulate-comm');
+}
+el('sim-mode').addEventListener('change', ()=>{
+  const isReply = el('sim-mode').value === 'reply';
+  el('sim-reply-thread-field').style.display = isReply ? '' : 'none';
+  el('sim-source').disabled = isReply;
+  if(isReply){
+    populateReplyThreadOptions();
+    applyReplyThreadPrefill();
+  } else {
+    el('sim-group').value = '';
+    el('sim-phone').value = '';
+    el('sim-subject').value = '';
+  }
+});
+el('sim-reply-thread').addEventListener('change', applyReplyThreadPrefill);
+el('sim-source').addEventListener('change', updateSourceFieldVisibility);
+function renderSimResult(html, isError){
+  const box = el('sim-result');
+  box.className = 'sim-result-box ' + (isError ? 'error' : 'success');
+  box.style.display = 'block';
+  box.innerHTML = html;
+}
+el('save-simulate-comm').addEventListener('click', ()=>{
+  const isReply = el('sim-mode').value === 'reply';
+  const source = el('sim-source').value;
+  const sender = el('sim-sender').value.trim();
+  const content = el('sim-content').value.trim();
+  if(!sender || !content){ showToast('Sender and message content are required', 'error'); return; }
+  if(isReply && !el('sim-reply-thread').value){ showToast('Choose an existing conversation to reply to', 'error'); return; }
+  const recipients = el('sim-recipients').value.split(',').map(r=>r.trim()).filter(Boolean);
+  const subject = source==='OUTLOOK' ? el('sim-subject').value.trim() : '';
+  const groupName = source==='WATI' ? el('sim-group').value.trim() : '';
+  const phone = source==='WATI' ? el('sim-phone').value.trim() : '';
+  const attachments = el('sim-attachments').value.split(',').map(a=>a.trim()).filter(Boolean)
+    .map(name=>({name, sizeBytes: 40000 + name.length*500}));
+
+  // Replying reuses the existing conversation's own sourceThreadId, which is
+  // what makes it join the same trail — a WhatsApp group also merges purely by
+  // matching group name (see commThreadKey), but reusing the id here keeps
+  // both signals consistent.
+  let sourceThreadId = makeId('THREAD-SIM');
+  if(isReply){
+    const thread = allThreadsGlobal().find(t=>threadKey(t)===el('sim-reply-thread').value);
+    if(thread) sourceThreadId = thread[0].sourceThreadId || sourceThreadId;
+  }
+
+  const comm = {
+    id: makeId('sim'),
+    source, sender, recipients,
+    subject: subject || undefined,
+    groupName: groupName || undefined,
+    phone: phone || undefined,
+    content,
+    timestamp: new Date(),
+    sourceMessageId: makeId('MSG-SIM'),
+    sourceThreadId,
+    attachments,
+  };
+
+  const result = ingestCommunication(comm);
+  COMMUNICATIONS_MOCK.push(comm);
+
+  const replyPrefix = isReply ? '<b>Added as a reply in the existing conversation.</b> ' : '';
+  if(!result.triggered){
+    renderSimResult(`${replyPrefix}<b>Not ingested.</b> Sender/recipients aren't on the watched email/DL or phone number list, so this communication never entered the pipeline — per the customer engagement trigger policy, ZELO/B/L matching was never attempted. Check the browser console for the log.`, true);
+    showToast('Not on watch-list — communication not ingested', 'error');
+  } else if(result.matches.length){
+    const inheritedNote = result.inherited ? ` (no ZELO ID/B-L Number in this message — inherited from its conversation trail)` : '';
+    renderSimResult(`${replyPrefix}<b>Matched to:</b> ${result.matches.join(', ')}${inheritedNote} — now visible in ${result.matches.length>1?'each shipment\'s':'the shipment\'s'} Communications tab${attachments.length ? ' and Documents tab' : ''}.`, false);
+    showToast(`Communication matched to ${result.matches.join(', ')}`);
+  } else if(result.conflict){
+    renderSimResult(`${replyPrefix}<b>Conflicting references detected</b> — the ZELO ID and B/L Number in this message point to different shipments (ZELO → ${result.zeloMatches.join(', ')||'—'}, B/L → ${result.blMatches.join(', ')||'—'}). Per the matching rules, no association was made. Check the browser console for the logged conflict.`, true);
+    showToast('Conflict detected — not associated', 'error');
+  } else {
+    renderSimResult(`${replyPrefix}<b>No shipment reference recognized.</b> This communication was not stored against any shipment — there is no unmatched-communications queue in this MVP.`, true);
+    showToast('No shipment reference recognized', 'error');
+  }
+
+  if(state.currentView==='shipment-detail' && result.matches.includes(state.currentShipmentRef)){
+    renderCommunications();
+    renderDocuments();
+  }
+});
+
+/* ==========================================================================
    Global delegated click handling
    (covers all elements that get recreated by innerHTML re-renders)
    ========================================================================== */
@@ -1973,6 +2751,20 @@ document.body.addEventListener('click', (e)=>{
   const quoteLink = t.closest('[data-quote-link]');
   if(quoteLink){ e.preventDefault(); showToast('Quote navigation isn\'t wired up in this prototype yet'); return; }
 
+  const commFilterBtn = t.closest('[data-comm-filter]');
+  if(commFilterBtn){ state.commFilter = commFilterBtn.dataset.commFilter; renderCommunications(); return; }
+
+  const commThreadItem = t.closest('[data-comm-thread]');
+  if(commThreadItem){
+    const key = commThreadItem.dataset.commThread;
+    state.selectedCommThread = key;
+    state.readThreads.add(key);
+    renderCommunications();
+    return;
+  }
+
+  if(t.closest('#btn-simulate-comm')){ openSimulateModal(); return; }
+
   if(t.closest('#btn-upload-docs')){ openUploadDocsModal(); return; }
   const docView = t.closest('[data-doc-view]');
   if(docView){ viewDocument(docView.dataset.docView); return; }
@@ -1987,6 +2779,11 @@ document.body.addEventListener('click', (e)=>{
 el('shipment-search').addEventListener('input', (e)=>{
   state.searchQuery = e.target.value;
   renderShipmentsList();
+});
+
+el('comm-search-input').addEventListener('input', (e)=>{
+  state.commSearch = e.target.value;
+  renderCommunications();
 });
 
 /* ==========================================================================
