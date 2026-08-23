@@ -134,7 +134,7 @@ input,textarea{font-family:var(--font-body)}
 .section-label{ font-family:var(--font-display); font-weight:600; font-size:13.5px; color:var(--green-dark); padding:6px 2px; }
 .comments-section .comment-item:first-of-type{ margin-top:8px; }
 .comment-item{ background:var(--white); border:1px solid var(--border-tint); border-radius:var(--radius-md); padding:10px 12px; margin-bottom:8px; }
-.comment-item .comment-meta{ display:flex; justify-content:space-between; gap:10px; font-size:11.5px; font-weight:600; color:var(--silver-light); margin-bottom:5px; }
+.comment-item .comment-meta{ font-size:11.5px; font-weight:600; color:var(--silver-light); margin-bottom:5px; }
 .comment-item .comment-text{ font-size:13.5px; color:var(--silver-dark); line-height:1.5; }
 .comment-item .comment-text.empty{ color:var(--silver-light); font-style:italic; }
 .empty-note{ font-size:13px; color:var(--silver-light); margin:8px 2px 0; }
@@ -646,12 +646,14 @@ function loadMilestoneDetail(){
   });
 }
 
+// No author shown — only the assigned Operations Staff member can add a
+// comment here, so a name would be redundant. (The Admin Portal, which
+// several people can act from, still shows who flagged each comment.)
 function renderCommentItem(entry){
-  const author = (MilestoneStore.getUserById(entry.by)||{}).name || 'Unknown';
   const when = new Date(entry.at).toLocaleString('en-GB',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'});
   return `
     <div class="comment-item">
-      <div class="comment-meta"><span>${author}</span><span>${when}</span></div>
+      <div class="comment-meta">${when}</div>
       <div class="comment-text${entry.note ? '' : ' empty'}">${entry.note || 'No note added.'}</div>
     </div>`;
 }

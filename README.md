@@ -133,11 +133,15 @@ sequence (section 43):
   introducing a `BLOCKED` state or overwriting a single note; a milestone
   can carry a running discussion of blockers over time. The Detail
   screen's Comments section is collapsed by default but always shows the
-  most recent comment; older ones are revealed by expanding it. A flagged
-  milestone also shows a banner on Detail, a "Flagged" pill on its To-Dos
-  card, and a flag icon in the Admin Portal's Service Delivery table
-  (tooltip shows the latest comment) — visible everywhere through the
-  same shared record, not a Field-Channel-only note.
+  most recent comment; older ones are revealed by expanding it. Field
+  Channel comments show only the note and timestamp — no author name,
+  since only the milestone's assigned Operations Staff member can add one
+  there, so it would be redundant. The Admin Portal's flag tooltip still
+  names who flagged it (several people can act from there), showing the
+  latest comment plus a count when there's more than one. A flagged
+  milestone also shows a banner on Detail and a "Flagged" pill on its
+  To-Dos card — visible everywhere through the same shared record, not a
+  Field-Channel-only note.
 - **Concurrency & idempotency** — before completing, the app re-fetches
   the milestone from the store; if it's been reassigned, already
   completed, or no longer exists, it shows the corresponding message from
