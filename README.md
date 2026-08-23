@@ -109,15 +109,21 @@ sequence (section 43):
   the list already revalidates on load, on return to this screen, and
   whenever the store notifies of a change elsewhere (spec section 36), so
   a button that does the same thing on demand was redundant.
-- **Milestone Detail** — an SLA/status banner, the milestone name, the
-  shipment context needed to execute it (reference, customer, shipment
-  type, transport, B/L or AWB number, route, location), and a collapsible
-  comment history (see "Flag a blocker" below). "Mark as Complete" and
-  "Flag" sit side by side at the bottom,
-  same order as the To-Dos card, always reachable without scrolling —
-  pinned below the independently-scrollable content, never the page
-  itself. Opened only for a milestone that is still `NOT_STARTED` and
-  assigned to the signed-in user; if it's already been completed or
+- **Milestone Detail** — an SLA/status banner (sharing a row with the
+  "Blocker flagged" banner when the milestone has one, instead of
+  stacking), the milestone name, the shipment context needed to execute
+  it (reference, customer, shipment type, transport, B/L or AWB number,
+  route, location), and a collapsible comment history (see "Flag a
+  blocker" below). No shipment/customer subtitle under the milestone name
+  — that's already in the info card right below it. "Mark as Complete"
+  and "Flag" sit side by side at the bottom, same order as the To-Dos
+  card, always reachable without scrolling — pinned below the
+  independently-scrollable content, never the page itself. The Flag
+  button always looks the same regardless of whether the milestone
+  already has comments — flagging is a repeatable action, not a toggle,
+  so it doesn't get an "active" state. Opened only for a milestone that
+  is still `NOT_STARTED` and assigned to the signed-in user; if it's
+  already been completed or
   reassigned elsewhere by the time the screen loads, the app shows the
   message and returns to To-Dos rather than rendering a dead page.
 - **Completion confirmation** — a bottom sheet with an optional note,

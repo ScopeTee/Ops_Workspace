@@ -118,8 +118,9 @@ input,textarea{font-family:var(--font-body)}
 .detail-status-banner.healthy{ background:var(--success-bg); color:var(--success-text); }
 .detail-status-banner.at-risk{ background:var(--gold-bg); color:var(--gold-text); }
 .detail-status-banner.breached{ background:var(--error-bg); color:var(--error-text); }
-.detail-h1{ font-size:20px; margin-bottom:3px; }
-.detail-sub{ color:var(--silver-light); font-size:13.5px; margin-bottom:14px; }
+.detail-h1{ font-size:20px; margin-bottom:14px; }
+.banner-row{ display:flex; flex-wrap:wrap; gap:10px; margin-bottom:14px; }
+.banner-row .detail-status-banner, .banner-row .banner{ flex:1 1 0; min-width:150px; margin-bottom:0; }
 .info-card{ background:var(--white); border:1px solid var(--border-tint); border-radius:var(--radius-lg); padding:6px 16px; margin-bottom:14px; }
 .info-row{ display:flex; justify-content:space-between; gap:12px; padding:9px 0; border-bottom:1px solid var(--border-tint); font-size:13.5px; }
 .info-row:last-child{ border-bottom:none; }
@@ -149,7 +150,6 @@ input,textarea{font-family:var(--font-body)}
 .action-row{ display:flex; gap:10px; }
 .action-row .btn-primary, .action-row .btn-card-complete{ flex:1; }
 .btn-flag{ width:auto; flex-shrink:0; }
-.btn-flag.flagged{ background:var(--gold-bg); border-color:var(--gold); color:var(--gold-text); }
 
 /* ---- Bottom tab navigation ---- */
 .bottom-nav{ position:sticky; bottom:0; z-index:15; display:flex; background:var(--white); border-top:1px solid var(--border-tint); flex-shrink:0; padding:4px 6px calc(4px + env(safe-area-inset-bottom)); }
@@ -586,7 +586,7 @@ function renderTodosList(){
       </div>
       <div class="action-row">
         <button class="btn btn-primary btn-card-complete" data-complete-ms="${m.id}">${ICON_CHECK} Mark Complete</button>
-        <button class="btn btn-outline btn-flag${m.flagged ? ' flagged' : ''}" data-flag-ms="${m.id}">${ICON_FLAG} Flag</button>
+        <button class="btn btn-outline btn-flag" data-flag-ms="${m.id}">${ICON_FLAG} Flag</button>
       </div>
     </div>`;
   }).join('');
@@ -671,10 +671,11 @@ function renderMilestoneDetail(m, s){
     : '';
 
   el('detail-body').innerHTML = `
-    <div class="detail-status-banner ${sla.tier}">${SLA_ICON[sla.tier]} ${sla.label}</div>
-    ${m.flagged ? bannerHtml('warn', `<b>Blocker flagged</b> — see comments below`, ICON_FLAG) : ''}
+    <div class="banner-row">
+      <div class="detail-status-banner ${sla.tier}">${SLA_ICON[sla.tier]} ${sla.label}</div>
+      ${m.flagged ? bannerHtml('warn', `<b>Blocker flagged</b> — see comments below`, ICON_FLAG) : ''}
+    </div>
     <h2 class="detail-h1">${m.name}</h2>
-    <p class="detail-sub">${s.jobRef} · ${s.customer}</p>
 
     <div class="info-card">
       <div class="info-row"><span class="k">Reference</span><span class="v">${s.jobRef}</span></div>
@@ -699,7 +700,7 @@ function renderMilestoneDetail(m, s){
     el('detail-action-bar').innerHTML = `
       <div class="action-row">
         <button class="btn btn-primary btn-card-complete" id="btn-mark-complete">${ICON_CHECK} Mark as Complete</button>
-        <button class="btn btn-outline btn-flag${m.flagged ? ' flagged' : ''}" id="btn-flag" title="${m.flagged ? 'Update flagged blocker' : 'Flag a blocker'}">${ICON_FLAG} Flag</button>
+        <button class="btn btn-outline btn-flag" id="btn-flag" title="Flag a blocker">${ICON_FLAG} Flag</button>
       </div>`;
     el('btn-mark-complete').addEventListener('click', ()=>openConfirmSheet(m, s, 'detail'));
     el('btn-flag').addEventListener('click', ()=>openFlagSheet(m, s, 'detail'));
