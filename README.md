@@ -109,11 +109,11 @@ sequence (section 43):
   the list already revalidates on load, on return to this screen, and
   whenever the store notifies of a change elsewhere (spec section 36), so
   a button that does the same thing on demand was redundant.
-- **Milestone Detail** — an SLA/status banner, the milestone name, a
-  collapsible "Shipment Details" section (reference, customer, shipment
-  type, transport, B/L or AWB number, route, location — collapsed by
-  default), and a collapsible comment history (see "Flag a blocker"
-  below). "Mark as Complete" and "Flag" sit side by side at the bottom,
+- **Milestone Detail** — an SLA/status banner, the milestone name, the
+  shipment context needed to execute it (reference, customer, shipment
+  type, transport, B/L or AWB number, route, location), and a collapsible
+  comment history (see "Flag a blocker" below). "Mark as Complete" and
+  "Flag" sit side by side at the bottom,
   same order as the To-Dos card, always reachable without scrolling —
   pinned below the independently-scrollable content, never the page
   itself. Opened only for a milestone that is still `NOT_STARTED` and

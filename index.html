@@ -585,7 +585,7 @@ function renderTodosList(){
         ${m.flagged ? `<span class="sla-pill flagged" title="Blocker flagged">${ICON_FLAG} Flagged</span>` : ''}
       </div>
       <div class="action-row">
-        <button class="btn btn-outline btn-card-complete" data-complete-ms="${m.id}">${ICON_CHECK} Mark Complete</button>
+        <button class="btn btn-primary btn-card-complete" data-complete-ms="${m.id}">${ICON_CHECK} Mark Complete</button>
         <button class="btn btn-outline btn-flag${m.flagged ? ' flagged' : ''}" data-flag-ms="${m.id}">${ICON_FLAG} Flag</button>
       </div>
     </div>`;
@@ -676,21 +676,14 @@ function renderMilestoneDetail(m, s){
     <h2 class="detail-h1">${m.name}</h2>
     <p class="detail-sub">${s.jobRef} · ${s.customer}</p>
 
-    <div class="collapsible">
-      <button class="collapsible-header" data-toggle="shipment-details-body">
-        <span>Shipment Details</span>${ICON_CHEVRON}
-      </button>
-      <div class="collapsible-body" id="shipment-details-body">
-        <div class="info-card">
-          <div class="info-row"><span class="k">Reference</span><span class="v">${s.jobRef}</span></div>
-          <div class="info-row"><span class="k">Customer</span><span class="v">${s.customer}</span></div>
-          <div class="info-row"><span class="k">Shipment Type</span><span class="v">${shipmentTypeOf(s)}</span></div>
-          <div class="info-row"><span class="k">Transport</span><span class="v">${transportLabelOf(s)}</span></div>
-          <div class="info-row"><span class="k">${transportDocLabel(s)}</span><span class="v">${s.transportDocNumber}</span></div>
-          <div class="info-row"><span class="k">Route</span><span class="v">${s.route}</span></div>
-          <div class="info-row"><span class="k">Location</span><span class="v">${m.location}</span></div>
-        </div>
-      </div>
+    <div class="info-card">
+      <div class="info-row"><span class="k">Reference</span><span class="v">${s.jobRef}</span></div>
+      <div class="info-row"><span class="k">Customer</span><span class="v">${s.customer}</span></div>
+      <div class="info-row"><span class="k">Shipment Type</span><span class="v">${shipmentTypeOf(s)}</span></div>
+      <div class="info-row"><span class="k">Transport</span><span class="v">${transportLabelOf(s)}</span></div>
+      <div class="info-row"><span class="k">${transportDocLabel(s)}</span><span class="v">${s.transportDocNumber}</span></div>
+      <div class="info-row"><span class="k">Route</span><span class="v">${s.route}</span></div>
+      <div class="info-row"><span class="k">Location</span><span class="v">${m.location}</span></div>
     </div>
 
     <div class="collapsible comments-section">
