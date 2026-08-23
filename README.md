@@ -102,35 +102,42 @@ sequence (section 43):
   customer name, or task name. Each card shows the customer, the
   shipment's transport type, the route, and an SLA indicator (Healthy /
   At Risk / Breached, both date and time, derived from the due date)
-  alongside a "Mark Complete" action, so a milestone can be completed
+  alongside "Mark Complete" and "Flag" actions (icon + text, in that
+  left-to-right order), so a milestone can be completed or flagged
   straight from the list without opening it. The "You're all caught up"
   empty state is from spec section 35. There's no manual refresh button —
   the list already revalidates on load, on return to this screen, and
   whenever the store notifies of a change elsewhere (spec section 36), so
   a button that does the same thing on demand was redundant.
-- **Milestone Detail** — an SLA/status banner, the milestone name, and the
-  shipment context needed to execute it (reference, customer, shipment
-  type, transport, B/L or AWB number, route, location). The primary
-  action always stays reachable without scrolling — it's pinned below the
-  (independently scrollable) content, never the page itself. Opened only
-  for a milestone that is still `NOT_STARTED` and assigned to the
-  signed-in user; if it's already been completed or reassigned elsewhere
-  by the time the screen loads, the app shows the message and returns to
-  To-Dos rather than rendering a dead page.
+- **Milestone Detail** — an SLA/status banner, the milestone name, a
+  collapsible "Shipment Details" section (reference, customer, shipment
+  type, transport, B/L or AWB number, route, location — collapsed by
+  default), and a collapsible comment history (see "Flag a blocker"
+  below). "Mark as Complete" and "Flag" sit side by side at the bottom,
+  same order as the To-Dos card, always reachable without scrolling —
+  pinned below the independently-scrollable content, never the page
+  itself. Opened only for a milestone that is still `NOT_STARTED` and
+  assigned to the signed-in user; if it's already been completed or
+  reassigned elsewhere by the time the screen loads, the app shows the
+  message and returns to To-Dos rather than rendering a dead page.
 - **Completion confirmation** — a bottom sheet with an optional note,
   requiring a deliberate second action before the mutation fires (spec
   section 16.2). Reachable from either the To-Dos card or the Detail
   screen; either path lands back on To-Dos afterward, since a completed
   milestone is no longer accessible here.
-- **Flag a blocker** — a "Flag" button beside "Mark as Complete" on the
-  Detail screen opens a sheet for an optional note describing what's
+- **Flag a blocker** — a "Flag" button, reachable from the To-Dos card or
+  the Detail screen, opens a sheet for an optional note describing what's
   blocking the milestone. This is deliberately *not* a status change —
-  MVP has only `NOT_STARTED`/`COMPLETED` (spec sections 7–8), so flagging
-  attaches a note to the milestone without introducing a `BLOCKED` state.
-  A flagged milestone shows a banner on Detail, a "Flagged" pill on its
-  To-Dos card, and a flag icon (with the note as a tooltip) next to its
-  name in the Admin Portal's Service Delivery table — visible everywhere
-  through the same shared record, not a Field-Channel-only note.
+  MVP has only `NOT_STARTED`/`COMPLETED` (spec sections 7–8) — so flagging
+  appends a timestamped comment to the milestone's history rather than
+  introducing a `BLOCKED` state or overwriting a single note; a milestone
+  can carry a running discussion of blockers over time. The Detail
+  screen's Comments section is collapsed by default but always shows the
+  most recent comment; older ones are revealed by expanding it. A flagged
+  milestone also shows a banner on Detail, a "Flagged" pill on its To-Dos
+  card, and a flag icon in the Admin Portal's Service Delivery table
+  (tooltip shows the latest comment) — visible everywhere through the
+  same shared record, not a Field-Channel-only note.
 - **Concurrency & idempotency** — before completing, the app re-fetches
   the milestone from the store; if it's been reassigned, already
   completed, or no longer exists, it shows the corresponding message from

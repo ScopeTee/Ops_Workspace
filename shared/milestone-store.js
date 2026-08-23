@@ -157,9 +157,7 @@
         completedAt: isDone ? new Date(dueDate.getTime() - 3600000).toISOString() : null,
         completionNote: isDone && i % 3 === 0 ? 'Cleared without exceptions.' : '',
         flagged: false,
-        flagNote: '',
-        flaggedBy: null,
-        flaggedAt: null,
+        flagHistory: [], // [{ note, by, at }], newest appended last
         // Deliberately derived from dueDate, not a fresh `new Date()` call
         // — this field isn't part of the demo's day-relative narrative, so
         // it should stay byte-identical across two devices seeding fresh
@@ -372,9 +370,11 @@
   }
 
   // Flags a blocker on a milestone without changing its status — MVP has
-  // no BLOCKED state (spec section 8/39), so this is a note attached to the
-  // still-NOT_STARTED milestone, not a state transition. Same authorization
-  // rule as completion: assigned staff or an admin.
+  // no BLOCKED state (spec section 8/39), so this appends a comment to the
+  // still-NOT_STARTED milestone's history, not a state transition. Every
+  // flag action is kept (not overwritten), so a milestone can carry a
+  // running discussion of blockers over time. Same authorization rule as
+  // completion: assigned staff or an admin.
   function flagMilestone(id, actingUserId, note) {
     return respond(() => {
       const m = state.milestones[id];
@@ -387,9 +387,7 @@
       if (!permitted) return { ok: false, code: 'FORBIDDEN', milestone: { ...m } };
 
       m.flagged = true;
-      m.flagNote = (note || '').trim();
-      m.flaggedBy = actingUserId;
-      m.flaggedAt = new Date().toISOString();
+      m.flagHistory = [...m.flagHistory, { note: (note || '').trim(), by: actingUserId, at: new Date().toISOString() }];
       m.updatedAt = new Date().toISOString();
       commit('flag');
       return { ok: true, milestone: { ...m } };
