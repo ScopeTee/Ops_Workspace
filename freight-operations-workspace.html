@@ -976,9 +976,11 @@ function toAdminMilestones(storeMilestones){
       completedSlaHealth,
       comment: sm.completionNote || '',
       flagged: !!sm.flagged,
-      flagNote: sm.flagNote || '',
-      flaggedBy: sm.flaggedBy ? (teamMember(sm.flaggedBy)||{}).name || sm.flaggedBy : '',
-      flaggedAt: sm.flaggedAt ? new Date(sm.flaggedAt) : null,
+      flagHistory: (sm.flagHistory || []).map(c => ({
+        note: c.note,
+        by: (teamMember(c.by)||{}).name || c.by,
+        at: new Date(c.at),
+      })),
     };
   });
 }
@@ -1303,7 +1305,9 @@ function renderServiceDelivery(){
     let historyNote = '';
     if(isDone && m.completedSlaHealth==='Breached') historyNote = '<div class="sla-history-note breach">⚠ After Breach</div>';
     else if(isDone && m.completedSlaHealth==='At-Risk') historyNote = '<div class="sla-history-note at-risk">⚠ Completed While At-Risk</div>';
-    const flagTitle = m.flagged ? `Blocker flagged by ${m.flaggedBy}${m.flagNote ? ': ' + m.flagNote : ''}` : '';
+    const latestComment = m.flagHistory.length ? m.flagHistory[m.flagHistory.length-1] : null;
+    const flagCountLabel = m.flagHistory.length > 1 ? ` (${m.flagHistory.length} comments)` : '';
+    const flagTitle = latestComment ? `Blocker flagged by ${latestComment.by}${flagCountLabel}${latestComment.note ? ': ' + latestComment.note : ''}` : '';
     const flagIcon = m.flagged ? `<svg class="flag-icon" width="14" height="14" fill="none" stroke="#8a6a00" stroke-width="2.2" viewBox="0 0 24 24" title="${flagTitle.replace(/"/g,'&quot;')}"><path d="M5 21V4a1 1 0 011-1h11.4a1 1 0 01.8 1.6l-3 4 3 4a1 1 0 01-.8 1.6H6" stroke-linecap="round" stroke-linejoin="round"></path></svg>` : '';
     return `
     <tr class="${rowClass}">
