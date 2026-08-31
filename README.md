@@ -237,3 +237,20 @@ migration on this shape.
   transfers actual values rather than re-deriving them, so it's
   unaffected either way. Call `MilestoneStore.resetDemoData()` from either
   app's console to start over.
+- **Schema migration on load.** The milestone/shipment record shape has
+  changed over the life of this prototype (e.g. `flagHistory` replacing an
+  older single `flagNote`/`flaggedBy`/`flaggedAt` shape). A browser with
+  data cached from before such a change used to keep the old shape forever
+  — `loadState()` had no version gate, so a record missing a field the
+  current code assumes exists could crash mid-render (this surfaced as
+  Field Channel's Milestone Detail screen showing "Unable to load this
+  milestone," a generic message from a `.catch()` that was swallowing the
+  real `TypeError`). `loadState()` now normalizes every record it reads —
+  backfilling missing fields, migrating old shapes, and re-saving the
+  result — so an old-schema browser self-heals on its next load instead of
+  crashing. That resave only happens when normalization actually changed
+  something: an event-triggered reload (cross-tab `storage`/
+  `BroadcastChannel` sync) runs concurrently with whichever tab's own
+  `commit()` is in flight, and an unconditional resave there would
+  overwrite that tab's fresh write with the stale snapshot this reload
+  happened to observe.

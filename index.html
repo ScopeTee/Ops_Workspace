@@ -509,7 +509,8 @@ function loadTodos(){
   MilestoneStore.getMyMilestones(state.me.id).then(items=>{
     state.todos = items.filter(({milestone}) => milestone.status === 'NOT_STARTED');
     renderTodosList();
-  }).catch(()=>{
+  }).catch(err=>{
+    console.error('loadTodos failed:', err);
     el('todos-banner').innerHTML = bannerHtml('error', 'Unable to load your To-Dos. Please check your connection and try again.');
   });
 }
@@ -638,7 +639,8 @@ function loadMilestoneDetail(){
       return;
     }
     renderMilestoneDetail(result.milestone, result.shipment);
-  }).catch(()=>{
+  }).catch(err=>{
+    console.error('loadMilestoneDetail failed:', err);
     el('detail-body').innerHTML = '';
     el('detail-banner').innerHTML = bannerHtml('error', 'Unable to load this milestone. Please check your connection and try again.');
     el('detail-action-bar').innerHTML = `<button class="btn btn-outline" id="btn-retry-detail">Retry</button>`;
@@ -663,7 +665,7 @@ function renderMilestoneDetail(m, s){
   const sla = slaMeta(m.dueDate);
   // Newest first, so the "most recent comment visible by default" is
   // simply the first entry — everything else sits in the collapsed body.
-  const comments = [...m.flagHistory].sort((a,b)=> new Date(b.at) - new Date(a.at));
+  const comments = (Array.isArray(m.flagHistory) ? [...m.flagHistory] : []).sort((a,b)=> new Date(b.at) - new Date(a.at));
   const [latestComment, ...olderComments] = comments;
 
   el('detail-banner').innerHTML = !isMine
@@ -762,6 +764,7 @@ el('confirm-complete').addEventListener('click', ()=>{
   }).catch(err=>{
     state.completing = false;
     const code = err && err.code;
+    if(!code) console.error('completeMilestone failed:', err);
     if(code === 'NETWORK_ERROR'){
       btn.disabled = false;
       btn.innerHTML = 'Complete';
@@ -813,7 +816,8 @@ el('flag-submit').addEventListener('click', ()=>{
     if(!res.ok){ handleMutationError(res.code, target.source); return; }
     showToast('Blocker flagged');
     if(target.source === 'detail') loadMilestoneDetail(); else loadTodos();
-  }).catch(()=>{
+  }).catch(err=>{
+    console.error('flagMilestone failed:', err);
     btn.disabled = false;
     btn.innerHTML = 'Flag';
     showToast('Unable to update this milestone. Please check your connection and try again.', 'error');
