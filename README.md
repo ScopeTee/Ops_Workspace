@@ -48,6 +48,7 @@ getMyMilestones(userId)     -> GET  /milestones?assigned_to=me
 getMilestone(id)            -> GET  /milestones/{id}
 completeMilestone(id, ...)  -> POST /milestones/{id}/complete
 reassignMilestone(...)      -> existing Admin assignment APIs (spec 27.4)
+addComment(id, ...)         -> POST /milestones/{id}/comments
 ```
 
 ## Running it
@@ -137,17 +138,21 @@ sequence (section 43):
   MVP has only `NOT_STARTED`/`COMPLETED` (spec sections 7–8) — so flagging
   appends a timestamped comment to the milestone's history rather than
   introducing a `BLOCKED` state or overwriting a single note; a milestone
-  can carry a running discussion of blockers over time. The Detail
-  screen's Comments section is collapsed by default but always shows the
-  most recent comment; older ones are revealed by expanding it. Field
-  Channel comments show only the note and timestamp — no author name,
-  since only the milestone's assigned Operations Staff member can add one
-  there, so it would be redundant. The Admin Portal's flag tooltip still
-  names who flagged it (several people can act from there), showing the
-  latest comment plus a count when there's more than one. A flagged
+  can carry a running discussion of blockers over time. A flagged
   milestone also shows a banner on Detail and a "Flagged" pill on its
   To-Dos card — visible everywhere through the same shared record, not a
   Field-Channel-only note.
+- **Comments** — a separate, general-purpose "Comment" button on the
+  Detail screen, independent of Flag: anyone who opens the milestone can
+  add a plain note, whether or not it's currently assigned to them, since
+  this is a shared discussion rather than an execution action. It's a
+  flat, append-only list — no delete, no reply/threading, no @ mentions.
+  The Detail screen renders one merged "Comments" feed combining Flag
+  notes and plain comments (`MilestoneStore.getActivity`), newest first;
+  it's collapsed by default but always shows the most recent entry, with
+  older ones revealed by expanding it. Every entry shows its author and
+  timestamp — a flag-sourced entry also gets a "Blocker flagged by…"
+  label so the two kinds stay visually distinct within the one feed.
 - **Concurrency & idempotency** — before completing, the app re-fetches
   the milestone from the store; if it's been reassigned, already
   completed, or no longer exists, it shows the corresponding message from
@@ -166,6 +171,10 @@ sequence (section 43):
 - The open shipment's Service Delivery tab live-refreshes when the store
   notifies of a change — e.g. a Field Channel completion shows up on
   screen without the Admin needing to navigate away and back.
+- Each milestone row has a comment icon + count that opens a Comments
+  modal — the same merged Flag+Comment feed as the Field Channel's Detail
+  screen, plus a box to post a new comment as the Admin user, via
+  `MilestoneStore.addComment`.
 - Everything else (containers, documents, physical tracking, shipment
   CRUD) is unchanged local-mock behavior — those are out of MVP scope for
   the Field Channel and were left alone.

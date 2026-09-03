@@ -158,6 +158,7 @@
         completionNote: isDone && i % 3 === 0 ? 'Cleared without exceptions.' : '',
         flagged: false,
         flagHistory: [], // [{ note, by, at }], newest appended last
+        comments: [], // [{ text, by, at }], newest appended last — general discussion, independent of flagging
         // Deliberately derived from dueDate, not a fresh `new Date()` call
         // — this field isn't part of the demo's day-relative narrative, so
         // it should stay byte-identical across two devices seeding fresh
@@ -218,6 +219,7 @@
     if ('flagNote' in m) { delete m.flagNote; changed = true; }
     if ('flaggedBy' in m) { delete m.flaggedBy; changed = true; }
     if ('flaggedAt' in m) { delete m.flaggedAt; changed = true; }
+    if (!Array.isArray(m.comments)) { m.comments = []; changed = true; }
     return changed;
   }
 
@@ -461,6 +463,47 @@
     });
   }
 
+  // General comments — separate from flagMilestone above. A comment is a
+  // plain note anyone with access to the milestone can add and everyone
+  // can see; it never changes `flagged` or the milestone's status. Unlike
+  // flag/complete, there is no assignee-or-admin gate: any authenticated
+  // user (Operations Staff or Admin) may comment on any milestone, since
+  // this is meant as a shared discussion, not an execution action. Per
+  // product decision there is no delete, no reply/threading, and no @
+  // mentions — just an append-only, flat list.
+  function addComment(id, actingUserId, text) {
+    return respond(() => {
+      const m = state.milestones[id];
+      if (!m) return { ok: false, code: 'NOT_FOUND' };
+
+      const actor = getUserById(actingUserId);
+      if (!actor) return { ok: false, code: 'UNAUTHENTICATED' };
+
+      const trimmed = (text || '').trim();
+      if (!trimmed) return { ok: false, code: 'EMPTY_COMMENT' };
+
+      const priorComments = Array.isArray(m.comments) ? m.comments : [];
+      m.comments = [...priorComments, { text: trimmed, by: actingUserId, at: new Date().toISOString() }];
+      m.updatedAt = new Date().toISOString();
+      commit('comment');
+      return { ok: true, milestone: { ...m } };
+    });
+  }
+
+  // Merges flagHistory and comments into one flat, chronological feed for
+  // display — the product decision was one merged "Comments" list rather
+  // than two separate histories, so a flagged blocker note and a plain
+  // comment both show up as the same kind of item, tagged by `kind` only
+  // so the UI can render a small "Blocker flagged" label on the former.
+  // Pure/synchronous: it only reshapes a milestone object already in hand.
+  function getActivity(m) {
+    const flags = (Array.isArray(m.flagHistory) ? m.flagHistory : [])
+      .map((e) => ({ kind: 'flag', text: e.note, by: e.by, at: e.at }));
+    const comments = (Array.isArray(m.comments) ? m.comments : [])
+      .map((e) => ({ kind: 'comment', text: e.text, by: e.by, at: e.at }));
+    return [...flags, ...comments].sort((a, b) => new Date(b.at) - new Date(a.at));
+  }
+
   function resetDemoData() {
     state = buildInitialState();
     commit('reset');
@@ -470,7 +513,7 @@
     getUsers, getOperationsStaff, getUserById, isAdmin,
     getShipments, getShipment, getMilestonesForShipment,
     getMyMilestones, getMilestone,
-    reassignMilestone, completeMilestone, flagMilestone,
+    reassignMilestone, completeMilestone, flagMilestone, addComment, getActivity,
     subscribe, resetDemoData, getSyncLink,
     ADMIN_USER_ID: ADMIN_USER.id,
     sync: {

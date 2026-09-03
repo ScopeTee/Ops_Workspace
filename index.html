@@ -338,6 +338,20 @@ select.field-input{ background-image:url('data:image/svg+xml;utf8,<svg xmlns="ht
   </div>
 </div>
 
+<!-- ============== COMMENT SHEET ============== -->
+<div class="sheet-overlay" id="comment-sheet">
+  <div class="sheet">
+    <div class="handle"></div>
+    <h2>Add a comment</h2>
+    <p class="sheet-sub" id="comment-sub"></p>
+    <textarea id="comment-text" placeholder="Write a comment…" maxlength="500"></textarea>
+    <div class="sheet-actions">
+      <button class="btn btn-outline" id="comment-cancel">Cancel</button>
+      <button class="btn btn-primary" id="comment-submit">Post</button>
+    </div>
+  </div>
+</div>
+
 <div id="toast-wrap"></div>
 
 <script src="shared/milestone-store.js"></script>
@@ -353,6 +367,7 @@ const ICON_SEARCH = '<svg width="19" height="19" fill="none" stroke="currentColo
 const ICON_CLOSE = '<svg width="19" height="19" fill="none" stroke="currentColor" stroke-width="2.3" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18" stroke-linecap="round"></path></svg>';
 const ICON_FLAG = '<svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M5 21V4a1 1 0 011-1h11.4a1 1 0 01.8 1.6l-3 4 3 4a1 1 0 01-.8 1.6H6" stroke-linecap="round" stroke-linejoin="round"></path></svg>';
 const ICON_CHEVRON = '<svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"></path></svg>';
+const ICON_COMMENT = '<svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z" stroke-linecap="round" stroke-linejoin="round"></path></svg>';
 const SLA_ICON = { healthy: ICON_CLOCK, 'at-risk': ICON_WARN, breached: ICON_WARN };
 
 const state = {
@@ -362,10 +377,14 @@ const state = {
   currentMilestoneId: null,
   confirmTarget: null, // { id, source: 'todos' | 'detail' } — completion sheet
   flagTarget: null, // { id, source: 'detail' } — flag sheet
+  commentTarget: null, // { id, source: 'detail' } — comment sheet
   completing: false,
 };
 
 function el(id){ return document.getElementById(id); }
+function escapeHtml(str){
+  return String(str).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
 
 function showScreen(id){
   document.querySelectorAll('.screen').forEach(s=>s.classList.toggle('active', s.id===id));
@@ -648,15 +667,18 @@ function loadMilestoneDetail(){
   });
 }
 
-// No author shown — only the assigned Operations Staff member can add a
-// comment here, so a name would be redundant. (The Admin Portal, which
-// several people can act from, still shows who flagged each comment.)
+// Entries come from MilestoneStore.getActivity(m) — a merged, newest-first
+// feed of blocker flags and plain comments. Anyone can add a comment here
+// (not just the assignee), so the author is always shown.
 function renderCommentItem(entry){
   const when = new Date(entry.at).toLocaleString('en-GB',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'});
+  const author = MilestoneStore.getUserById(entry.by);
+  const who = escapeHtml(author ? author.name : 'Unknown');
+  const flagLabel = entry.kind === 'flag' ? `${ICON_FLAG} Blocker flagged by ` : '';
   return `
     <div class="comment-item">
-      <div class="comment-meta">${when}</div>
-      <div class="comment-text${entry.note ? '' : ' empty'}">${entry.note || 'No note added.'}</div>
+      <div class="comment-meta">${flagLabel}${who} · ${when}</div>
+      <div class="comment-text${entry.text ? '' : ' empty'}">${entry.text ? escapeHtml(entry.text) : 'No note added.'}</div>
     </div>`;
 }
 
@@ -665,7 +687,7 @@ function renderMilestoneDetail(m, s){
   const sla = slaMeta(m.dueDate);
   // Newest first, so the "most recent comment visible by default" is
   // simply the first entry — everything else sits in the collapsed body.
-  const comments = (Array.isArray(m.flagHistory) ? [...m.flagHistory] : []).sort((a,b)=> new Date(b.at) - new Date(a.at));
+  const comments = MilestoneStore.getActivity(m);
   const [latestComment, ...olderComments] = comments;
 
   el('detail-banner').innerHTML = !isMine
@@ -698,16 +720,28 @@ function renderMilestoneDetail(m, s){
     </div>
   `;
 
+  // Comment is available to whoever opened this screen, assigned or not —
+  // it's a shared discussion, not an execution action, so it doesn't carry
+  // the assignee-only restriction that Mark Complete/Flag do.
   if(isMine){
     el('detail-action-bar').innerHTML = `
       <div class="action-row">
         <button class="btn btn-primary btn-card-complete" id="btn-mark-complete">${ICON_CHECK} Mark as Complete</button>
-        <button class="btn btn-outline btn-flag" id="btn-flag" title="Flag a blocker">${ICON_FLAG} Flag</button>
+      </div>
+      <div class="action-row" style="margin-top:8px">
+        <button class="btn btn-outline btn-flag" id="btn-flag" style="flex:1" title="Flag a blocker">${ICON_FLAG} Flag</button>
+        <button class="btn btn-outline" id="btn-comment" style="flex:1" title="Add a comment">${ICON_COMMENT} Comment</button>
       </div>`;
     el('btn-mark-complete').addEventListener('click', ()=>openConfirmSheet(m, s, 'detail'));
     el('btn-flag').addEventListener('click', ()=>openFlagSheet(m, s, 'detail'));
+    el('btn-comment').addEventListener('click', ()=>openCommentSheet(m, s, 'detail'));
   } else {
-    el('detail-action-bar').innerHTML = `<button class="btn btn-outline" id="btn-refresh-detail">Refresh</button>`;
+    el('detail-action-bar').innerHTML = `
+      <div class="action-row">
+        <button class="btn btn-outline" id="btn-comment" style="flex:1" title="Add a comment">${ICON_COMMENT} Comment</button>
+        <button class="btn btn-outline" id="btn-refresh-detail" style="flex:1">Refresh</button>
+      </div>`;
+    el('btn-comment').addEventListener('click', ()=>openCommentSheet(m, s, 'detail'));
     el('btn-refresh-detail').addEventListener('click', loadMilestoneDetail);
   }
 }
@@ -792,7 +826,7 @@ function handleMutationError(code, source){
    ========================================================================== */
 function openFlagSheet(m, s, source){
   state.flagTarget = { id: m.id, source };
-  el('flag-heading').textContent = m.flagged ? 'Add a comment?' : 'Flag a blocker?';
+  el('flag-heading').textContent = 'Flag a blocker?';
   el('flag-sub').textContent = `${m.name} — ${s.jobRef}`;
   el('flag-note').value = '';
   el('flag-submit').disabled = false;
@@ -821,6 +855,45 @@ el('flag-submit').addEventListener('click', ()=>{
     btn.disabled = false;
     btn.innerHTML = 'Flag';
     showToast('Unable to update this milestone. Please check your connection and try again.', 'error');
+  });
+});
+
+/* ==========================================================================
+   Comment — a plain note anyone can add and everyone can see, independent
+   of Flag. No delete, no reply/threading, no @ mentions (product decision).
+   Reachable from the Detail screen regardless of who it's assigned to.
+   ========================================================================== */
+function openCommentSheet(m, s, source){
+  state.commentTarget = { id: m.id, source };
+  el('comment-sub').textContent = `${m.name} — ${s.jobRef}`;
+  el('comment-text').value = '';
+  el('comment-submit').disabled = false;
+  el('comment-submit').innerHTML = 'Post';
+  el('comment-sheet').classList.add('open');
+  el('comment-text').focus();
+}
+function closeCommentSheet(){ el('comment-sheet').classList.remove('open'); }
+el('comment-cancel').addEventListener('click', closeCommentSheet);
+el('comment-sheet').addEventListener('click', (e)=>{ if(e.target.id==='comment-sheet') closeCommentSheet(); });
+
+el('comment-submit').addEventListener('click', ()=>{
+  const text = el('comment-text').value.trim();
+  if(!text){ showToast('Write something before posting.', 'error'); return; }
+  const target = state.commentTarget;
+  const btn = el('comment-submit');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> Posting…';
+
+  MilestoneStore.addComment(target.id, state.me.id, text).then(res=>{
+    closeCommentSheet();
+    if(!res.ok){ handleMutationError(res.code, target.source); return; }
+    showToast('Comment added');
+    if(target.source === 'detail') loadMilestoneDetail(); else loadTodos();
+  }).catch(err=>{
+    console.error('addComment failed:', err);
+    btn.disabled = false;
+    btn.innerHTML = 'Post';
+    showToast('Unable to add your comment. Please check your connection and try again.', 'error');
   });
 });
 

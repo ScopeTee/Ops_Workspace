@@ -255,6 +255,17 @@ textarea.field-control{resize:vertical;min-height:70px}
 .modal-body{padding:24px 26px;overflow-y:auto}
 .modal-foot{display:flex;justify-content:flex-end;gap:10px;padding:18px 26px;border-top:1px solid var(--border-tint)}
 
+/* Milestone comments modal */
+.comment-list{max-height:280px;overflow-y:auto;margin-bottom:4px}
+.comment-list:empty{display:none}
+.comment-item{background:var(--green-light-surface);border:1px solid var(--border-tint);border-radius:var(--radius-md);padding:10px 12px;margin-bottom:8px}
+.comment-item:last-child{margin-bottom:0}
+.comment-item .comment-meta{font-size:11.5px;font-weight:700;color:var(--silver-light);margin-bottom:5px;display:flex;align-items:center;gap:4px}
+.comment-item .comment-text{font-size:13px;color:var(--silver-dark);line-height:1.5;white-space:pre-wrap}
+.comment-item .comment-text.empty{color:var(--silver-light);font-style:italic}
+.comment-count-btn{display:inline-flex;align-items:center;gap:4px;background:transparent;border:none;color:var(--silver-light);font-size:11.5px;font-weight:600;cursor:pointer;padding:2px 4px;border-radius:5px}
+.comment-count-btn:hover{background:var(--green-light-surface);color:var(--green-dark)}
+
 /* Dropdown menu (Actions button + row overflow menus) */
 .dropdown{position:relative;display:inline-block}
 .dropdown-menu{position:absolute;right:0;top:calc(100% + 6px);background:var(--white);border:1px solid var(--border-tint);border-radius:var(--radius-md);box-shadow:var(--shadow-e3);min-width:220px;padding:6px;display:none;z-index:50}
@@ -783,6 +794,33 @@ textarea.field-control{resize:vertical;min-height:70px}
   </div>
 </div>
 
+<!-- Milestone Comments — a flat, shared discussion. No delete, no reply/
+     threading, no @ mentions (product decision). Anyone with access to the
+     shipment can view and add to it, independent of who a milestone is
+     assigned to. -->
+<div class="modal-overlay" id="modal-comments">
+  <div class="modal">
+    <div class="modal-head">
+      <div>
+        <h3>Comments</h3>
+        <p id="comments-modal-sub"></p>
+      </div>
+      <button class="modal-close" data-close-modal><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18" stroke-linecap="round"></path></svg></button>
+    </div>
+    <div class="modal-body">
+      <div class="comment-list" id="comments-list"></div>
+      <div class="form-field" style="margin-top:6px">
+        <label class="field-label">Add a Comment</label>
+        <textarea class="field-control" id="input-new-comment" rows="3" placeholder="Write a comment..."></textarea>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-outline" data-close-modal>Close</button>
+      <button class="btn btn-accent" id="save-comment">Post Comment</button>
+    </div>
+  </div>
+</div>
+
 <!-- Upload Documents -->
 <div class="modal-overlay" id="modal-upload-docs">
   <div class="modal modal-wide">
@@ -879,6 +917,7 @@ const ICON_WARN = `<svg width="10" height="10" fill="none" stroke="currentColor"
 const ICON_BUILDING = `<svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 21h18M5 21V7l6-4 6 4v14M9 9h1M9 13h1M14 9h1M14 13h1"></path></svg>`;
 const ICON_PERSON = `<svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"></circle><path d="M4 21v-1a8 8 0 0116 0v1"></path></svg>`;
 const ICON_ROUTE = `<svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="6" cy="19" r="2"></circle><circle cx="18" cy="5" r="2"></circle><path d="M6 17V13a4 4 0 014-4h4a4 4 0 004-4"></path></svg>`;
+const ICON_COMMENT = `<svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z" stroke-linecap="round" stroke-linejoin="round"></path></svg>`;
 const SOURCE_ICON = {
   Terminal: `<svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 21h18M5 21V9l7-6 7 6v12M9 21v-6h6v6"></path></svg>`,
   Vessel: `<svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 17l1.2-5h13.6L20 17M6 12V7h3V5h6v2h3v5M3 21c1.3 0 1.3-1.3 2.6-1.3S7.9 21 9.2 21s1.3-1.3 2.6-1.3S14.1 21 15.4 21s1.3-1.3 2.6-1.3S20.3 21 21.6 21" stroke-linecap="round" stroke-linejoin="round"></path></svg>`,
@@ -899,6 +938,9 @@ const TEAM = [
   {id:'u6', name:'Ada Nwosu', role:'Finance', initials:'AN', fill:'light'},
 ];
 function teamMember(id){ return TEAM.find(t=>t.id===id); }
+function escapeHtml(str){
+  return String(str).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
 function avatarFillStyle(fill){
   if(fill==='light') return 'background:var(--green-light);color:var(--green-dark)';
   if(fill==='gold') return 'background:var(--gold);color:var(--green-dark)';
@@ -980,6 +1022,21 @@ function toAdminMilestones(storeMilestones){
         note: c.note,
         by: (teamMember(c.by)||{}).name || c.by,
         at: new Date(c.at),
+      })),
+      comments: (sm.comments || []).map(c => ({
+        text: c.text,
+        by: (MilestoneStore.getUserById(c.by)||{}).name || c.by,
+        at: new Date(c.at),
+      })),
+      // Merged, newest-first feed of blocker flags + plain comments — one
+      // "Comments" list, per product decision, rather than two histories.
+      // Uses getUserById (not teamMember) because comments — unlike flags —
+      // can be authored by the Admin user, not just Operations Staff.
+      activity: MilestoneStore.getActivity(sm).map(e => ({
+        kind: e.kind,
+        text: e.text,
+        by: (MilestoneStore.getUserById(e.by)||{}).name || e.by,
+        at: new Date(e.at),
       })),
     };
   });
@@ -1309,9 +1366,10 @@ function renderServiceDelivery(){
     const flagCountLabel = m.flagHistory.length > 1 ? ` (${m.flagHistory.length} comments)` : '';
     const flagTitle = latestComment ? `Blocker flagged by ${latestComment.by}${flagCountLabel}${latestComment.note ? ': ' + latestComment.note : ''}` : '';
     const flagIcon = m.flagged ? `<svg class="flag-icon" width="14" height="14" fill="none" stroke="#8a6a00" stroke-width="2.2" viewBox="0 0 24 24" title="${flagTitle.replace(/"/g,'&quot;')}"><path d="M5 21V4a1 1 0 011-1h11.4a1 1 0 01.8 1.6l-3 4 3 4a1 1 0 01-.8 1.6H6" stroke-linecap="round" stroke-linejoin="round"></path></svg>` : '';
+    const commentBtn = `<button type="button" class="comment-count-btn" data-comments-ms="${m.id}" title="View/add comments">${ICON_COMMENT}${m.activity.length || ''}</button>`;
     return `
     <tr class="${rowClass}">
-      <td><b class="task-name">${m.name}</b> ${flagIcon}</td>
+      <td><b class="task-name">${m.name}</b> ${flagIcon} ${commentBtn}</td>
       <td>
         <div class="dropdown task-owner-dropdown">
           <button type="button" class="task-owner-btn dropdown-toggle">
@@ -1535,6 +1593,49 @@ el('save-milestone').addEventListener('click', ()=>{
   });
 });
 
+/* --- Milestone comments — flat, shared discussion; no delete, no reply/
+   threading, no @ mentions. Anyone can view/add regardless of assignment. --- */
+function renderAdminCommentItem(entry){
+  const when = entry.at.toLocaleString('en-GB',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'});
+  const flagLabel = entry.kind === 'flag' ? 'Blocker flagged · ' : '';
+  return `
+    <div class="comment-item">
+      <div class="comment-meta">${flagLabel}${escapeHtml(entry.by)} · ${when}</div>
+      <div class="comment-text${entry.text ? '' : ' empty'}">${entry.text ? escapeHtml(entry.text) : 'No note added.'}</div>
+    </div>`;
+}
+function renderCommentsModal(){
+  const s = currentShipment();
+  const m = s.milestones.find(x=>x.id===state.activeMilestone);
+  el('comments-modal-sub').textContent = m.name;
+  el('comments-list').innerHTML = m.activity.length
+    ? m.activity.map(renderAdminCommentItem).join('')
+    : `<p class="field-hint">No comments yet.</p>`;
+  el('input-new-comment').value = '';
+}
+function openCommentsModal(msId){
+  state.activeMilestone = msId;
+  renderCommentsModal();
+  openModal('modal-comments');
+}
+el('save-comment').addEventListener('click', ()=>{
+  const text = el('input-new-comment').value.trim();
+  if(!text){ showToast('Write something before posting.', 'error'); return; }
+  const btn = el('save-comment');
+  btn.disabled = true;
+  MilestoneStore.addComment(state.activeMilestone, MilestoneStore.ADMIN_USER_ID, text).then(res=>{
+    btn.disabled = false;
+    if(!res.ok){ showToast('Unable to add your comment.', 'error'); return; }
+    refreshCurrentShipmentMilestones();
+    renderCommentsModal();
+    showToast('Comment added');
+  }).catch(err=>{
+    console.error('addComment failed:', err);
+    btn.disabled = false;
+    showToast('Unable to add your comment. Please check your connection and try again.', 'error');
+  });
+});
+
 // Keep the open shipment in sync when the Field Channel (or another tab)
 // changes a milestone's assignment or status — never trust stale local state.
 MilestoneStore.subscribe(()=>{ refreshCurrentShipmentMilestones(); });
@@ -1744,6 +1845,9 @@ document.body.addEventListener('click', (e)=>{
 
   const msBtn = t.closest('[data-complete-ms]');
   if(msBtn){ openMilestoneModal(msBtn.dataset.completeMs); return; }
+
+  const commentsBtn = t.closest('[data-comments-ms]');
+  if(commentsBtn){ openCommentsModal(commentsBtn.dataset.commentsMs); return; }
 
   const reassignBtn = t.closest('[data-reassign-task]');
   if(reassignBtn){
