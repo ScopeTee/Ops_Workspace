@@ -201,6 +201,29 @@ table{width:100%;border-collapse:collapse}
 .task-owner-cell .owner-pill{display:flex;align-items:center;gap:6px}
 .task-owner-cell .owner-pill span{font-size:12px;color:var(--silver-dark)}
 .task-owner-unassigned{color:var(--silver-light);font-style:italic;font-size:12.5px}
+.task-flag-badge{display:inline-flex;align-items:center;gap:4px;font-size:10.5px;font-weight:700;padding:2px 7px;border-radius:999px;background:var(--error-bg);color:var(--error-text);margin-left:6px;vertical-align:middle}
+
+/* Task Details & Completion modal */
+.ms-status-row{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;padding-bottom:16px;border-bottom:1px solid var(--border-tint)}
+.ms-status-left{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.ms-status-left .ms-status-word{font-size:12.5px;font-weight:700;color:var(--silver-dark)}
+.ms-sla-label{font-size:12.5px;color:var(--silver-light);font-weight:600}
+.ms-info-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px 24px;background:var(--green-light-surface);border-radius:var(--radius-md);padding:16px 18px;margin-top:16px}
+.ms-info-grid .k{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--silver-light);font-weight:700;margin-bottom:5px}
+.ms-info-grid .v{font-size:14px;font-weight:600;color:var(--green-dark);display:flex;align-items:center;gap:8px}
+.ms-activity-head{display:flex;align-items:center;gap:8px;font-size:11.5px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--silver-dark);margin:20px 0 10px}
+.ms-activity-list{display:flex;flex-direction:column;gap:10px;max-height:280px;overflow-y:auto;padding-right:2px}
+.ms-activity-empty{font-size:12.5px;color:var(--silver-light);padding:6px 2px}
+.ms-activity-item{display:flex;gap:10px;background:var(--white);border:1px solid var(--border-tint);border-radius:var(--radius-md);padding:10px 12px}
+.ms-activity-body{flex:1;min-width:0}
+.ms-activity-top{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.ms-activity-name{font-size:12.5px;font-weight:700;color:var(--green-dark)}
+.ms-activity-time{font-size:11px;color:var(--silver-light);margin-left:auto}
+.ms-activity-text{font-size:13px;color:var(--silver-dark);margin-top:4px;line-height:1.5}
+.ms-compose{margin-top:12px}
+.ms-compose-row{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:8px}
+.ms-flag-check{display:flex;align-items:center;gap:7px;font-size:12.5px;color:var(--silver-dark);font-weight:600;cursor:pointer}
+.ms-flag-check input{accent-color:var(--error)}
 
 .form-field{position:relative;margin-bottom:18px}
 .form-field label.field-label{
@@ -877,25 +900,43 @@ textarea.field-control{resize:vertical;min-height:70px}
   </div>
 </div>
 
-<!-- Mark Milestone Complete -->
+<!-- Task Details & Completion -->
 <div class="modal-overlay" id="modal-milestone">
-  <div class="modal">
+  <div class="modal modal-wide">
     <div class="modal-head">
       <div>
-        <h3>Mark Complete</h3>
-        <p id="milestone-modal-sub">Log completion for this milestone.</p>
+        <h3>Task Details &amp; Completion</h3>
+        <p id="milestone-modal-sub"></p>
       </div>
       <button class="modal-close" data-close-modal><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18" stroke-linecap="round"></path></svg></button>
     </div>
     <div class="modal-body">
-      <div class="form-field">
-        <label class="field-label">Optional Comment</label>
-        <textarea class="field-control" id="input-milestone-comment" rows="3" placeholder="Add any relevant detail..."></textarea>
+      <div class="ms-status-row">
+        <div class="ms-status-left">
+          <span class="ms-status-word">Status:</span>
+          <span id="ms-status-chip"></span>
+          <span id="ms-history-chip"></span>
+          <span id="ms-flag-chip"></span>
+        </div>
+        <div class="ms-sla-label" id="ms-sla-label"></div>
       </div>
-      <p class="field-hint">Completed by <b>Nkechi M.</b> at the current date and time — logged automatically.</p>
+      <div class="ms-info-grid" id="ms-info-grid"></div>
+      <div class="form-field" style="margin-top:16px">
+        <label class="field-label">Completion Note</label>
+        <textarea class="field-control" id="input-milestone-comment" rows="2" placeholder="Add any relevant detail..."></textarea>
+      </div>
+      <div class="ms-activity-head"><svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z" stroke-linecap="round" stroke-linejoin="round"></path></svg> <span id="ms-activity-heading">Field Activity &amp; Comments</span></div>
+      <div class="ms-activity-list" id="ms-activity-list"></div>
+      <div class="ms-compose">
+        <textarea class="field-control" id="ms-new-comment" rows="2" placeholder="Write a comment..."></textarea>
+        <div class="ms-compose-row">
+          <label class="ms-flag-check"><input type="checkbox" id="ms-new-is-flag"> <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.4" viewBox="0 0 24 24"><path d="M5 21V4a1 1 0 011-1h11.4a1 1 0 01.8 1.6l-3 4 3 4a1 1 0 01-.8 1.6H6" stroke-linecap="round" stroke-linejoin="round"></path></svg> Flag as blocker</label>
+          <button class="btn btn-outline btn-sm" id="ms-post-comment">Post</button>
+        </div>
+      </div>
     </div>
     <div class="modal-foot">
-      <button class="btn btn-outline" data-close-modal>Cancel</button>
+      <button class="btn btn-outline" data-close-modal>Close</button>
       <button class="btn btn-accent" id="save-milestone">Mark Complete</button>
     </div>
   </div>
@@ -1078,6 +1119,8 @@ const SOURCE_ICON = {
 const ICON_MAIL = `<svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2"></rect><path d="M2 6l10 7 10-7" stroke-linecap="round" stroke-linejoin="round"></path></svg>`;
 const ICON_CHAT = `<svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z" stroke-linecap="round" stroke-linejoin="round"></path></svg>`;
 const ICON_PAPERCLIP = `<svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21.44 11.05l-9.19 9.19a5 5 0 01-7.07-7.07l9.19-9.19a3.5 3.5 0 014.95 4.95l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48" stroke-linecap="round" stroke-linejoin="round"></path></svg>`;
+const ICON_FLAG = `<svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.4" viewBox="0 0 24 24"><path d="M5 21V4a1 1 0 011-1h11.4a1 1 0 01.8 1.6l-3 4 3 4a1 1 0 01-.8 1.6H6" stroke-linecap="round" stroke-linejoin="round"></path></svg>`;
+const ICON_EYE = `<svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"></path><circle cx="12" cy="12" r="3"></circle></svg>`;
 
 /* ==========================================================================
    Mock data
@@ -1193,28 +1236,28 @@ function computeLiveSlaHealth(dueDate){
 }
 
 const OCEAN_EXPORT_TEMPLATE = [
-  {name:'Booking Placement', responsibility:'Operations Officer'},
-  {name:'Empty Container', responsibility:'Transport Coordinator'},
-  {name:'Clean CCI', responsibility:'Documentation Officer'},
-  {name:'Draft BL to Customer', responsibility:'Documentation Officer'},
-  {name:'Gate-In', responsibility:'Transport Coordinator'},
-  {name:'Inspection', responsibility:'QA Officer'},
-  {name:'Vessel Confirmation', responsibility:'Operations Manager'},
-  {name:'Sailing Confirmation', responsibility:'Operations Manager'},
-  {name:'OBL Issuance', responsibility:'Documentation Officer'},
-  {name:'Document Release', responsibility:'CX Officer'},
+  {name:'Booking Placement', responsibility:'Operations Officer', slaDays:1},
+  {name:'Empty Container', responsibility:'Transport Coordinator', slaDays:2},
+  {name:'Clean CCI', responsibility:'Documentation Officer', slaDays:1},
+  {name:'Draft BL to Customer', responsibility:'Documentation Officer', slaDays:2},
+  {name:'Gate-In', responsibility:'Transport Coordinator', slaDays:1},
+  {name:'Inspection', responsibility:'QA Officer', slaDays:1},
+  {name:'Vessel Confirmation', responsibility:'Operations Manager', slaDays:1},
+  {name:'Sailing Confirmation', responsibility:'Operations Manager', slaDays:1},
+  {name:'OBL Issuance', responsibility:'Documentation Officer', slaDays:3},
+  {name:'Document Release', responsibility:'CX Officer', slaDays:2},
 ];
 const OCEAN_IMPORT_TEMPLATE = [
-  {name:'Pre-Alert Receipt', responsibility:'CX Officer'},
-  {name:'Form M Validation', responsibility:'Documentation Officer'},
-  {name:'PAAR Application', responsibility:'Clearing Officer'},
-  {name:'Draft Assessment', responsibility:'Clearing Officer'},
-  {name:'Final Assessment', responsibility:'Clearing Officer'},
-  {name:'THC Payment', responsibility:'Finance Officer'},
-  {name:'Delivery', responsibility:'Transport Coordinator'},
-  {name:'Empty Return', responsibility:'Transport Coordinator'},
-  {name:'Post Delivery Docs', responsibility:'Documentation Officer'},
-  {name:'Document Release', responsibility:'CX Officer'},
+  {name:'Pre-Alert Receipt', responsibility:'CX Officer', slaDays:1},
+  {name:'Form M Validation', responsibility:'Documentation Officer', slaDays:2},
+  {name:'PAAR Application', responsibility:'Clearing Officer', slaDays:2},
+  {name:'Draft Assessment', responsibility:'Clearing Officer', slaDays:2},
+  {name:'Final Assessment', responsibility:'Clearing Officer', slaDays:3},
+  {name:'THC Payment', responsibility:'Finance Officer', slaDays:1},
+  {name:'Delivery', responsibility:'Transport Coordinator', slaDays:2},
+  {name:'Empty Return', responsibility:'Transport Coordinator', slaDays:2},
+  {name:'Post Delivery Docs', responsibility:'Documentation Officer', slaDays:1},
+  {name:'Document Release', responsibility:'CX Officer', slaDays:2},
 ];
 
 const PHYSICAL_TRACKING_TEMPLATE = [
@@ -1284,22 +1327,43 @@ function buildShipmentDetail(base, seed){
     if(seed===4 && i===6){ dueDate = new Date(); dueDate.setDate(dueDate.getDate()+1); dueDate.setHours(10,0,0,0); }
     const isDone = i < completedCount;
     let completedSlaHealth = null, completedBy = '', completedAt = null, comment = '';
+    let flagged = false, flagHistory = [], comments = [];
     if(isDone){
       completedSlaHealth = ((i+seed) % 5 === 0) ? 'Breached' : ((i+seed) % 7 === 0) ? 'At-Risk' : 'Healthy';
       completedBy = teamMember(shipTeamIds[(i+seed+1)%shipTeamIds.length]).name;
       completedAt = new Date(Date.now() - (template.length-i)*86400000);
       comment = (i%3===0) ? 'Cleared without exceptions.' : '';
+      // A milestone that breached SLA on the way to completion plausibly had
+      // a blocker along the way — seed a small, realistic field activity
+      // trail (2 flags + 2 follow-up comments) so the Task Details modal has
+      // something to show without every browser session starting empty.
+      if(completedSlaHealth === 'Breached'){
+        flagged = true;
+        const fieldUser = completedBy;
+        flagHistory = [
+          { note: 'Customer invoice is still outstanding — holding release until it clears.', by: fieldUser, at: new Date(completedAt.getTime() - 4*3600000) },
+          { note: 'Still waiting on payment confirmation from the customer.', by: fieldUser, at: new Date(completedAt.getTime() - 2*3600000) },
+        ];
+        comments = [
+          { text: 'Following up with the customer directly today.', by: fieldUser, at: new Date(completedAt.getTime() - 3*3600000) },
+          { text: 'Payment confirmed — proceeding now.', by: fieldUser, at: new Date(completedAt.getTime() - 1*3600000) },
+        ];
+      }
     }
     return {
       id: makeId('ms'),
       name: t.name,
       responsibility: t.responsibility,
+      slaDays: t.slaDays,
       status: isDone ? 'Completed' : 'Not Started',
       dueDate,
       completedBy,
       completedAt,
       completedSlaHealth,
       comment,
+      flagged,
+      flagHistory,
+      comments,
     };
   });
 
@@ -1878,16 +1942,24 @@ function renderServiceDelivery(){
     const ownerCell = owners.length
       ? `<div class="task-owner-cell">${owners.map(o=>`<div class="owner-pill"><div class="avatar avatar-sm" style="${avatarFillStyle(o.fill)}">${o.initials}</div><span>${o.name.split(' ')[0]}</span></div>`).join('')}</div>`
       : `<span class="task-owner-unassigned">Unassigned</span>`;
+    const flagCount = (m.flagHistory||[]).length;
+    const flagBadge = m.flagged ? `<span class="task-flag-badge">${ICON_FLAG} ${flagCount} Flag${flagCount===1?'':'s'}</span>` : '';
+    const viewBtn = `<button class="btn btn-ghost btn-icon" data-view-ms="${m.id}" title="View task details">${ICON_EYE}</button>`;
     return `
     <tr class="${rowClass}">
-      <td><b class="task-name">${m.name}</b></td>
+      <td><b class="task-name">${m.name}</b>${flagBadge}</td>
       <td>${ownerCell}</td>
       <td class="due-cell">${dueLabel}</td>
       <td>
         <span class="chip ${isDone?'chip-success':'chip-neutral'}">${m.status}</span>
         ${historyNote}
       </td>
-      <td style="text-align:right">${!isDone ? `<button class="btn btn-outline btn-sm" data-complete-ms="${m.id}">Mark Complete</button>` : `<svg width="18" height="18" fill="none" stroke="#1F8A5B" stroke-width="2.4" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5" stroke-linecap="round" stroke-linejoin="round"></path></svg>`}</td>
+      <td style="text-align:right">
+        <div style="display:flex;gap:6px;justify-content:flex-end;align-items:center">
+          ${!isDone ? `<button class="btn btn-outline btn-sm" data-complete-ms="${m.id}">Mark Complete</button>` : `<svg width="18" height="18" fill="none" stroke="#1F8A5B" stroke-width="2.4" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5" stroke-linecap="round" stroke-linejoin="round"></path></svg>`}
+          ${viewBtn}
+        </div>
+      </td>
     </tr>`;
   }).join('');
 }
@@ -2335,15 +2407,101 @@ el('save-container').addEventListener('click', ()=>{
   closeModal('modal-container');
 });
 
-/* --- Milestone completion --- */
+/* --- Milestone completion, flags & comments --- */
+// A merged, chronological (oldest-first) feed of blocker flags and plain
+// comments — one "Field Activity & Comments" list rather than two separate
+// histories, tagged by `kind` only so a flag entry can carry its own badge.
+function milestoneActivity(m){
+  const flags = (m.flagHistory||[]).map(e=>({kind:'flag', text:e.note, by:e.by, at:e.at}));
+  const comments = (m.comments||[]).map(e=>({kind:'comment', text:e.text, by:e.by, at:e.at}));
+  return [...flags, ...comments].sort((a,b)=> a.at - b.at);
+}
+function renderActivityItem(entry){
+  const t = TEAM.find(x=>x.name===entry.by);
+  const initials = t ? t.initials : String(entry.by||'?').trim().split(/\s+/).map(w=>w[0]).join('').slice(0,2).toUpperCase();
+  const fillStyle = avatarFillStyle(t ? t.fill : 'dark');
+  const badge = entry.kind==='flag' ? `<span class="chip chip-error" style="padding:2px 8px;font-size:10px">${ICON_FLAG} Blocker Flag</span>` : '';
+  return `
+    <div class="ms-activity-item">
+      <div class="avatar avatar-sm" style="${fillStyle}">${initials}</div>
+      <div class="ms-activity-body">
+        <div class="ms-activity-top">
+          <span class="ms-activity-name">${escapeHtml(entry.by || 'Unknown')}</span>
+          ${badge}
+          <span class="ms-activity-time">${timeAgo(entry.at)}</span>
+        </div>
+        <div class="ms-activity-text">${escapeHtml(entry.text || '')}</div>
+      </div>
+    </div>`;
+}
+function renderMilestoneModal(){
+  const s = currentShipment();
+  const m = s.milestones.find(x=>x.id===state.activeMilestone);
+  const isDone = m.status === 'Completed';
+  el('milestone-modal-sub').textContent = m.name;
+
+  el('ms-status-chip').innerHTML = `<span class="chip ${isDone?'chip-success':'chip-neutral'}">${m.status}</span>`;
+  let historyChip = '';
+  if(isDone && m.completedSlaHealth==='Breached') historyChip = `<span class="chip chip-error">After Breach</span>`;
+  else if(isDone && m.completedSlaHealth==='At-Risk') historyChip = `<span class="chip chip-warning">Completed While At-Risk</span>`;
+  el('ms-history-chip').innerHTML = historyChip;
+  const flagCount = (m.flagHistory||[]).length;
+  el('ms-flag-chip').innerHTML = m.flagged ? `<span class="chip chip-error">${ICON_FLAG} ${flagCount} Flag${flagCount===1?'':'s'}</span>` : '';
+  el('ms-sla-label').textContent = m.slaDays ? `SLA: ${m.slaDays} working day${m.slaDays===1?'':'s'}` : '';
+
+  const ownerTeam = isDone ? TEAM.find(t=>t.name===m.completedBy) : null;
+  el('ms-info-grid').innerHTML = `
+    <div>
+      <div class="k">Completed By</div>
+      <div class="v">${isDone ? `<div class="avatar avatar-sm" style="${avatarFillStyle(ownerTeam?ownerTeam.fill:'dark')}">${ownerTeam?ownerTeam.initials:'?'}</div>${escapeHtml(m.completedBy)}` : '—'}</div>
+    </div>
+    <div>
+      <div class="k">Completed At</div>
+      <div class="v">${isDone ? formatDueDateTime(m.completedAt) : '—'}</div>
+    </div>
+    <div>
+      <div class="k">Due Date</div>
+      <div class="v">${formatDueDateTime(m.dueDate)}</div>
+    </div>
+    <div>
+      <div class="k">Required Role</div>
+      <div class="v">${escapeHtml(m.responsibility)}</div>
+    </div>`;
+
+  el('input-milestone-comment').value = m.comment || '';
+
+  const activity = milestoneActivity(m);
+  el('ms-activity-heading').textContent = `Field Activity & Comments (${activity.length})`;
+  el('ms-activity-list').innerHTML = activity.length
+    ? activity.map(renderActivityItem).join('')
+    : `<p class="ms-activity-empty">No activity yet.</p>`;
+
+  el('ms-new-comment').value = '';
+  el('ms-new-is-flag').checked = false;
+
+  el('save-milestone').style.display = isDone ? 'none' : '';
+}
 function openMilestoneModal(msId){
   state.activeMilestone = msId;
-  const s = currentShipment();
-  const m = s.milestones.find(x=>x.id===msId);
-  el('milestone-modal-sub').textContent = m.name;
-  el('input-milestone-comment').value = '';
+  renderMilestoneModal();
   openModal('modal-milestone');
 }
+el('ms-post-comment').addEventListener('click', ()=>{
+  const s = currentShipment();
+  const m = s.milestones.find(x=>x.id===state.activeMilestone);
+  const text = el('ms-new-comment').value.trim();
+  if(!text){ showToast('Write something before posting.', 'error'); return; }
+  const isFlag = el('ms-new-is-flag').checked;
+  if(isFlag){
+    m.flagged = true;
+    m.flagHistory = [...(m.flagHistory||[]), { note: text, by: CURRENT_USER, at: new Date() }];
+  } else {
+    m.comments = [...(m.comments||[]), { text, by: CURRENT_USER, at: new Date() }];
+  }
+  renderMilestoneModal();
+  renderServiceDelivery();
+  showToast(isFlag ? 'Blocker flagged' : 'Comment added');
+});
 el('save-milestone').addEventListener('click', ()=>{
   const s = currentShipment();
   const m = s.milestones.find(x=>x.id===state.activeMilestone);
@@ -2719,6 +2877,9 @@ document.body.addEventListener('click', (e)=>{
 
   const msBtn = t.closest('[data-complete-ms]');
   if(msBtn){ openMilestoneModal(msBtn.dataset.completeMs); return; }
+
+  const msViewBtn = t.closest('[data-view-ms]');
+  if(msViewBtn){ openMilestoneModal(msViewBtn.dataset.viewMs); return; }
 
   const shipAction = t.closest('[data-ship-action]');
   if(shipAction){
