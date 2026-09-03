@@ -186,6 +186,65 @@
   const TEAM_ROLE_LABEL = { owner: 'Owner', supporting: 'Supporting' };
   const TEAM_ROLE_RANK = { supporting: 1, owner: 2 };
 
+  // Demo-only: seed one example of every non-breach notification type
+  // (comment / team_added / team_removed / role_updated — sla_breached
+  // already appears on its own via checkSlaBreaches() below, for whoever
+  // happens to have an overdue milestone) spread across several different
+  // user profiles, so a fresh browser has something in the Notifications
+  // screen right away instead of only ever showing breaches. Every entry
+  // is chosen to be consistent with the shipment's actual seeded team —
+  // e.g. a "reduced to Supporting" notification only goes to someone who
+  // is, in fact, currently Supporting on that shipment — so clicking
+  // through, or comparing against the Admin Portal, never contradicts
+  // what's on screen. A comment notification also appends the matching
+  // comment to the milestone itself, so the Detail screen backs it up.
+  function seedDemoNotifications(milestones) {
+    const notifications = {};
+    function firstNotStartedFor(jobRef, userId) {
+      return Object.values(milestones).find((m) => m.shipmentRef === jobRef && m.status === 'NOT_STARTED' && m.assignedTo === userId) || null;
+    }
+    function seedComment(userId, jobRef, byUserId, text) {
+      const m = firstNotStartedFor(jobRef, userId);
+      if (!m) return; // no matching milestone in this demo data — skip rather than seed a broken reference
+      const commentId = makeId('cm');
+      m.comments = [...(m.comments || []), { id: commentId, text, by: byUserId, at: new Date().toISOString() }];
+      const notifId = 'comment-' + commentId;
+      notifications[notifId] = {
+        id: notifId, userId, type: 'comment', shipmentRef: jobRef, milestoneId: m.id,
+        message: `${getUserById(byUserId).name.split(' ')[0]} commented on "${m.name}"`,
+        createdAt: new Date().toISOString(), read: false,
+      };
+    }
+    function seedTeamNotif(userId, jobRef, type, message) {
+      const id = makeId('notif-demo');
+      notifications[id] = { id, userId, type, shipmentRef: jobRef, milestoneId: null, message, createdAt: new Date().toISOString(), read: false };
+    }
+
+    // Comments — every Field Channel profile gets at least one, so
+    // whichever user you sign in as, there's something to see.
+    seedComment('u1', 'ZELO000001', 'u2', 'Confirmed with the line — go ahead and file this.');
+    seedComment('u2', 'ZELO000002', 'admin', 'Any update on this leg? Customer is asking.');
+    seedComment('u3', 'ZELO000003', 'u2', 'Flagging that the assessment looks high — please double-check.');
+    seedComment('u4', 'ZELO000004', 'u1', 'Docs from customs came back — see attached.');
+    seedComment('u5', 'ZELO000005', 'admin', 'Nice work closing this leg out ahead of schedule.');
+    seedComment('u6', 'ZELO000001', 'u4', 'Can you confirm the empty return slot for this one?');
+
+    // Team changes — u4, u5, u6 currently support a shipment they weren't
+    // originally on; u1, u2 currently hold a reduced (Supporting) role
+    // after starting as Owner elsewhere; u3, u6 were once on a shipment
+    // team they're not part of today.
+    seedTeamNotif('u4', 'ZELO000002', 'team_added', "You were added to ZELO000002's shipment team as Supporting");
+    seedTeamNotif('u5', 'ZELO000001', 'team_added', "You were added to ZELO000001's shipment team as Supporting");
+    seedTeamNotif('u6', 'ZELO000001', 'team_added', "You were added to ZELO000001's shipment team as Supporting");
+    seedTeamNotif('u1', 'ZELO000004', 'role_updated', 'Your role on ZELO000004 was reduced to Supporting');
+    seedTeamNotif('u2', 'ZELO000005', 'role_updated', 'Your role on ZELO000005 was reduced to Supporting');
+    seedTeamNotif('u5', 'ZELO000005', 'role_updated', 'Your role on ZELO000005 was upgraded to Owner');
+    seedTeamNotif('u3', 'ZELO000004', 'team_removed', "You were removed from ZELO000004's shipment team");
+    seedTeamNotif('u6', 'ZELO000003', 'team_removed', "You were removed from ZELO000003's shipment team");
+
+    return notifications;
+  }
+
   function buildInitialState() {
     const shipments = {};
     const milestones = {};
@@ -193,7 +252,7 @@
       shipments[s.jobRef] = { ...s, team: deriveTeamFromOwners(s) };
       seedMilestonesForShipment(s, shipmentIndex).forEach((m) => { milestones[m.id] = m; });
     });
-    return { shipments, milestones, notifications: {}, version: 1 };
+    return { shipments, milestones, notifications: seedDemoNotifications(milestones), version: 1 };
   }
 
   // ------------------------------------------------------------------

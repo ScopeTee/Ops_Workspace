@@ -190,6 +190,25 @@ sequence (section 43):
   10 at a time with a "Load more" button rather than infinite scroll: on a
   small screen, an explicit tap is easier to reason about (and to recover
   from) than content that shifts under your thumb as you scroll.
+  - **Seeing every notification type without triggering them yourself:**
+    `seedDemoNotifications` (in `shared/milestone-store.js`) plants one
+    example of each non-breach type on fresh demo data, consistent with
+    each shipment's actual seeded team so nothing on screen contradicts
+    itself. `sla_breached` isn't hand-seeded — it appears on its own,
+    for whichever milestones are already overdue the day you load the
+    app — so which profiles show it can shift day to day; the rest are
+    fixed. Sign in as each to see:
+    | Profile | comment | team_added | team_removed | role_updated |
+    |---|---|---|---|---|
+    | u1 — James Adewale | ✓ | | | ✓ (reduced) |
+    | u2 — Sarah Adeyemi | ✓ | | | ✓ (reduced) |
+    | u3 — Michael Ibe | ✓ | | ✓ | |
+    | u4 — Titi Aluko | ✓ | ✓ | | |
+    | u5 — Chidi Eze | ✓ | ✓ | | ✓ (upgraded) |
+    | u6 — Ada Nwosu | ✓ | ✓ | ✓ | |
+    Already have older demo data in this browser? These only seed into a
+    *fresh* store — run `MilestoneStore.resetDemoData()` from the console
+    (either app) to reseed and pick them up.
 
 ## Admin Portal — what changed
 
