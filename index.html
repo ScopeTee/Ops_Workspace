@@ -78,6 +78,10 @@ input,textarea{font-family:var(--font-body)}
 .avatar{ width:24px; height:24px; border-radius:50%; background:var(--green-accent); color:var(--green-dark); display:grid; place-items:center; font-family:var(--font-display); font-weight:700; font-size:11px; flex-shrink:0 }
 .sync-link-btn{ background:none; border:none; color:rgba(253,251,241,.6); padding:6px; display:flex; border-radius:var(--radius-sm); }
 .sync-link-btn:active{ background:rgba(255,255,255,.12); color:var(--cream); }
+
+.notif-btn{ position:relative; background:none; border:none; color:var(--cream); padding:6px; display:flex; border-radius:var(--radius-sm); }
+.notif-btn:active{ background:rgba(255,255,255,.12); }
+.notif-badge{ position:absolute; top:2px; right:2px; min-width:15px; height:15px; padding:0 3px; border-radius:999px; background:var(--gold); color:var(--green-dark); font-size:9.5px; font-weight:700; line-height:15px; text-align:center; border:1.5px solid var(--green-dark); }
 @keyframes spin{ to{ transform:rotate(360deg); } }
 
 /* ---- Screens ---- */
@@ -238,6 +242,10 @@ select.field-input{ background-image:url('data:image/svg+xml;utf8,<svg xmlns="ht
         <div style="display:flex; align-items:center; gap:8px;">
           <button class="sync-link-btn" title="Copy a link that loads this exact milestone data on another device — a testing aid, since demo data is stored locally per device.">
             <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M10 13a5 5 0 007 0l3-3a5 5 0 00-7-7l-1.5 1.5" stroke-linecap="round"></path><path d="M14 11a5 5 0 00-7 0l-3 3a5 5 0 007 7l1.5-1.5" stroke-linecap="round"></path></svg>
+          </button>
+          <button class="notif-btn" id="btn-notifications" title="Notifications">
+            <svg width="19" height="19" fill="none" stroke="currentColor" stroke-width="2.1" viewBox="0 0 24 24"><path d="M18 8a6 6 0 00-12 0c0 7-3 9-3 9h18s-3-2-3-9" stroke-linecap="round" stroke-linejoin="round"></path><path d="M13.73 21a2 2 0 01-3.46 0" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+            <span class="notif-badge" id="notif-badge">3</span>
           </button>
           <button class="user-chip me-account"><span class="avatar me-avatar"></span><span class="me-name"></span></button>
         </div>
