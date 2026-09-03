@@ -37,6 +37,9 @@
   const CHANNEL_NAME = 'oneport-milestones';
   const SIMULATED_LATENCY_MS = 260;
 
+  let idSeq = 0;
+  function makeId(prefix) { idSeq += 1; return `${prefix}-${Date.now().toString(36)}-${idSeq}`; }
+
   // ------------------------------------------------------------------
   // Reference data — Operations Staff / Admin users
   // ------------------------------------------------------------------
@@ -170,14 +173,27 @@
     });
   }
 
+  // A shipment's team roster, as the Admin Portal's Assign Owner modal and
+  // the notification system both need it: one 'owner' plus any number of
+  // 'supporting' members. Seeded from the flatter ownerId/supportingOwnerIds
+  // shape already in SHIPMENTS_SEED, which stays around for back-compat
+  // (updateShipmentTeam below keeps both shapes in sync on every change).
+  function deriveTeamFromOwners(s) {
+    const team = [{ userId: s.ownerId, role: 'owner' }];
+    (s.supportingOwnerIds || []).forEach((userId) => team.push({ userId, role: 'supporting' }));
+    return team;
+  }
+  const TEAM_ROLE_LABEL = { owner: 'Owner', supporting: 'Supporting' };
+  const TEAM_ROLE_RANK = { supporting: 1, owner: 2 };
+
   function buildInitialState() {
     const shipments = {};
     const milestones = {};
     SHIPMENTS_SEED.forEach((s, shipmentIndex) => {
-      shipments[s.jobRef] = { ...s };
+      shipments[s.jobRef] = { ...s, team: deriveTeamFromOwners(s) };
       seedMilestonesForShipment(s, shipmentIndex).forEach((m) => { milestones[m.id] = m; });
     });
-    return { shipments, milestones, version: 1 };
+    return { shipments, milestones, notifications: {}, version: 1 };
   }
 
   // ------------------------------------------------------------------
@@ -220,6 +236,9 @@
     if ('flaggedBy' in m) { delete m.flaggedBy; changed = true; }
     if ('flaggedAt' in m) { delete m.flaggedAt; changed = true; }
     if (!Array.isArray(m.comments)) { m.comments = []; changed = true; }
+    // Comments predate having their own id (needed to key a comment's
+    // notification so it can't be created twice) — backfill one in place.
+    m.comments.forEach((c) => { if (!c.id) { c.id = makeId('cm'); changed = true; } });
     return changed;
   }
 
@@ -229,6 +248,7 @@
     if (seed) {
       Object.keys(seed).forEach((k) => { if (s[k] === undefined) { s[k] = seed[k]; changed = true; } });
     }
+    if (!Array.isArray(s.team)) { s.team = deriveTeamFromOwners(s); changed = true; }
     return changed;
   }
 
@@ -238,6 +258,7 @@
       if (raw) {
         const parsed = JSON.parse(raw);
         let migrated = false;
+        if (!parsed.notifications) { parsed.notifications = {}; migrated = true; }
         Object.values(parsed.milestones || {}).forEach((m) => { if (normalizeMilestone(m)) migrated = true; });
         Object.values(parsed.shipments || {}).forEach((s) => { if (normalizeShipment(s)) migrated = true; });
         // Only resave when the migration actually changed something — see
@@ -482,11 +503,84 @@
       const trimmed = (text || '').trim();
       if (!trimmed) return { ok: false, code: 'EMPTY_COMMENT' };
 
+      const commentId = makeId('cm');
       const priorComments = Array.isArray(m.comments) ? m.comments : [];
-      m.comments = [...priorComments, { text: trimmed, by: actingUserId, at: new Date().toISOString() }];
+      m.comments = [...priorComments, { id: commentId, text: trimmed, by: actingUserId, at: new Date().toISOString() }];
       m.updatedAt = new Date().toISOString();
+
+      // Only the assignee is notified, and only when someone else left the
+      // comment — an admin or co-worker browsing the milestone never pings
+      // themselves, and an unassigned milestone notifies no one.
+      if (m.assignedTo && m.assignedTo !== actingUserId) {
+        addNotification({
+          id: 'comment-' + commentId,
+          userId: m.assignedTo,
+          type: 'comment',
+          shipmentRef: m.shipmentRef,
+          milestoneId: m.id,
+          message: `${actor.name.split(' ')[0]} commented on "${m.name}"`,
+        });
+      }
+
       commit('comment');
       return { ok: true, milestone: { ...m } };
+    });
+  }
+
+  // Replaces a shipment's whole team roster in one call — the Admin
+  // Portal's Assign Owner modal always submits the full new roster, not a
+  // single add/remove — diffing against the prior roster so only the
+  // people actually affected get notified. Every affected person is, by
+  // definition, someone other than the admin making the change, so there's
+  // no "don't notify yourself" check to make here (unlike addComment).
+  function updateShipmentTeam(jobRef, newTeam, actingAdminId) {
+    return respond(() => {
+      const s = state.shipments[jobRef];
+      if (!s) return { ok: false, code: 'NOT_FOUND' };
+      if (!isAdmin(actingAdminId)) return { ok: false, code: 'FORBIDDEN' };
+
+      const oldTeam = Array.isArray(s.team) ? s.team : [];
+      const oldByUser = new Map(oldTeam.map((t) => [t.userId, t.role]));
+      const newByUser = new Map(newTeam.map((t) => [t.userId, t.role]));
+
+      oldByUser.forEach((role, userId) => {
+        if (!newByUser.has(userId)) {
+          addNotification({
+            id: makeId('notif-team-removed'),
+            userId,
+            type: 'team_removed',
+            shipmentRef: jobRef,
+            message: `You were removed from ${jobRef}'s shipment team`,
+          });
+        }
+      });
+      newByUser.forEach((role, userId) => {
+        const priorRole = oldByUser.get(userId);
+        if (priorRole === undefined) {
+          addNotification({
+            id: makeId('notif-team-added'),
+            userId,
+            type: 'team_added',
+            shipmentRef: jobRef,
+            message: `You were added to ${jobRef}'s shipment team as ${TEAM_ROLE_LABEL[role]}`,
+          });
+        } else if (priorRole !== role) {
+          const direction = TEAM_ROLE_RANK[role] > TEAM_ROLE_RANK[priorRole] ? 'upgraded' : 'reduced';
+          addNotification({
+            id: makeId('notif-team-role'),
+            userId,
+            type: 'role_updated',
+            shipmentRef: jobRef,
+            message: `Your role on ${jobRef} was ${direction} to ${TEAM_ROLE_LABEL[role]}`,
+          });
+        }
+      });
+
+      s.team = newTeam.map((t) => ({ userId: t.userId, role: t.role }));
+      s.ownerId = (s.team.find((t) => t.role === 'owner') || {}).userId || s.ownerId;
+      s.supportingOwnerIds = s.team.filter((t) => t.role === 'supporting').map((t) => t.userId);
+      commit('team-update');
+      return { ok: true, shipment: { ...s } };
     });
   }
 
@@ -504,6 +598,85 @@
     return [...flags, ...comments].sort((a, b) => new Date(b.at) - new Date(a.at));
   }
 
+  // ------------------------------------------------------------------
+  // Notifications — Field Channel alerts sourced from actions taken on
+  // the Admin Portal: a comment on one of my milestones, being added to
+  // or removed from a shipment team, my role on a team changing, or one
+  // of my milestones breaching its SLA. Never sent to whoever caused the
+  // event, and never sent about a milestone that isn't mine.
+  // ------------------------------------------------------------------
+  function addNotification(fields) {
+    // Idempotent by id: the SLA breach check below can run more than once
+    // for the same underlying breach (every open tab polls independently),
+    // so re-inserting an id that already exists is a no-op, not a dupe.
+    if (state.notifications[fields.id]) return false;
+    state.notifications[fields.id] = {
+      id: fields.id,
+      userId: fields.userId,
+      type: fields.type,
+      shipmentRef: fields.shipmentRef || null,
+      milestoneId: fields.milestoneId || null,
+      message: fields.message,
+      createdAt: new Date().toISOString(),
+      read: false,
+    };
+    return true;
+  }
+
+  function _getNotifications(userId, opts) {
+    const page = (opts && opts.page) || 1;
+    const pageSize = (opts && opts.pageSize) || 10;
+    const all = Object.values(state.notifications)
+      .filter((n) => n.userId === userId)
+      .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+    const start = (page - 1) * pageSize;
+    const items = all.slice(start, start + pageSize).map((n) => ({ ...n }));
+    return { items, page, pageSize, total: all.length, hasMore: start + items.length < all.length };
+  }
+  function _getUnreadNotificationCount(userId) {
+    return Object.values(state.notifications).filter((n) => n.userId === userId && !n.read).length;
+  }
+  // GET /notifications?assigned_to=me&page=
+  function getNotifications(userId, opts) { return respond(() => _getNotifications(userId, opts)); }
+  function getUnreadNotificationCount(userId) { return respond(() => _getUnreadNotificationCount(userId)); }
+
+  // POST /notifications/{id}/read
+  function markNotificationRead(id, userId) {
+    return respond(() => {
+      const n = state.notifications[id];
+      if (!n || n.userId !== userId) return { ok: false, code: 'NOT_FOUND' };
+      if (!n.read) { n.read = true; commit('notification-read'); }
+      return { ok: true };
+    });
+  }
+
+  // Simulated backend job: a real deployment detects SLA breaches
+  // server-side on a schedule, so here whichever client tab(s) happen to
+  // be open run the same check periodically instead. The notification id
+  // is derived from the milestone id, not random, so the check is
+  // idempotent — running it again, in this tab or another, never creates
+  // a second notification for the same breach.
+  function checkSlaBreaches() {
+    const now = Date.now();
+    let changed = false;
+    Object.values(state.milestones).forEach((m) => {
+      if (m.status !== 'NOT_STARTED' || !m.assignedTo) return;
+      if (new Date(m.dueDate).getTime() >= now) return;
+      const created = addNotification({
+        id: 'breach-' + m.id,
+        userId: m.assignedTo,
+        type: 'sla_breached',
+        shipmentRef: m.shipmentRef,
+        milestoneId: m.id,
+        message: `"${m.name}" (${m.shipmentRef}) is overdue`,
+      });
+      if (created) changed = true;
+    });
+    if (changed) commit('sla-breach');
+  }
+  checkSlaBreaches();
+  global.setInterval(checkSlaBreaches, 60000);
+
   function resetDemoData() {
     state = buildInitialState();
     commit('reset');
@@ -514,14 +687,19 @@
     getShipments, getShipment, getMilestonesForShipment,
     getMyMilestones, getMilestone,
     reassignMilestone, completeMilestone, flagMilestone, addComment, getActivity,
+    updateShipmentTeam,
+    getNotifications, getUnreadNotificationCount, markNotificationRead,
     subscribe, resetDemoData, getSyncLink,
     ADMIN_USER_ID: ADMIN_USER.id,
+    TEAM_ROLE_LABEL,
     sync: {
       getShipments: _getShipments,
       getShipment: _getShipment,
       getMilestonesForShipment: _getMilestonesForShipment,
       getMyMilestones: _getMyMilestones,
       getMilestone: _getMilestone,
+      getNotifications: _getNotifications,
+      getUnreadNotificationCount: _getUnreadNotificationCount,
     },
   };
 })(window);

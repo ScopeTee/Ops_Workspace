@@ -82,6 +82,7 @@ input,textarea{font-family:var(--font-body)}
 .notif-btn{ position:relative; background:none; border:none; color:var(--cream); padding:6px; display:flex; border-radius:var(--radius-sm); }
 .notif-btn:active{ background:rgba(255,255,255,.12); }
 .notif-badge{ position:absolute; top:2px; right:2px; min-width:15px; height:15px; padding:0 3px; border-radius:999px; background:var(--gold); color:var(--green-dark); font-size:9.5px; font-weight:700; line-height:15px; text-align:center; border:1.5px solid var(--green-dark); }
+.notif-badge.hidden{ display:none; }
 @keyframes spin{ to{ transform:rotate(360deg); } }
 
 /* ---- Screens ---- */
@@ -143,6 +144,22 @@ input,textarea{font-family:var(--font-body)}
 .comment-item .comment-text{ font-size:13.5px; color:var(--silver-dark); line-height:1.5; }
 .comment-item .comment-text.empty{ color:var(--silver-light); font-style:italic; }
 .empty-note{ font-size:13px; color:var(--silver-light); margin:8px 2px 0; }
+
+/* ---- Notifications ---- */
+.notif-item{
+  background:var(--white); border:1px solid var(--border-tint); border-radius:var(--radius-lg);
+  padding:12px 14px; display:flex; gap:10px; align-items:flex-start; text-align:left; width:100%; cursor:pointer;
+}
+.notif-item:active{ background:var(--green-light-surface); }
+.notif-item.unread{ border-color:var(--green-accent); background:var(--green-light-surface); }
+.notif-item .notif-icon{ width:34px; height:34px; border-radius:50%; background:var(--green-light-surface); color:var(--green-dark); display:grid; place-items:center; flex-shrink:0; }
+.notif-item.unread .notif-icon{ background:var(--green-dark); color:var(--green-accent); }
+.notif-item .notif-body{ flex:1; min-width:0; }
+.notif-item .notif-msg{ font-size:13.5px; color:var(--silver-dark); line-height:1.4; }
+.notif-item.unread .notif-msg{ font-weight:600; color:var(--green-dark); }
+.notif-item .notif-time{ font-size:11.5px; color:var(--silver-light); margin-top:3px; }
+.notif-item .notif-dot{ width:8px; height:8px; border-radius:50%; background:var(--gold); flex-shrink:0; margin-top:5px; }
+.load-more-btn{ margin-top:2px; }
 
 /* ---- Bottom action bar (per-screen primary action) ---- */
 .bottom-bar{ position:sticky; bottom:0; z-index:15; background:var(--cream); border-top:1px solid var(--border-tint); padding:14px 18px; flex-shrink:0; }
@@ -245,7 +262,7 @@ select.field-input{ background-image:url('data:image/svg+xml;utf8,<svg xmlns="ht
           </button>
           <button class="notif-btn" id="btn-notifications" title="Notifications">
             <svg width="19" height="19" fill="none" stroke="currentColor" stroke-width="2.1" viewBox="0 0 24 24"><path d="M18 8a6 6 0 00-12 0c0 7-3 9-3 9h18s-3-2-3-9" stroke-linecap="round" stroke-linejoin="round"></path><path d="M13.73 21a2 2 0 01-3.46 0" stroke-linecap="round" stroke-linejoin="round"></path></svg>
-            <span class="notif-badge" id="notif-badge">3</span>
+            <span class="notif-badge hidden" id="notif-badge">0</span>
           </button>
           <button class="user-chip me-account"><span class="avatar me-avatar"></span><span class="me-name"></span></button>
         </div>
@@ -298,6 +315,15 @@ select.field-input{ background-image:url('data:image/svg+xml;utf8,<svg xmlns="ht
     <div id="detail-banner"></div>
     <div class="detail-body" id="detail-body"></div>
     <div class="bottom-bar" id="detail-action-bar"></div>
+  </div>
+
+  <!-- ============== NOTIFICATIONS (drill-down) ============== -->
+  <div class="screen" id="screen-notifications">
+    <div class="topbar topbar-simple">
+      <button class="back-btn" id="btn-back-notifications"><svg width="21" height="21" fill="none" stroke="currentColor" stroke-width="2.3" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6" stroke-linecap="round" stroke-linejoin="round"></path></svg></button>
+      <h1>Notifications</h1>
+    </div>
+    <div class="list" id="notif-list"></div>
   </div>
 
   <!-- ============== BOTTOM TAB NAV ============== -->
@@ -376,12 +402,19 @@ const ICON_CLOSE = '<svg width="19" height="19" fill="none" stroke="currentColor
 const ICON_FLAG = '<svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M5 21V4a1 1 0 011-1h11.4a1 1 0 01.8 1.6l-3 4 3 4a1 1 0 01-.8 1.6H6" stroke-linecap="round" stroke-linejoin="round"></path></svg>';
 const ICON_CHEVRON = '<svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"></path></svg>';
 const ICON_COMMENT = '<svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z" stroke-linecap="round" stroke-linejoin="round"></path></svg>';
+const ICON_TEAM = '<svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.1" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H7a4 4 0 00-4 4v2" stroke-linecap="round" stroke-linejoin="round"></path><circle cx="10" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75" stroke-linecap="round" stroke-linejoin="round"></path></svg>';
 const SLA_ICON = { healthy: ICON_CLOCK, 'at-risk': ICON_WARN, breached: ICON_WARN };
+const NOTIF_ICON = { comment: ICON_COMMENT, sla_breached: ICON_WARN, team_added: ICON_TEAM, team_removed: ICON_TEAM, role_updated: ICON_TEAM };
+const NOTIF_PAGE_SIZE = 10;
 
 const state = {
   me: null,
   todos: [],
   searchQuery: '',
+  notifItems: [],
+  notifPage: 1,
+  notifHasMore: false,
+  notifLoading: false,
   currentMilestoneId: null,
   confirmTarget: null, // { id, source: 'todos' | 'detail' } — completion sheet
   flagTarget: null, // { id, source: 'detail' } — flag sheet
@@ -454,6 +487,19 @@ function slaMeta(dueDateIso){
   if(diffDays <= 2) return { tier:'at-risk', label:`Due ${when}` };
   return { tier:'healthy', label:`Due ${when}` };
 }
+// Short, relative — keeps notification rows scannable at a glance.
+function timeAgo(iso){
+  const diffMs = Date.now() - new Date(iso).getTime();
+  const mins = Math.floor(diffMs / 60000);
+  if(mins < 1) return 'Just now';
+  if(mins < 60) return `${mins}m ago`;
+  const hours = Math.floor(mins / 60);
+  if(hours < 24) return `${hours}h ago`;
+  const days = Math.floor(hours / 24);
+  if(days === 1) return 'Yesterday';
+  if(days < 7) return `${days}d ago`;
+  return new Date(iso).toLocaleDateString('en-GB',{day:'2-digit',month:'short'});
+}
 
 /* ==========================================================================
    Auth (simulated) — stands in for the org's real login. A real build
@@ -481,6 +527,7 @@ function signIn(userId){
   state.me = MilestoneStore.getUserById(userId);
   localStorage.setItem(ME_KEY, userId);
   renderIdentity();
+  refreshNotifBadge();
   goToTodos();
 }
 document.querySelectorAll('.me-account').forEach(btn=>btn.addEventListener('click', ()=>{
@@ -906,14 +953,101 @@ el('comment-submit').addEventListener('click', ()=>{
 });
 
 /* ==========================================================================
+   Notifications — alerts sourced from actions taken on the Admin Portal:
+   a comment on one of my milestones, being added to or removed from a
+   shipment team, my team role changing, or one of my milestones breaching
+   its SLA. A comment notification opens that milestone (the closest thing
+   to "the shipment" this app has) and marks itself read on the way in;
+   every other kind is purely informative, so a tap just marks it read.
+   ========================================================================== */
+function refreshNotifBadge(){
+  if(!state.me) return;
+  const count = MilestoneStore.sync.getUnreadNotificationCount(state.me.id);
+  const badge = el('notif-badge');
+  badge.textContent = count > 99 ? '99+' : String(count);
+  badge.classList.toggle('hidden', count === 0);
+}
+function openNotifications(){
+  state.notifItems = [];
+  state.notifPage = 1;
+  state.notifHasMore = false;
+  showScreen('screen-notifications');
+  el('notif-list').innerHTML = `<div class="empty-state"><p>Loading…</p></div>`;
+  loadNotifications();
+}
+el('btn-notifications').addEventListener('click', openNotifications);
+el('btn-back-notifications').addEventListener('click', goToTodos);
+
+function loadNotifications(){
+  if(state.notifLoading) return;
+  state.notifLoading = true;
+  MilestoneStore.getNotifications(state.me.id, { page: state.notifPage, pageSize: NOTIF_PAGE_SIZE }).then(result=>{
+    state.notifLoading = false;
+    state.notifItems = state.notifPage === 1 ? result.items : [...state.notifItems, ...result.items];
+    state.notifHasMore = result.hasMore;
+    renderNotificationsList();
+  }).catch(err=>{
+    state.notifLoading = false;
+    console.error('getNotifications failed:', err);
+    el('notif-list').innerHTML = bannerHtml('error', 'Unable to load notifications. Please check your connection and try again.');
+  });
+}
+function renderNotificationsList(){
+  if(!state.notifItems.length){
+    el('notif-list').innerHTML = `
+      <div class="empty-state">
+        <div class="icon">${ICON_TEAM}</div>
+        <h3>No notifications yet</h3>
+        <p>You'll see updates here about your milestones and shipment team changes.</p>
+      </div>`;
+    return;
+  }
+  const rows = state.notifItems.map(n => `
+    <div class="notif-item ${n.read ? '' : 'unread'}" data-notif-id="${n.id}" data-notif-type="${n.type}" data-milestone-id="${n.milestoneId || ''}">
+      <div class="notif-icon">${NOTIF_ICON[n.type] || ICON_TEAM}</div>
+      <div class="notif-body">
+        <div class="notif-msg">${escapeHtml(n.message)}</div>
+        <div class="notif-time">${timeAgo(n.createdAt)}</div>
+      </div>
+      ${n.read ? '' : '<div class="notif-dot"></div>'}
+    </div>`).join('');
+  const loadMore = state.notifHasMore
+    ? `<button class="btn btn-outline load-more-btn" id="btn-notif-load-more">Load more</button>`
+    : '';
+  el('notif-list').innerHTML = rows + loadMore;
+  const loadMoreBtn = el('btn-notif-load-more');
+  if(loadMoreBtn) loadMoreBtn.addEventListener('click', ()=>{ state.notifPage += 1; loadNotifications(); });
+}
+el('notif-list').addEventListener('click', (e)=>{
+  const item = e.target.closest('[data-notif-id]');
+  if(!item) return;
+  const id = item.dataset.notifId;
+  const type = item.dataset.notifType;
+  const milestoneId = item.dataset.milestoneId;
+  MilestoneStore.markNotificationRead(id, state.me.id).then(()=>{
+    refreshNotifBadge();
+    if(type === 'comment' && milestoneId){
+      openMilestoneDetail(milestoneId);
+    } else {
+      const local = state.notifItems.find(n=>n.id===id);
+      if(local) local.read = true;
+      renderNotificationsList();
+    }
+  }).catch(err=>console.error('markNotificationRead failed:', err));
+});
+
+/* ==========================================================================
    Cross-channel revalidation — if the Admin Portal (or another tab)
    reassigns or completes a milestone, this app must reflect it rather
    than trusting whatever it last rendered.
    ========================================================================== */
 MilestoneStore.subscribe(()=>{
-  if(!state.me || state.completing) return;
+  if(!state.me) return;
+  refreshNotifBadge();
+  if(state.completing) return;
   if(el('screen-todos').classList.contains('active')) loadTodos();
   if(el('screen-detail').classList.contains('active')) loadMilestoneDetail();
+  if(el('screen-notifications').classList.contains('active')){ state.notifPage = 1; loadNotifications(); }
 });
 
 /* ==========================================================================
@@ -925,6 +1059,7 @@ MilestoneStore.subscribe(()=>{
   if(saved && !saved.isAdmin){
     state.me = saved;
     renderIdentity();
+    refreshNotifBadge();
     goToTodos();
   } else {
     renderLogin();

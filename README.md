@@ -49,6 +49,10 @@ getMilestone(id)            -> GET  /milestones/{id}
 completeMilestone(id, ...)  -> POST /milestones/{id}/complete
 reassignMilestone(...)      -> existing Admin assignment APIs (spec 27.4)
 addComment(id, ...)         -> POST /milestones/{id}/comments
+updateShipmentTeam(...)     -> existing Admin team-assignment APIs
+getNotifications(userId, ...)      -> GET  /notifications?assigned_to=me
+getUnreadNotificationCount(userId) -> GET  /notifications/unread-count
+markNotificationRead(id, userId)   -> POST /notifications/{id}/read
 ```
 
 ## Running it
@@ -161,6 +165,31 @@ sequence (section 43):
   triggered is in flight, so that revalidation can't race the completion
   and show a spurious "already completed" message for a request that
   actually just succeeded.
+- **Notifications** — a bell in the To-Dos topbar, badged with the unread
+  count, opens a dedicated Notifications screen. Every notification here
+  is sourced from something that happened on the Admin Portal, never from
+  the Field Channel's own actions, and only ever about *this* user's own
+  milestones or team membership — nobody is notified about someone else's
+  work, and a milestone with no assignee notifies no one:
+  - Someone other than you comments on a milestone assigned to you (never
+    fired for your own comment on your own milestone).
+  - You're added to or removed from a shipment's team.
+  - Your role on a shipment's team changes (upgraded to Owner, or reduced
+    to Supporting).
+  - One of your milestones breaches its SLA — detected by a lightweight
+    periodic check (`checkSlaBreaches`, every 60s) that simulates a
+    server-side job; it's idempotent per milestone, so it can safely run
+    in more than one open tab without double-notifying anyone.
+  Each message is intentionally short — one line, no body text. Tapping a
+  comment notification opens that milestone's Detail screen (the closest
+  thing to "the shipment" the Field Channel has) and marks it read on the
+  way in; every other kind is purely informational, so a tap just marks it
+  read in place. The badge and the open notifications list both update
+  live via the same `MilestoneStore.subscribe` mechanism everything else
+  in this app already uses — no polling, no manual refresh. The list loads
+  10 at a time with a "Load more" button rather than infinite scroll: on a
+  small screen, an explicit tap is easier to reason about (and to recover
+  from) than content that shifts under your thumb as you scroll.
 
 ## Admin Portal — what changed
 
@@ -175,6 +204,11 @@ sequence (section 43):
   modal — the same merged Flag+Comment feed as the Field Channel's Detail
   screen, plus a box to post a new comment as the Admin user, via
   `MilestoneStore.addComment`.
+- The Assign Owner modal now reads and writes a shipment's team through
+  `MilestoneStore` (`updateShipmentTeam`) instead of a local-only object,
+  since the Field Channel's notifications depend on that roster being the
+  same shared record both apps see — not two independently-maintained
+  copies of "who's on this shipment."
 - Everything else (containers, documents, physical tracking, shipment
   CRUD) is unchanged local-mock behavior — those are out of MVP scope for
   the Field Channel and were left alone.

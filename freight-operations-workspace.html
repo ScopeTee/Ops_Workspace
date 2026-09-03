@@ -938,6 +938,15 @@ const TEAM = [
   {id:'u6', name:'Ada Nwosu', role:'Finance', initials:'AN', fill:'light'},
 ];
 function teamMember(id){ return TEAM.find(t=>t.id===id); }
+// Converts MilestoneStore's flat team roster ([{userId,role}]) into the
+// {primary, supporting} shape this file's rendering already expects.
+function teamToOwners(team){
+  const list = team || [];
+  const ownerEntry = list.find(t=>t.role==='owner') || list[0] || null;
+  const primary = teamMember(ownerEntry ? ownerEntry.userId : null);
+  const supporting = list.filter(t=>t!==ownerEntry).map(t=>teamMember(t.userId));
+  return { primary, supporting };
+}
 function escapeHtml(str){
   return String(str).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 }
@@ -1057,8 +1066,8 @@ function makeId(prefix){ return prefix + '-' + Math.random().toString(36).slice(
 
 // Build a fleshed-out shipment detail object from a light list record + a seed for variety
 function buildShipmentDetail(base, seed){
-  const primary = teamMember(base.ownerId);
-  const supporting = (base.supportingOwnerIds||[]).map(teamMember);
+  // Only used below to seed document-author variety, not the shipment's
+  // actual team roster (owners: reads that from MilestoneStore instead).
   const shipTeamIds = [base.ownerId, ...(base.supportingOwnerIds||[])];
 
   const containerCount = 2 + (seed % 3);
@@ -1113,7 +1122,12 @@ function buildShipmentDetail(base, seed){
 
   return {
     ...base,
-    owners: { primary, supporting },
+    // The team roster (who's on it, primary vs supporting) is read from
+    // MilestoneStore, not derived from this local seed record — it's the
+    // one thing about a shipment the Field Channel also needs to know
+    // about (to notify a user added/removed/re-roled), so it has to live
+    // in the shared store rather than this file's own local mock data.
+    owners: teamToOwners(MilestoneStore.sync.getShipment(base.jobRef).team),
     containers,
     milestones,
     physicalTracking,
@@ -1463,6 +1477,14 @@ function openAssignOwnerModal(){
   renderOwnerSelectList();
   openModal('modal-assign-owner');
 }
+// {primary, supporting} (this file's local render shape) -> the flat
+// [{userId, role}] roster MilestoneStore.updateShipmentTeam expects.
+function ownerModalStateToTeam(){
+  return [...ownerModalState.checked].map(userId => ({
+    userId,
+    role: userId === ownerModalState.primary ? 'owner' : 'supporting',
+  }));
+}
 function renderOwnerSelectList(){
   el('owner-select-list').innerHTML = TEAM.map(t=>{
     const isChecked = ownerModalState.checked.has(t.id);
@@ -1478,11 +1500,16 @@ function renderOwnerSelectList(){
 }
 el('save-assign-owner').addEventListener('click', ()=>{
   const s = currentShipment();
-  const supporting = [...ownerModalState.checked].filter(id=>id!==ownerModalState.primary).map(teamMember);
-  s.owners = { primary: teamMember(ownerModalState.primary), supporting };
-  renderShipHeader(); renderShipDetailFields(); renderShipmentsList();
-  closeModal('modal-assign-owner');
-  showToast('Shipment ownership updated');
+  const btn = el('save-assign-owner');
+  btn.disabled = true;
+  MilestoneStore.updateShipmentTeam(s.jobRef, ownerModalStateToTeam(), MilestoneStore.ADMIN_USER_ID).then(res=>{
+    btn.disabled = false;
+    if(!res.ok){ showToast('Unable to update the shipment team.', 'error'); return; }
+    s.owners = teamToOwners(res.shipment.team);
+    renderShipHeader(); renderShipDetailFields(); renderShipmentsList();
+    closeModal('modal-assign-owner');
+    showToast('Shipment ownership updated');
+  });
 });
 
 /* --- Update Status --- */
@@ -1576,9 +1603,10 @@ function refreshCurrentShipmentMilestones(){
   const s = currentShipment();
   if(!s) return;
   s.milestones = toAdminMilestones(MilestoneStore.sync.getMilestonesForShipment(s.jobRef));
+  s.owners = teamToOwners(MilestoneStore.sync.getShipment(s.jobRef).team);
   // openShipment() doesn't set state.currentView, so check the DOM directly
   // for whether the shipment-detail view is actually the one on screen.
-  if(el('view-shipment-detail').classList.contains('active')){ renderServiceDelivery(); renderShipHeader(); }
+  if(el('view-shipment-detail').classList.contains('active')){ renderServiceDelivery(); renderShipHeader(); renderShipDetailFields(); }
 }
 el('save-milestone').addEventListener('click', ()=>{
   const note = el('input-milestone-comment').value.trim();
