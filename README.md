@@ -1,16 +1,42 @@
 # OnePort 365 — Service Delivery Field Channel (MVP)
 
-This repository contains two front-end prototypes that operate against **one
-shared milestone record**, per the Service Delivery Field Channel product
-spec:
+This is a monorepo containing two independently-deployed front-end apps
+that operate against **one shared milestone record**, per the Service
+Delivery Field Channel product spec:
 
-| File | Role |
+| Path | Role |
 |---|---|
-| `freight-operations-workspace.html` | **Admin Portal** — desktop, office-based shipment/service-delivery management. |
-| `index.html` | **Field Channel (new)** — mobile-first execution surface for Operations Staff. |
-| `shared/milestone-store.js` | The shared milestone record both surfaces read and write against. |
+| `apps/shipment/` | **Shipment (Admin Portal)** — desktop, office-based shipment/service-delivery management. |
+| `apps/ops-mobile/` | **Ops Mobile (Field Channel)** — mobile-first execution surface for Operations Staff. |
+| `packages/shared/milestone-store.js` | The shared milestone record both apps read and write against. |
+| `scripts/` | Build/deploy plumbing shared by both apps (see [Deploying on Vercel](#deploying-on-vercel)). |
 
 > One workflow. One milestone record. Multiple channels of interaction.
+
+## Repo layout
+
+```
+apps/
+  shipment/           # Admin Portal — its own Vercel project
+    index.html
+    package.json      # "build" copies packages/shared into dist/
+    vercel.json
+  ops-mobile/         # Field Channel — its own Vercel project
+    index.html
+    package.json
+    vercel.json
+packages/
+  shared/
+    milestone-store.js   # single source of truth, imported by both apps at build time
+scripts/
+  build-app.js        # stages an app's static files + packages/shared into apps/<app>/dist
+  vercel-ignore.sh     # per-project "Ignored Build Step" so unrelated changes don't redeploy both apps
+```
+
+Each app is a separate static site with no bundler — `npm run build` just
+assembles `dist/` (its own files plus a fresh copy of
+`packages/shared/`). Nothing but that copy step is app-specific, so the two
+apps can never drift onto different shared-store versions.
 
 ## Why a shared store, not two mock datasets
 
@@ -20,9 +46,11 @@ original Admin Portal prototype generated its milestones locally, in
 memory, with `Math.random()`-based ids on every page load — there was
 nothing for a second surface to share.
 
-`shared/milestone-store.js` replaces that with a single authoritative
-milestone record, persisted to `localStorage` and shared by both HTML
-files via a `<script src="shared/milestone-store.js">` include. The Admin
+`packages/shared/milestone-store.js` replaces that with a single
+authoritative milestone record, persisted to `localStorage` and shared by
+both apps via a `<script src="shared/milestone-store.js">` include (that
+file is staged into each app's own `dist/shared/` at build time — see
+[Deploying on Vercel](#deploying-on-vercel)). The Admin
 Portal's `buildShipmentDetail()` no longer invents milestones; it asks the
 store for them (`MilestoneStore.sync.getMilestonesForShipment(jobRef)`),
 and its Reassign / Mark Complete actions call the store's mutation
@@ -57,29 +85,70 @@ markNotificationRead(id, userId)   -> POST /notifications/{id}/read
 
 ## Running it
 
-Both files are static HTML/JS — no build step. For full-fidelity
-cross-tab sync testing (BroadcastChannel/`storage` events need a real
-origin), serve the folder rather than opening the files directly:
+Both apps are static HTML/JS — no bundler, but each needs one build pass
+so `packages/shared/milestone-store.js` gets copied alongside it (this is
+the same step Vercel runs):
 
 ```bash
+(cd apps/shipment && npm run build)
+(cd apps/ops-mobile && npm run build)
+
 python3 -m http.server 8080
-# Admin Portal:  http://localhost:8080/freight-operations-workspace.html
-# Field Channel: http://localhost:8080/index.html
+# Shipment (Admin Portal): http://localhost:8080/apps/shipment/dist/index.html
+# Ops Mobile (Field Ch.):  http://localhost:8080/apps/ops-mobile/dist/index.html
 ```
 
 Open both in the same browser to see completions and reassignments made
 in one reflect live in the other, with no reload.
 
-Opening the files directly via `file://` still works for each app
-individually (per-tab), but same-origin cross-tab sync isn't guaranteed
-by browsers for `file://` URLs.
+If you're only editing app-specific markup/JS (not the shared store), you
+can skip the build and open `apps/<app>/index.html` directly via `file://`
+as long as you also drop a copy of `packages/shared/milestone-store.js`
+next to it in a `shared/` folder — same-origin cross-tab sync isn't
+guaranteed by browsers for `file://` URLs either way.
 
 ### Simulating a network failure
 
-Append `?simulateOffline=1` to `index.html`'s URL to make every
+Append `?simulateOffline=1` to the Ops Mobile URL to make every
 store call reject, so you can see the "Unable to update this milestone.
 Please check your connection and try again." error path (spec section
 30–31) without needing real network conditions.
+
+## Deploying on Vercel
+
+Shipment and Ops Mobile deploy as **two separate Vercel projects** against
+this one repo, so each can build, roll back, and get a domain
+independently — a bug or bad deploy in one never takes the other down.
+
+1. **Create two Vercel projects** pointing at this repository:
+   - Project `shipment` → **Root Directory**: `apps/shipment`
+   - Project `ops-mobile` → **Root Directory**: `apps/ops-mobile`
+2. In each project's Settings → Build & Development Settings, turn on
+   **"Include files outside the root directory in the Build Step"** —
+   both apps need to read `packages/shared/` and `scripts/` at build time.
+3. Framework Preset: **Other**. Build Command and Output Directory are
+   already declared in each app's `vercel.json` (`npm run build`, output
+   `dist`) — Vercel picks them up automatically.
+4. Set each project's **Ignored Build Step** (Settings → Git) to run the
+   command from its own `vercel.json` — this is already there by default
+   since `vercel.json` sets `ignoreCommand`, but if you ever override it in
+   the dashboard, use:
+   - `shipment`: `bash ../../scripts/vercel-ignore.sh apps/shipment packages/shared scripts`
+   - `ops-mobile`: `bash ../../scripts/vercel-ignore.sh apps/ops-mobile packages/shared scripts`
+
+   This means a commit that only touches `apps/ops-mobile/` skips a
+   `shipment` deploy entirely (and vice versa); a commit touching
+   `packages/shared/` correctly redeploys **both**, since that's the file
+   they both depend on. This is what eliminates the "one app's change
+   breaks/redeploys the other" class of deployment issue.
+5. Push to the branch each project is configured to track (or open a PR)
+   — Vercel builds Preview Deployments per-project per-commit, and
+   Production Deployments on merge to the production branch, same as any
+   single-app Vercel project.
+
+No monorepo build tool (Turborepo, Nx, etc.) is needed here — the two apps
+have no build interdependency beyond the plain-file copy in
+`scripts/build-app.js`, so plain `npm run build` per project is enough.
 
 ## Field Channel — what's implemented
 

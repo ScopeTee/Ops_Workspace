@@ -1,0 +1,7 @@
+{
+  "name": "ops-mobile",
+  "private": true,
+  "scripts": {
+    "build": "node ../../scripts/build-app.js"
+  }
+}

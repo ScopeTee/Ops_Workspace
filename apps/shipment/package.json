@@ -1,0 +1,7 @@
+{
+  "name": "shipment",
+  "private": true,
+  "scripts": {
+    "build": "node ../../scripts/build-app.js"
+  }
+}
